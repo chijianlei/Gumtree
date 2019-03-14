@@ -4,12 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.gumtreediff.actions.ActionGenerator;
-import com.github.gumtreediff.actions.model.Action;
-import com.github.gumtreediff.matchers.Matcher;
-import com.github.gumtreediff.matchers.Matchers;
-import com.github.gumtreediff.tree.TreeContext;
 import com.google.common.io.Files;
+
+import gumtreediff.actions.ActionGenerator;
+import gumtreediff.actions.model.Action;
+import gumtreediff.matchers.Matcher;
+import gumtreediff.matchers.Matchers;
+import gumtreediff.tree.TreeContext;
 
 public class Statistic {
 	

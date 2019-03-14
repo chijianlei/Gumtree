@@ -6,8 +6,8 @@ import java.util.LinkedList;
 
 import org.checkerframework.checker.units.qual.s;
 
-import com.github.gumtreediff.actions.model.Action;
-import com.github.gumtreediff.tree.*;
+import gumtreediff.actions.model.Action;
+import gumtreediff.tree.*;
 
 public class Transform {
 	

@@ -8,21 +8,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import com.github.gumtreediff.actions.ActionGenerator;
-import com.github.gumtreediff.actions.model.Action;
-import com.github.gumtreediff.actions.model.Delete;
-import com.github.gumtreediff.actions.model.Insert;
-import com.github.gumtreediff.actions.model.Move;
-import com.github.gumtreediff.actions.model.Update;
-import com.github.gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
-import com.github.gumtreediff.matchers.Mapping;
-import com.github.gumtreediff.matchers.MappingStore;
-import com.github.gumtreediff.matchers.Matcher;
-import com.github.gumtreediff.matchers.Matchers;
-import com.github.gumtreediff.tree.ITree;
-import com.github.gumtreediff.tree.TreeContext;
-import com.github.gumtreediff.tree.TreeUtils;
-
+import gumtreediff.actions.ActionGenerator;
+import gumtreediff.actions.model.Action;
+import gumtreediff.actions.model.Delete;
+import gumtreediff.actions.model.Insert;
+import gumtreediff.actions.model.Move;
+import gumtreediff.actions.model.Update;
+import gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
+import gumtreediff.matchers.Mapping;
+import gumtreediff.matchers.MappingStore;
+import gumtreediff.matchers.Matcher;
+import gumtreediff.matchers.Matchers;
+import gumtreediff.tree.ITree;
+import gumtreediff.tree.TreeContext;
+import gumtreediff.tree.TreeUtils;
 import similarity.DTree;
 import similarity.Split;
 

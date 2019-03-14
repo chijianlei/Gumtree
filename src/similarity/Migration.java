@@ -1,6 +1,6 @@
 package similarity;
 
-import com.github.gumtreediff.tree.TreeContext;
+import gumtreediff.tree.TreeContext;
 
 public class Migration {
 	

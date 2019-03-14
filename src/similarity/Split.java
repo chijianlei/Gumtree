@@ -9,17 +9,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.github.gumtreediff.actions.model.Action;
-import com.github.gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
-import com.github.gumtreediff.matchers.Mapping;
-import com.github.gumtreediff.matchers.MappingStore;
-import com.github.gumtreediff.matchers.Matcher;
-import com.github.gumtreediff.matchers.Matchers;
-import com.github.gumtreediff.tree.ITree;
-import com.github.gumtreediff.tree.TreeContext;
-import com.github.gumtreediff.tree.TreeUtils;
 import com.sun.tools.javah.Util;
 
+import gumtreediff.actions.model.Action;
+import gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
+import gumtreediff.matchers.Mapping;
+import gumtreediff.matchers.MappingStore;
+import gumtreediff.matchers.Matcher;
+import gumtreediff.matchers.Matchers;
+import gumtreediff.tree.ITree;
+import gumtreediff.tree.TreeContext;
+import gumtreediff.tree.TreeUtils;
 import nodecluster.Cluster;
 import nodecluster.SubTree;
 import nodecluster.Transform;

@@ -2,8 +2,8 @@ package similarity;
 
 import java.util.List;
 
-import com.github.gumtreediff.tree.ITree;
-import com.github.gumtreediff.tree.TreeContext;
+import gumtreediff.tree.ITree;
+import gumtreediff.tree.TreeContext;
 
 public class DTree {
 	

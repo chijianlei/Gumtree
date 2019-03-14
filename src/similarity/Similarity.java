@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.github.gumtreediff.matchers.MappingStore;
-import com.github.gumtreediff.tree.ITree;
-import com.github.gumtreediff.tree.TreeContext;
 import com.github.javaparser.ast.nodeTypes.modifiers.NodeWithAbstractModifier;
 
-import at.unisalzburg.dbresearch.apted.costmodel.StringUnitCostModel;
-import at.unisalzburg.dbresearch.apted.distance.APTED;
-import at.unisalzburg.dbresearch.apted.node.Node;
-import at.unisalzburg.dbresearch.apted.node.StringNodeData;
-import at.unisalzburg.dbresearch.apted.parser.BracketStringInputParser;
+import apted.costmodel.StringUnitCostModel;
+import apted.distance.APTED;
+import apted.node.Node;
+import apted.node.StringNodeData;
+import apted.parser.BracketStringInputParser;
+import gumtreediff.matchers.MappingStore;
+import gumtreediff.tree.ITree;
+import gumtreediff.tree.TreeContext;
 import nodecluster.SubTree;
 import nodecluster.Utils;
 

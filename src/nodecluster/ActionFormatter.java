@@ -6,14 +6,14 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import com.github.gumtreediff.actions.model.Action;
-import com.github.gumtreediff.actions.model.Delete;
-import com.github.gumtreediff.actions.model.Insert;
-import com.github.gumtreediff.actions.model.Move;
-import com.github.gumtreediff.actions.model.Update;
-import com.github.gumtreediff.io.IndentingXMLStreamWriter;
-import com.github.gumtreediff.tree.ITree;
-import com.github.gumtreediff.tree.TreeContext;
+import gumtreediff.actions.model.Action;
+import gumtreediff.actions.model.Delete;
+import gumtreediff.actions.model.Insert;
+import gumtreediff.actions.model.Move;
+import gumtreediff.actions.model.Update;
+import gumtreediff.io.IndentingXMLStreamWriter;
+import gumtreediff.tree.ITree;
+import gumtreediff.tree.TreeContext;
 
 public interface ActionFormatter  {
 	

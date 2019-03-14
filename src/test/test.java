@@ -5,11 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.github.gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
-import com.github.gumtreediff.tree.ITree;
-import com.github.gumtreediff.tree.TreeContext;
-import com.github.gumtreediff.tree.TreeUtils;
-
+import gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
+import gumtreediff.tree.ITree;
+import gumtreediff.tree.TreeContext;
+import gumtreediff.tree.TreeUtils;
 import nodecluster.SubTree;
 import similarity.Similarity;
 import similarity.Split;

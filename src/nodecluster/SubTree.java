@@ -1,7 +1,7 @@
 package nodecluster;
 
-import com.github.gumtreediff.tree.ITree;
-import com.github.gumtreediff.tree.TreeContext;
+import gumtreediff.tree.ITree;
+import gumtreediff.tree.TreeContext;
 
 public class SubTree {
 	
