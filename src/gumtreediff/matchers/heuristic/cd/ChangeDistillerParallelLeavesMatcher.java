@@ -17,7 +17,7 @@
  * Copyright 2015-2016 Georg Dotzler <georg.dotzler@fau.de>
  * Copyright 2015-2016 Marius Kamp <marius.kamp@fau.de>
  */
-package github.gumtreediff.matchers.heuristic.cd;
+package gumtreediff.matchers.heuristic.cd;
 
 import gumtreediff.matchers.Mapping;
 import gumtreediff.matchers.MappingStore;

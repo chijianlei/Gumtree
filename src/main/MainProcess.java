@@ -16,6 +16,7 @@ public class MainProcess {
 		
 		String inputPath = "input.cpp";
 		sp.suggestion(inputPath);
+		System.out.println();
 	}
 
 }

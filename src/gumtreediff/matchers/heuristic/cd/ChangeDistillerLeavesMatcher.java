@@ -18,7 +18,7 @@
  * Copyright 2011-2015 Floréal Morandat <florealm@gmail.com>
  */
 
-package github.gumtreediff.matchers.heuristic.cd;
+package gumtreediff.matchers.heuristic.cd;
 
 import gumtreediff.matchers.Mapping;
 import gumtreediff.matchers.MappingStore;

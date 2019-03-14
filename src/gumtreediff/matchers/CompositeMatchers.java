@@ -20,10 +20,10 @@
 
 package gumtreediff.matchers;
 
-import github.gumtreediff.matchers.heuristic.cd.ChangeDistillerBottomUpMatcher;
-import github.gumtreediff.matchers.heuristic.cd.ChangeDistillerLeavesMatcher;
 import gumtreediff.gen.Registry;
 import gumtreediff.matchers.heuristic.XyBottomUpMatcher;
+import gumtreediff.matchers.heuristic.cd.ChangeDistillerBottomUpMatcher;
+import gumtreediff.matchers.heuristic.cd.ChangeDistillerLeavesMatcher;
 import gumtreediff.matchers.heuristic.gt.CliqueSubtreeMatcher;
 import gumtreediff.matchers.heuristic.gt.CompleteBottomUpMatcher;
 import gumtreediff.matchers.heuristic.gt.GreedyBottomUpMatcher;

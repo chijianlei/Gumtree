@@ -19,12 +19,12 @@
  */
 package gumtreediff.matchers;
 
-import github.gumtreediff.matchers.heuristic.cd.ChangeDistillerBottomUpMatcher;
-import github.gumtreediff.matchers.heuristic.cd.ChangeDistillerLeavesMatcher;
-import github.gumtreediff.matchers.heuristic.cd.ChangeDistillerParallelLeavesMatcher;
 import gumtreediff.matchers.CompositeMatcher;
 import gumtreediff.matchers.MappingStore;
 import gumtreediff.matchers.Matcher;
+import gumtreediff.matchers.heuristic.cd.ChangeDistillerBottomUpMatcher;
+import gumtreediff.matchers.heuristic.cd.ChangeDistillerLeavesMatcher;
+import gumtreediff.matchers.heuristic.cd.ChangeDistillerParallelLeavesMatcher;
 import gumtreediff.matchers.heuristic.gt.GreedyBottomUpMatcher;
 import gumtreediff.matchers.heuristic.gt.GreedySubtreeMatcher;
 import gumtreediff.matchers.optimal.rted.RtedMatcher;
