@@ -1,4 +1,4 @@
-package similarity;
+package split;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import gumtreediff.actions.model.Action;
 import gumtreediff.matchers.Matcher;
 import gumtreediff.matchers.Matchers;
 import gumtreediff.tree.TreeContext;
+import structure.Migration;
 
 public class Statistic {
 	

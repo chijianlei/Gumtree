@@ -1,4 +1,4 @@
-package similarity;
+package utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,8 +14,8 @@ import apted.parser.BracketStringInputParser;
 import gumtreediff.matchers.MappingStore;
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
-import nodecluster.SubTree;
-import nodecluster.Utils;
+import structure.DTree;
+import structure.SubTree;
 
 public class Similarity {
 	private static TreeContext tCont;
@@ -37,10 +37,6 @@ public class Similarity {
 		double similarity = 1.0-(float)editDistance/(float)(nodeNum1+nodeNum2+edgeNum1+edgeNum2);
 //		System.out.println(similarity);
 		return similarity;				
-	}
-	
-	public static void getDTSim(MappingStore map, DTree dt1, DTree dt2) {
-		
 	}
 	
 	public static float getEditDistance(SubTree st1, SubTree st2) throws Exception {

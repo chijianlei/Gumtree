@@ -9,11 +9,11 @@ import gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
 import gumtreediff.tree.TreeUtils;
-import nodecluster.SubTree;
-import similarity.Similarity;
-import similarity.Split;
+import split.Split;
+import structure.SubTree;
+import utils.Similarity;
 
-public class test {
+public class Test {
 	
 	public static void main (String args[]) throws Exception{
 		String path = "talker.cpp";

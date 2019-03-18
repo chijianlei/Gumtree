@@ -1,4 +1,4 @@
-package similarity;
+package split;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,9 +21,12 @@ import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
 import gumtreediff.tree.TreeUtils;
 import nodecluster.Cluster;
-import nodecluster.SubTree;
-import nodecluster.Transform;
-import nodecluster.Utils;
+import structure.DTree;
+import structure.Migration;
+import structure.SubTree;
+import structure.Transform;
+import utils.Similarity;
+import utils.Utils;
 
 public class Split {
 	private ArrayList<Transform> trans = new ArrayList<>();
@@ -31,13 +34,14 @@ public class Split {
 	
 	public static void main (String args[]) throws Exception{
 		Split sp = new Split();
-		String path = "migrations";
+		String path = "migrations_test";
 		ArrayList<Migration> migrats = new ArrayList<>();
 		migrats = sp.readMigration(path, "talker");
 		sp.storeTrans(migrats);
+		sp.splitSnippets();
 		
-		String inputPath = "talker.cpp";
-		sp.suggestion(inputPath);
+//		String inputPath = "talker.cpp";
+//		sp.suggestion(inputPath);
 	}
 	
 	public void suggestion(String input) throws Exception {//每个statement给5个suggestion		
@@ -115,22 +119,21 @@ public class Split {
 		wr.close();
 	}
 	
-	public void splitSnippets() throws Exception {//finer-grained split statement into type snippets
-		
-		for(Transform tf : trans) {
+	public void splitSnippets() throws Exception {//finer-grained split statement into type snippets		
+		for(Transform tf : trans) {			
 			SubTree srcST = tf.getSTree();
 			SubTree dstST = tf.getDTree();
-			HashMap<Integer, Integer> subMap = tf.getSubMap();
+	        HashMap<Integer, Integer> subMap = tf.getSubMap();
 			HashMap<String, ArrayList<Action>> actMap = tf.getActMap();
 			String miName = tf.getMiName();
+			System.out.println("TF:"+miName);
 			ArrayList<DTree> srcDTs = getDwarfTrees(srcST);
 			ArrayList<DTree> dstDTs = getDwarfTrees(dstST);
 			HashMap<String, ArrayList<DTree>> sDTmap = new HashMap<>();
 			HashMap<String, ArrayList<DTree>> dDTmap = new HashMap<>();
 			for(DTree dt : srcDTs) {
-				ITree root = dt.getRoot();
-				TreeContext tc = dt.getTreeContext();
-				String typeName = tc.getTypeLabel(root);
+				String typeName = dt.getRootType();
+				System.out.println("sDT:"+Utils.printDTree(dt));
 				if(!sDTmap.containsKey(typeName)) {
 					ArrayList<DTree> dts = new ArrayList<>();
 					dts.add(dt);
@@ -139,9 +142,8 @@ public class Split {
 					sDTmap.get(typeName).add(dt);								
 			}
 			for(DTree dt : dstDTs) {
-				ITree root = dt.getRoot();
-				TreeContext tc = dt.getTreeContext();
-				String typeName = tc.getTypeLabel(root);
+				String typeName = dt.getRootType();
+				System.out.println("dDT:"+Utils.printDTree(dt));
 				if(!dDTmap.containsKey(typeName)) {
 					ArrayList<DTree> dts = new ArrayList<>();
 					dts.add(dt);
@@ -150,6 +152,7 @@ public class Split {
 					dDTmap.get(typeName).add(dt);								
 			}//put into type categories
 			
+			//find three kinds of actions
 			HashMap<DTree, DTree> dtMap = new HashMap<>();
 			for(Map.Entry<String, ArrayList<DTree>> entry : sDTmap.entrySet()) {
 				String typeName = entry.getKey();
@@ -159,40 +162,9 @@ public class Split {
 						String leaves = Utils.printLeaf(sDT);
 						System.out.println("Del:"+ leaves);
 					}									
-				}else {//find change actions
+				}else {//search change actions
 					ArrayList<DTree> dDTs = dDTmap.get(typeName);
-					for(DTree sDT : sDTs) {//Dwarf-tree level
-						ITree root = sDT.getRoot();
-						List<ITree> leaves = sDT.getChildren();
-						String srcTString = Utils.printLeaf(sDT);
-						int size1 = leaves.size();
-						for(int i=0;i<dDTs.size();i++) {
-							DTree dDT = dDTs.get(i);
-							ITree root2 = dDT.getRoot();
-							List<ITree> leaves2 = dDT.getChildren();
-							int size2 = leaves2.size();
-							int mapNum = 0;
-							for(ITree leaf : leaves) {
-								int srcId = leaf.getId();
-								if(subMap.get(srcId)!=null) {//search mapping
-									for(ITree leaf2 : leaves2) {
-										if(leaf2.getId()==subMap.get(srcId)) {
-											mapNum++;				
-										}
-									}
-								}else 
-									continue;
-								double sim = (2*mapNum)/(size1+size2);
-								if(sim>0.5) {
-									String dstTString = Utils.printLeaf(dDT);
-									System.out.println("Change:"+srcTString+"->"+dstTString);
-									dtMap.put(sDT, dDT);
-									dDTs.remove(dDT);
-									break;//可能有问题
-								}								
-							}
-						}
-					}
+					dtMap = getDTmap(sDTs, dDTs, subMap);
 				}							
 			}			
 			for(Map.Entry<String, ArrayList<DTree>> entry : dDTmap.entrySet()) {
@@ -203,32 +175,65 @@ public class Split {
 						String leaves = Utils.printLeaf(dST);
 						System.out.println("Add:"+ leaves);
 					}	
-				}else {
-					
 				}
 			}
 		}
 	}
 	
-	public ArrayList<String> extraceUPD(ArrayList<Migration> migrates) {
-		ArrayList<String> commonUPD = new ArrayList<>();
-		ArrayList<String> updStrings = new ArrayList<>();
-		for(Migration m : migrates) {
-			TreeContext tc1 = m.getSrcT();
-			TreeContext tc2 = m.getDstT();
-			HashMap<String, LinkedList<Action>> actions = Utils.collectAction(tc1, tc2);
-			LinkedList<Action> updates = actions.get("update");
-			for(Action a : updates) {	
-				String src = tc1.getTypeLabel(a.getNode());
-				String dst = a.getName();
-				String updString = src+"->"+dst;
-				if(updStrings.contains(updString))
-					commonUPD.add(updString);
-				else
-					updStrings.add(updString);
+	public HashMap<DTree, DTree> getDTmap(ArrayList<DTree> sDTs, ArrayList<DTree> dDTs, HashMap<Integer, Integer> subMap) throws Exception{
+		HashMap<DTree, DTree> dtMap = new HashMap<>();
+		for(DTree sDT : sDTs) {//Dwarf-tree level
+			List<ITree> leaves = sDT.getLeaves();
+			String srcTString = Utils.printLeaf(sDT);//因为结构原因，可能有部分root的子节点不是DT的叶子			
+			int size1 = leaves.size();
+			for(int i=0;i<dDTs.size();i++) {
+				DTree dDT = dDTs.get(i);
+				List<ITree> leaves2 = dDT.getLeaves();
+				int size2 = leaves2.size();
+				
+				//two ways of similarity
+				int mapNum1 = 0;
+				int mapNum2 = 0;
+				for(ITree leaf : leaves) {
+					int srcId = leaf.getId();
+					String value = leaf.getLabel();//maybe some leaves do not have values
+					for(ITree leaf2 : leaves2) {
+						String value2 = leaf2.getLabel();
+						if(value2.equals(value)) {
+							mapNum1++;
+							break;
+						}//search for equivalent value.						
+					}
+					for(ITree leaf2 : leaves2) {
+						int dstId = leaf2.getId();
+						if(subMap.get(srcId)!=null) {
+							if(dstId==subMap.get(srcId)) {//search mapping
+								mapNum2++;
+								break;
+							}
+						}						
+					}
+					double sim1 = (2*mapNum1)/(size1+size2);
+					double sim2 = (2*mapNum2)/(size1+size2);
+					if(sim1>0.5||sim2>0.5) {
+						String dstTString = Utils.printLeaf(dDT);
+						if(sim1>0.5&&sim1!=1) {
+							System.out.println("Change1:"+srcTString+"->"+dstTString);
+							dtMap.put(sDT, dDT);
+							dDTs.remove(dDT);
+//							break;//可能有问题
+						}
+						if(sim2>0.5&&sim1!=1) {
+							System.out.println("Change2:"+srcTString+"->"+dstTString);
+							dtMap.put(sDT, dDT);
+							dDTs.remove(dDT);
+//							break;//可能有问题
+						}
+					}								
+				}
 			}
 		}
-		return commonUPD;
+		return null;		
 	}
 	
 	public ArrayList<DTree> getDwarfTrees(SubTree st) throws Exception{
@@ -295,21 +300,7 @@ public class Split {
 			String miName = migrat.getMiName();
 			TreeContext srcT = migrat.getSrcT();
 			TreeContext dstT = migrat.getDstT();
-			ArrayList<SubTree> sub1 = splitSubTree(srcT, miName);
-//			List<ITree> list1 = TreeUtils.postOrder(sub1.get(0).getRoot());
-//			for(ITree t : list1) {
-//				System.out.println(srcT.getTypeLabel(t));
-//			}
-//			System.out.println(list1.size());			
-
-//			Matcher m = Matchers.getInstance().getMatcher(sub1.get(0).getRoot(), sub2.get(0).getRoot());
-//	        m.match();
-//	        MappingStore mappings = m.getMappings();
-//	        for(Mapping map : mappings) {
-//	        	ITree src = map.getFirst();
-//	        	ITree dst = map.getSecond();
-//	        	System.out.println("Mapping:"+src.getId()+"->"+dst.getId());
-//	        }
+			ArrayList<SubTree> sub1 = splitSubTree(srcT, miName);				
 			
 //			ArrayList<SubTree> sub2 = splitSubTree(dstT, miName);
 //	        double similarity = Similarity.getSimilarity(sub1.get(0), sub2.get(0));
@@ -324,6 +315,7 @@ public class Split {
 		System.out.println("Analyse:"+miName);
 		ArrayList<Transform> trans = new ArrayList<>();
 		ArrayList<SubTree> actSubTree = new ArrayList<>();
+		ArrayList<SubTree> sub2 = splitSubTree(dstT, miName);
 		Matcher m = Matchers.getInstance().getMatcher(srcT.getRoot(), dstT.getRoot());
         m.match();
         MappingStore mappings = m.getMappings();
@@ -425,11 +417,16 @@ public class Split {
     		ITree dstStRoot = mappings.getDst(srcStRoot);
     		SubTree dstSt = null;
     		if(dstStRoot==null) {
-    			System.out.println("SID:"+srcStRoot.getId()); 			
+    			System.out.println("SID:"+srcStRoot.getId()); //发现有整颗srcSr删除的情况 
     		}else {
-    			String miName2 = miName.substring(0, miName.length()-4)+"2.cpp";
-        		dstSt = new SubTree(dstStRoot, dstT, 0, miName2);//dst子树count号暂时置0，好像没用
-    		}//发现有整颗srcSr删除的情况 	
+    			for(SubTree st2 : sub2) {
+    				ITree root = st2.getRoot();
+    				if(root.equals(dstStRoot)) {
+                		dstSt = st2;
+                		break;
+    				}      			
+    			}
+    		}   			       			     		       			
     		List<ITree> nodes = TreeUtils.preOrder(st.getRoot());
     		HashMap<Integer, Integer> subMap = new HashMap<>();
     		for(ITree src : nodes) {
@@ -437,7 +434,7 @@ public class Split {
     			if(dst!=null) {
     				subMap.put(src.getId(), dst.getId());
     			}
-    		}
+    		}//Mapping between srcId and dstId.
     		Transform tf = new Transform(st, dstSt, subMap, subActions, miName);
     		trans.add(tf);
         }      

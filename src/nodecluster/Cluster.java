@@ -15,7 +15,8 @@ import gumtreediff.matchers.Matcher;
 import gumtreediff.matchers.Matchers;
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
-import similarity.Migration;
+import structure.Migration;
+import utils.Utils;
 
 public class Cluster {
 	private TreeContext tc1;
@@ -41,6 +42,27 @@ public class Cluster {
 		Matcher m = Matchers.getInstance().getMatcher(tc1.getRoot(), tc2.getRoot());
         m.match();
         mapping = m.getMappings();
+	}
+	
+	public ArrayList<String> extraceUPD(ArrayList<Migration> migrates) {
+		ArrayList<String> commonUPD = new ArrayList<>();
+		ArrayList<String> updStrings = new ArrayList<>();
+		for(Migration m : migrates) {
+			TreeContext tc1 = m.getSrcT();
+			TreeContext tc2 = m.getDstT();
+			HashMap<String, LinkedList<Action>> actions = Utils.collectAction(tc1, tc2);
+			LinkedList<Action> updates = actions.get("update");
+			for(Action a : updates) {	
+				String src = tc1.getTypeLabel(a.getNode());
+				String dst = a.getName();
+				String updString = src+"->"+dst;
+				if(updStrings.contains(updString))
+					commonUPD.add(updString);
+				else
+					updStrings.add(updString);
+			}
+		}
+		return commonUPD;
 	}
 	
 	public void clusterActions(TreeContext tC1, TreeContext tC2) throws Exception {

@@ -1,4 +1,4 @@
-package similarity;
+package structure;
 
 import gumtreediff.tree.TreeContext;
 

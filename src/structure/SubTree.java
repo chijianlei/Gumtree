@@ -1,4 +1,4 @@
-package nodecluster;
+package structure;
 
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;

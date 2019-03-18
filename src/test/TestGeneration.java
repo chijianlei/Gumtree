@@ -1,4 +1,4 @@
-package gumtreediff.gen.srcml;
+package test;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,6 +20,7 @@ import gumtreediff.actions.model.Insert;
 import gumtreediff.actions.model.Move;
 import gumtreediff.actions.model.Update;
 import gumtreediff.gen.jdt.JdtTreeGenerator;
+import gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
 import gumtreediff.io.ActionsIoUtils;
 import gumtreediff.io.TreeIoUtils;
 import gumtreediff.io.ActionsIoUtils.ActionSerializer;
@@ -29,7 +30,7 @@ import gumtreediff.matchers.Matcher;
 import gumtreediff.matchers.Matchers;
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
-import nodecluster.Utils;
+import utils.Utils;
 
 public class TestGeneration {
 	
@@ -64,14 +65,14 @@ public class TestGeneration {
         BufferedWriter wr2 = new BufferedWriter(new FileWriter(out2));
         wr2.append(TreeIoUtils.toDot(tc2, mappings, actions, false).toString());
         wr2.flush();
-        wr2.close();
+        wr2.close(); 
         
 //        System.out.println(TreeIoUtils.toDot(tc, mappings, actions, true).toString());
 //        System.out.println(TreeIoUtils.toDot(tc2, mappings, actions, false).toString());
-//        System.out.println(TreeIoUtils.toXml(tc2).toString());
+        System.out.println(TreeIoUtils.toXml(tc).toString());
         
         HashMap<Integer, Integer> mapping = new HashMap<>();       
-        for(Mapping map : m.getMappings()) {
+        for(Mapping map : mappings) {
         	ITree src = map.getFirst();
         	ITree dst = map.getSecond();
 //        	System.out.println("Mapping:"+src.getId()+"->"+dst.getId());

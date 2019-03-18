@@ -1,4 +1,4 @@
-package nodecluster;
+package utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,8 +22,10 @@ import gumtreediff.matchers.Matchers;
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
 import gumtreediff.tree.TreeUtils;
-import similarity.DTree;
-import similarity.Split;
+import nodecluster.Cluster;
+import split.Split;
+import structure.DTree;
+import structure.SubTree;
 
 public class Utils {
 	private static Stack<String> blocks = new Stack<>();
@@ -349,13 +351,25 @@ public class Utils {
 		return srcActIds;        
 	}	
 	
-	public static String printLeaf(DTree st) throws Exception {
+	public static String printLeaf(DTree dt) throws Exception {
 		String values = "";
-		List<ITree> leaves = st.getChildren();
+		List<ITree> leaves = dt.getLeaves();
 		for(ITree leaf : leaves) {
 			values = values + leaf.getLabel();
 		}		
 		return values;		
+	}
+	
+	public static String printDTree(DTree dt) {
+		String dString = "";
+		String typeName = dt.getRootType();
+		dString = dString+dt.getRoot().getId()+typeName+"{";
+		List<ITree> leaves = dt.getLeaves();
+		for(ITree leaf : leaves) {
+			dString = dString+leaf.getId()+leaf.getLabel()+",";
+		}
+		dString = dString.substring(0, dString.length()-2)+"}";
+		return dString;
 	}
 	
 	public static List<ITree> traverse2Leaf(ITree node, List<ITree> leafList) throws Exception{//从根节点深度遍历至叶子节点，优先确定path相同的leaf mappings

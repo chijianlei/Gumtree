@@ -2,8 +2,8 @@ package main;
 
 import java.util.ArrayList;
 
-import similarity.Migration;
-import similarity.Split;
+import split.Split;
+import structure.Migration;
 
 public class MainProcess {
 	
