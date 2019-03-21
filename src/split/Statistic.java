@@ -10,14 +10,18 @@ import gumtreediff.actions.ActionGenerator;
 import gumtreediff.actions.model.Action;
 import gumtreediff.matchers.Matcher;
 import gumtreediff.matchers.Matchers;
+import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
 import structure.Migration;
+import structure.Transform;
+import utils.Utils;
 
 public class Statistic {
 	
 	public static void main (String args[]) throws Exception{
 		String path = "migrations";
-		givenStatistic(path);
+//		givenStatistic(path);
+		collectSpecificLeaves(path, "call");
 	}
 	
 	public static void givenStatistic(String path) throws Exception {
@@ -52,8 +56,50 @@ public class Statistic {
 		}			
 	}
 	
-	public static void clearInclude(String path) {
+	public static void collectSpecificLeaves(String path, String parType) throws Exception {
+		ArrayList<Migration> migrats = new ArrayList<>();
+		Split sp = new Split();
+		sp.getSize();
+		migrats = sp.readMigration(path, "");
+		ArrayList<String> types1 = new ArrayList<String>();
+		ArrayList<String> types2 = new ArrayList<String>();
+		for(Migration m : migrats) {
+			TreeContext tc1 = m.getSrcT();
+			TreeContext tc2 = m.getDstT();
+			ITree root1 = tc1.getRoot();
+			ITree root2 = tc2.getRoot();
+			List<ITree> leaves1 = new ArrayList<ITree>();
+			List<ITree> leaves2 = new ArrayList<ITree>();
+			leaves1 = Utils.traverse2Leaf(root1, leaves1);
+			leaves2 = Utils.traverse2Leaf(root2, leaves2);
+			for(ITree tmp : leaves1) {
+				String parType1 = tc1.getTypeLabel(tmp.getParent());
+				if(!parType1.equals(parType))
+					continue;
+				String type = tc1.getTypeLabel(tmp);
+				if(!types1.contains(type)) {
+					types1.add(type);
+				}
+			}
+			for(ITree tmp : leaves2) {
+				String parType2 = tc2.getTypeLabel(tmp.getParent());
+				if(!parType2.equals(parType))
+					continue;
+				String type = tc2.getTypeLabel(tmp);
+				if(!types2.contains(type)) {
+					types2.add(type);
+				}
+			}
+		}
 		
+		for(String type : types2) {
+			if(!types1.contains(type)) {
+				types1.add(type);
+			}
+		}
+		for(String type : types1) {
+			System.out.println(type);
+		}
 	}
 
 }

@@ -368,7 +368,7 @@ public class Utils {
 		for(ITree leaf : leaves) {
 			dString = dString+leaf.getId()+leaf.getLabel()+",";
 		}
-		dString = dString.substring(0, dString.length()-2)+"}";
+		dString = dString.substring(0, dString.length()-1)+"}";
 		return dString;
 	}
 	

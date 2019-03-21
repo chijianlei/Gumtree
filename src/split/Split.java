@@ -29,7 +29,7 @@ import utils.Similarity;
 import utils.Utils;
 
 public class Split {
-	private ArrayList<Transform> trans = new ArrayList<>();
+	public ArrayList<Transform> trans = new ArrayList<>();
 	private int count = 0;
 	
 	public static void main (String args[]) throws Exception{
@@ -133,7 +133,7 @@ public class Split {
 			HashMap<String, ArrayList<DTree>> dDTmap = new HashMap<>();
 			for(DTree dt : srcDTs) {
 				String typeName = dt.getRootType();
-				System.out.println("sDT:"+Utils.printDTree(dt));
+//				System.out.println("sDT:"+Utils.printDTree(dt));
 				if(!sDTmap.containsKey(typeName)) {
 					ArrayList<DTree> dts = new ArrayList<>();
 					dts.add(dt);
@@ -143,7 +143,7 @@ public class Split {
 			}
 			for(DTree dt : dstDTs) {
 				String typeName = dt.getRootType();
-				System.out.println("dDT:"+Utils.printDTree(dt));
+//				System.out.println("dDT:"+Utils.printDTree(dt));
 				if(!dDTmap.containsKey(typeName)) {
 					ArrayList<DTree> dts = new ArrayList<>();
 					dts.add(dt);
@@ -186,52 +186,84 @@ public class Split {
 			List<ITree> leaves = sDT.getLeaves();
 			String srcTString = Utils.printLeaf(sDT);//因为结构原因，可能有部分root的子节点不是DT的叶子			
 			int size1 = leaves.size();
+			double sim1 = 0.0;
+			double sim2 = 0.0;
+			DTree candidateDT1 = null;
+			DTree candidateDT2 = null;
 			for(int i=0;i<dDTs.size();i++) {
 				DTree dDT = dDTs.get(i);
 				List<ITree> leaves2 = dDT.getLeaves();
 				int size2 = leaves2.size();
+//				if(sDT.getRoot().getId()==1862) {
+//					System.out.println("dDT:"+dDT.getRoot().getId());
+//					System.out.println("sim2:"+sim2);	
+//				}
 				
 				//two ways of similarity
-				int mapNum1 = 0;
-				int mapNum2 = 0;
-				for(ITree leaf : leaves) {
+				int tmpNum1 = 0;
+				int tmpNum2 = 0;
+				for(int j=0;j<leaves.size();j++) {
+					ITree leaf = leaves.get(j);
 					int srcId = leaf.getId();
 					String value = leaf.getLabel();//maybe some leaves do not have values
-					for(ITree leaf2 : leaves2) {
+					for(int k=0;k<leaves2.size();k++) {
+						ITree leaf2 = leaves2.get(k);
 						String value2 = leaf2.getLabel();
 						if(value2.equals(value)) {
-							mapNum1++;
+							tmpNum1++;
 							break;
 						}//search for equivalent value.						
 					}
-					for(ITree leaf2 : leaves2) {
+					for(int k=0;k<leaves2.size();k++) {
+						ITree leaf2 = leaves2.get(k);
 						int dstId = leaf2.getId();
 						if(subMap.get(srcId)!=null) {
 							if(dstId==subMap.get(srcId)) {//search mapping
-								mapNum2++;
+								tmpNum2++;
 								break;
 							}
 						}						
-					}
-					double sim1 = (2*mapNum1)/(size1+size2);
-					double sim2 = (2*mapNum2)/(size1+size2);
-					if(sim1>0.5||sim2>0.5) {
-						String dstTString = Utils.printLeaf(dDT);
-						if(sim1>0.5&&sim1!=1) {
-							System.out.println("Change1:"+srcTString+"->"+dstTString);
-							dtMap.put(sDT, dDT);
-							dDTs.remove(dDT);
-//							break;//可能有问题
-						}
-						if(sim2>0.5&&sim1!=1) {
-							System.out.println("Change2:"+srcTString+"->"+dstTString);
-							dtMap.put(sDT, dDT);
-							dDTs.remove(dDT);
-//							break;//可能有问题
-						}
 					}								
 				}
+				double tmpSim1 = (2.0*tmpNum1)/(size1+size2);
+				double tmpSim2 = (2.0*tmpNum2)/(size1+size2);
+				if(sim1<tmpSim1) {
+					candidateDT1 = dDT;
+					sim1=tmpSim1;
+				}	
+				if(sim2<tmpSim2) {
+					candidateDT2 = dDT;
+					sim2=tmpSim2;
+				}					
+//				if(tmpSim1==1.0||tmpSim2==1.0) {					
+//					break;//找到sim==1就退出,是否只考虑sim2	
+//				}
+				if(sDT.getRoot().getId()==1862) {
+					System.out.println("dDT:"+dDT.getRoot().getId());
+					System.out.println("sim2??:"+sim2+","+tmpNum2);	
+				}
 			}
+			if(sim1>=0.5&&sim1!=1) {
+				String dstTString = Utils.printLeaf(candidateDT1);
+				System.out.println("Change1:"+srcTString+"->"+dstTString);
+//				System.out.println("Map:"+sDT.getRoot().getId()+"->"+candidateDT1.getRoot().getId());
+				dtMap.put(sDT, candidateDT1);
+				dDTs.remove(candidateDT1);
+//				break;//可能有问题
+			}
+				
+			if(sim2>=0.5&&sim2!=1) {
+				String dstTString = Utils.printLeaf(candidateDT2);
+				System.out.println("Change2:"+srcTString+"->"+dstTString);
+//				System.out.println("Map:"+sDT.getRoot().getId()+"->"+candidateDT2.getRoot().getId());
+				dtMap.put(sDT, candidateDT2);
+				dDTs.remove(candidateDT2);
+//				break;//可能有问题
+			}
+//			if(sDT.getRoot().getId()==2313) {
+//				System.out.println("sim:"+sim1+","+sim2);
+//				System.out.println("size:"+sDT.getLeaves().size());
+//			}
 		}
 		return null;		
 	}
@@ -245,8 +277,18 @@ public class Split {
 		leaves = Utils.traverse2Leaf(root, leaves);
 		ArrayList<DTree> dwarfTrees = new ArrayList<>();
 		HashMap<ITree, ArrayList<ITree>> parMap = new HashMap<>();
-		for(ITree leaf : leaves) {
+		for(int i=0;i<leaves.size();i++) {
+			ITree leaf = leaves.get(i);
+			String type = tc.getTypeLabel(leaf);			
 			ITree par = leaf.getParent();
+			String parType = tc.getTypeLabel(par);
+			if(type.equals("argument_list"))
+				continue;//"argument_list"的叶子节点不包含任何信息，还可能扰乱匹配
+			//leaf nodes have many situations, need to consider one by one.
+			else if(type.equals("name")||type.equals("operator")) {
+				if(parType.equals("name"))
+					par = par.getParent();
+			}//考虑name DTree发现的特殊情况, 不然多个name leaf的par跟单个name leaf会匹配异常
 			if(par==null)
 				throw new Exception("error par!!");
 			if(parMap.get(par)==null) {
@@ -299,23 +341,21 @@ public class Split {
 		for(Migration migrat : migrats) {
 			String miName = migrat.getMiName();
 			TreeContext srcT = migrat.getSrcT();
-			TreeContext dstT = migrat.getDstT();
-			ArrayList<SubTree> sub1 = splitSubTree(srcT, miName);				
+			TreeContext dstT = migrat.getDstT();							
 			
 //			ArrayList<SubTree> sub2 = splitSubTree(dstT, miName);
 //	        double similarity = Similarity.getSimilarity(sub1.get(0), sub2.get(0));
 //	        System.out.println("sime:"+similarity);//testing			
-			ArrayList<Transform> singleTrans = splitTransform(sub1, srcT, dstT, miName);
+			ArrayList<Transform> singleTrans = splitTransform(srcT, dstT, miName);
 			trans.addAll(singleTrans);
 			System.out.println("TransSize:"+singleTrans.size());
 		}	
 	}
 	
-	public ArrayList<Transform> splitTransform(ArrayList<SubTree> tList, TreeContext srcT, TreeContext dstT, String miName) throws Exception {
+	public ArrayList<Transform> splitTransform(TreeContext srcT, TreeContext dstT, String miName) throws Exception {
 		System.out.println("Analyse:"+miName);
 		ArrayList<Transform> trans = new ArrayList<>();
 		ArrayList<SubTree> actSubTree = new ArrayList<>();
-		ArrayList<SubTree> sub2 = splitSubTree(dstT, miName);
 		Matcher m = Matchers.getInstance().getMatcher(srcT.getRoot(), dstT.getRoot());
         m.match();
         MappingStore mappings = m.getMappings();
@@ -328,7 +368,9 @@ public class Split {
 		ArrayList<Integer> srcActIds = Utils.collectSrcActNodeIds(srcT, dstT, actions);
 //		System.out.println("IdNum:"+srcActIds.size());
 		Cluster cl = new Cluster(srcT, dstT);
-		for(SubTree st : tList) {
+		ArrayList<SubTree> sub1 = splitSubTree(srcT, miName);//Subtree中割裂过block,注意
+		ArrayList<SubTree> sub2 = splitSubTree(dstT, miName);//先计算action,再split ST
+		for(SubTree st : sub1) {
 			ITree t = st.getRoot();
 			List<ITree> nodeList = new ArrayList<>();
 			nodeList = Utils.collectNode(t, nodeList);
@@ -442,7 +484,7 @@ public class Split {
 		System.out.println("delsize:"+deletes.size());
 		System.out.println("addsize:"+inserts.size());
 		System.out.println("movsize:"+moves.size());
-		System.out.println("stSize:"+tList.size());
+		System.out.println("stSize:"+sub1.size());
 		return trans;      
 	}
 	

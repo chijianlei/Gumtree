@@ -36,12 +36,12 @@ public class TestGeneration {
 	
 	public static void main(String args[]) throws Exception{
 		String input = "";
-		String path = "talker.cpp";
-//		String path = "migrations/talker/talker.cpp";
+//		String path = "talker.cpp";
+		String path = "migrations_test/Absolute3DLocalizationElement/Absolute3DLocalizationElement.cpp";
 		File cppfile = new File(path);
 		TreeContext tc = new SrcmlCppTreeGenerator().generateFromFile(cppfile);
-		String path2 = "talker2.cpp";
-//		String path2 = "migrations/talker/talker2.cpp";
+//		String path2 = "talker2.cpp";
+		String path2 = "migrations_test/Absolute3DLocalizationElement/Absolute3DLocalizationElement2.cpp";
 		File cppfile2 = new File(path2);
 		TreeContext tc2 = new SrcmlCppTreeGenerator().generateFromFile(cppfile2);       
         System.out.println(tc.getRoot().getSize());
