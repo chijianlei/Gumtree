@@ -498,7 +498,7 @@ public class Utils {
 			}
 		}
 		return target;
-	}
+	}	
 	
 	public static Boolean ifSRoot(String typeLabel) {
 		if(typeLabel=="decl_stmt"||typeLabel=="expr_stmt"||typeLabel=="while"||typeLabel=="for"||

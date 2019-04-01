@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import com.sun.tools.javah.Util;
 
@@ -36,7 +37,7 @@ public class Split {
 		Split sp = new Split();
 		String path = "migrations_test";
 		ArrayList<Migration> migrats = new ArrayList<>();
-		migrats = sp.readMigration(path, "talker");
+		migrats = sp.readMigration(path, "");
 		sp.storeTrans(migrats);
 		sp.splitSnippets();
 		
@@ -127,95 +128,51 @@ public class Split {
 			HashMap<String, ArrayList<Action>> actMap = tf.getActMap();
 			String miName = tf.getMiName();
 			System.out.println("TF:"+miName);
-			ArrayList<DTree> srcDTs = getDwarfTrees(srcST);
-			ArrayList<DTree> dstDTs = getDwarfTrees(dstST);
-			HashMap<String, ArrayList<DTree>> sDTmap = new HashMap<>();
-			HashMap<String, ArrayList<DTree>> dDTmap = new HashMap<>();
-			for(DTree dt : srcDTs) {
-				String typeName = dt.getRootType();
-//				System.out.println("sDT:"+Utils.printDTree(dt));
-				if(!sDTmap.containsKey(typeName)) {
-					ArrayList<DTree> dts = new ArrayList<>();
-					dts.add(dt);
-					sDTmap.put(typeName, dts);
-				}else 
-					sDTmap.get(typeName).add(dt);								
-			}
-			for(DTree dt : dstDTs) {
-				String typeName = dt.getRootType();
-//				System.out.println("dDT:"+Utils.printDTree(dt));
-				if(!dDTmap.containsKey(typeName)) {
-					ArrayList<DTree> dts = new ArrayList<>();
-					dts.add(dt);
-					dDTmap.put(typeName, dts);
-				}else 
-					dDTmap.get(typeName).add(dt);								
-			}//put into type categories
+			ArrayList<DTree> sDTs = getDwarfTrees(srcST);
+			ArrayList<DTree> dDTs = getDwarfTrees(dstST);
 			
-			//find three kinds of actions
+			//find different kinds of actions
 			HashMap<DTree, DTree> dtMap = new HashMap<>();
-			for(Map.Entry<String, ArrayList<DTree>> entry : sDTmap.entrySet()) {
-				String typeName = entry.getKey();
-				ArrayList<DTree> sDTs = entry.getValue();
-				if(!dDTmap.containsKey(typeName)) {//find Del actions, DT only in src, not dst
-					for(DTree sDT : sDTs) {
-						String leaves = Utils.printLeaf(sDT);
-						System.out.println("Del:"+ leaves);
-					}									
-				}else {//search change actions
-					ArrayList<DTree> dDTs = dDTmap.get(typeName);
-					dtMap = getDTmap(sDTs, dDTs, subMap);
-				}							
-			}			
-			for(Map.Entry<String, ArrayList<DTree>> entry : dDTmap.entrySet()) {
-				String typeName = entry.getKey();
-				ArrayList<DTree> dDTs = entry.getValue();
-				if(!sDTmap.containsKey(typeName)) {//DT only in dst, not src
-					for(DTree dST : dDTs) {
-						String leaves = Utils.printLeaf(dST);
-						System.out.println("Add:"+ leaves);
-					}	
-				}
-			}
+			dtMap = getDTmap(sDTs, dDTs, subMap);			
+//			for(int i=0;i<sDTs.size();i++) {
+//				DTree sDT = sDTs.get(i);
+//				
+//			}
+			
+
 		}
 	}
 	
 	public HashMap<DTree, DTree> getDTmap(ArrayList<DTree> sDTs, ArrayList<DTree> dDTs, HashMap<Integer, Integer> subMap) throws Exception{
 		HashMap<DTree, DTree> dtMap = new HashMap<>();
-		for(DTree sDT : sDTs) {//Dwarf-tree level
+		for(int i=0;i<sDTs.size();i++) {//Dwarf-tree level
+			DTree sDT = sDTs.get(i);
 			List<ITree> leaves = sDT.getLeaves();
-			String srcTString = Utils.printLeaf(sDT);//因为结构原因，可能有部分root的子节点不是DT的叶子			
+			String srcTString = Utils.printLeaf(sDT);//因为结构原因，可能有部分root的子节点不是DT的叶子	
 			int size1 = leaves.size();
 			double sim1 = 0.0;
 			double sim2 = 0.0;
 			DTree candidateDT1 = null;
 			DTree candidateDT2 = null;
-			for(int i=0;i<dDTs.size();i++) {
-				DTree dDT = dDTs.get(i);
+			for(int j=0;j<dDTs.size();j++) {
+				DTree dDT = dDTs.get(j);
 				List<ITree> leaves2 = dDT.getLeaves();
 				int size2 = leaves2.size();
-//				if(sDT.getRoot().getId()==1862) {
-//					System.out.println("dDT:"+dDT.getRoot().getId());
-//					System.out.println("sim2:"+sim2);	
-//				}
 				
 				//two ways of similarity
 				int tmpNum1 = 0;
 				int tmpNum2 = 0;
-				for(int j=0;j<leaves.size();j++) {
-					ITree leaf = leaves.get(j);
+				for(ITree leaf : leaves) {
 					int srcId = leaf.getId();
 					String value = leaf.getLabel();//maybe some leaves do not have values
-					for(int k=0;k<leaves2.size();k++) {
-						ITree leaf2 = leaves2.get(k);
+					for(ITree leaf2 : leaves2) {
 						String value2 = leaf2.getLabel();
 						if(value2.equals(value)) {
 							tmpNum1++;
 							break;
 						}//search for equivalent value.						
 					}
-					for(int k=0;k<leaves2.size();k++) {
-						ITree leaf2 = leaves2.get(k);
+					for(ITree leaf2 : leaves2) {
 						int dstId = leaf2.getId();
 						if(subMap.get(srcId)!=null) {
 							if(dstId==subMap.get(srcId)) {//search mapping
@@ -235,38 +192,49 @@ public class Split {
 					candidateDT2 = dDT;
 					sim2=tmpSim2;
 				}					
-//				if(tmpSim1==1.0||tmpSim2==1.0) {					
-//					break;//找到sim==1就退出,是否只考虑sim2	
-//				}
-				if(sDT.getRoot().getId()==1862) {
+				if(sDT.getRoot().getId()==2337) {
 					System.out.println("dDT:"+dDT.getRoot().getId());
-					System.out.println("sim2??:"+sim2+","+tmpNum2);	
+					System.out.println("sim:"+sim1+","+tmpNum1+","+sim2+","+tmpNum2);	
 				}
 			}
 			if(sim1>=0.5&&sim1!=1) {
+				System.out.println(dtMap.size());
 				String dstTString = Utils.printLeaf(candidateDT1);
+				System.out.println(sDT.getRoot().getId());
 				System.out.println("Change1:"+srcTString+"->"+dstTString);
+				if(sDT.getRoot().getId()==2314) {
+				System.out.println("sim:"+sim1+","+sim2);	
+			    }
 //				System.out.println("Map:"+sDT.getRoot().getId()+"->"+candidateDT1.getRoot().getId());
-				dtMap.put(sDT, candidateDT1);
-				dDTs.remove(candidateDT1);
+				if((dtMap.containsKey(sDT)&&!dtMap.containsValue(candidateDT1))||
+						((!dtMap.containsKey(sDT)&&dtMap.containsValue(candidateDT1)))) {
+					throw new Exception("not identify mapping!");
+				}else {
+					dtMap.put(sDT, candidateDT1);
+				}				
+//				dDTs.remove(candidateDT1);
 //				break;//可能有问题
-			}
-				
+			}				
 			if(sim2>=0.5&&sim2!=1) {
 				String dstTString = Utils.printLeaf(candidateDT2);
 				System.out.println("Change2:"+srcTString+"->"+dstTString);
 //				System.out.println("Map:"+sDT.getRoot().getId()+"->"+candidateDT2.getRoot().getId());
-				dtMap.put(sDT, candidateDT2);
-				dDTs.remove(candidateDT2);
+				if((dtMap.containsKey(sDT)&&!dtMap.containsValue(candidateDT2))||
+						(!(dtMap.containsKey(sDT)&&dtMap.containsValue(candidateDT2)))) {
+					throw new Exception("not identify mapping!");
+				}else {
+					dtMap.put(sDT, candidateDT2);
+				}
+//				dDTs.remove(candidateDT2);
 //				break;//可能有问题
 			}
-//			if(sDT.getRoot().getId()==2313) {
-//				System.out.println("sim:"+sim1+","+sim2);
-//				System.out.println("size:"+sDT.getLeaves().size());
-//			}
+			if(sDT.getRoot().getId()==2335) {
+				System.out.println("sim:"+sim1+","+sim2);
+				System.out.println("size:"+sDT.getLeaves().size());
+			}
 		}
-		return null;		
-	}
+		return dtMap;		
+	}//Matching sDTs and dDTs
 	
 	public ArrayList<DTree> getDwarfTrees(SubTree st) throws Exception{
 		ITree root = st.getRoot();
@@ -301,10 +269,18 @@ public class Split {
 		}
 		
 		for(Map.Entry<ITree, ArrayList<ITree>> entry : parMap.entrySet()) {
-			ITree par = entry.getKey();
+			ITree par = entry.getKey();		
+			Stack<String> trace = new Stack<String>();
+			ITree tmp = par;
+			String type = tc.getTypeLabel(tmp);
+			while(!Utils.ifSRoot(type)) {
+				trace.push(type);
+				tmp = tmp.getParent();
+				type = tc.getTypeLabel(tmp);
+			}
 			ArrayList<ITree> leafList = entry.getValue();
 			if(leafList.size()>0) {
-				DTree dt = new DTree(par, leafList, tc);
+				DTree dt = new DTree(par, leafList, trace, tc);
 				dwarfTrees.add(dt);
 			}else 
 				throw new Exception("error par!!");			
@@ -351,6 +327,8 @@ public class Split {
 			System.out.println("TransSize:"+singleTrans.size());
 		}	
 	}
+	
+
 	
 	public ArrayList<Transform> splitTransform(TreeContext srcT, TreeContext dstT, String miName) throws Exception {
 		System.out.println("Analyse:"+miName);
