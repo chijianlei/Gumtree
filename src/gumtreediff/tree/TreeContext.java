@@ -29,7 +29,7 @@ import gumtreediff.io.TreeIoUtils.MetadataSerializer;
 import gumtreediff.io.TreeIoUtils.MetadataUnserializer;
 import gumtreediff.io.TreeIoUtils.TreeFormatter;
 
-public class TreeContext {
+public class TreeContext{
 
     private Map<Integer, String> typeLabels = new HashMap<>();
 

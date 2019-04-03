@@ -33,8 +33,26 @@ public class Test {
         Matcher m = Matchers.getInstance().getMatcher(tc1.getRoot(), tc2.getRoot());
         m.match();
         MappingStore mappings = m.getMappings();
-		Pruning pr = new Pruning(tc1, tc2, mappings);
-		pr.pruneTree();
+		List<ITree> list1 = root1.getDescendants();
+		for(ITree tmp : list1) {
+			if(tmp.getId()==87) {
+				ITree dst = mappings.getDst(tmp);
+				if(tmp.isIsomorphicTo(dst))
+					System.out.println("Is iso");
+				else
+					System.out.println("Not iso");
+				String type1 = tc1.getTypeLabel(tmp);
+				String type2 = tc2.getTypeLabel(dst);
+				String value1 = tmp.getLabel();
+				String value2 = dst.getLabel();
+				System.out.println(type1+","+type2+","+value1+","+value2);
+				if(type1.equals(type2)&&value1.equals(value2)) {
+					System.out.println(true);
+				}else {
+					System.out.println(false);
+				}
+			}
+		}
 	} 
 
 
