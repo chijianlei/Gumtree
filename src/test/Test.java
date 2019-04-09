@@ -13,10 +13,10 @@ import gumtreediff.matchers.Matchers;
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
 import gumtreediff.tree.TreeUtils;
+import split.Pruning;
 import split.Split;
 import structure.DTree;
 import structure.SubTree;
-import utils.Pruning;
 import utils.Similarity;
 
 public class Test {
@@ -53,6 +53,13 @@ public class Test {
 				}
 			}
 		}
+		
+		String test1 = "";
+		String test2 = null;
+		if(test1.equals(test2))
+			System.out.println(true);
+		else
+			System.out.println(false);
 	} 
 
 

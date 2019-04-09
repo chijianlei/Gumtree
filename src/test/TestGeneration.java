@@ -30,6 +30,7 @@ import gumtreediff.matchers.Matcher;
 import gumtreediff.matchers.Matchers;
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
+import split.Pruning;
 import utils.Utils;
 
 public class TestGeneration {
@@ -56,6 +57,8 @@ public class TestGeneration {
         MappingStore mappings = m.getMappings();
         ActionGenerator g = new ActionGenerator(tc.getRoot(), tc2.getRoot(), m.getMappings());
         List<Action> actions = g.generate();
+        Pruning pt = new Pruning(tc, tc2, mappings);
+        pt.pruneTree();//Prune the tree.
         String out = "testGraph.txt";
         BufferedWriter wr = new BufferedWriter(new FileWriter(out));
         wr.append(TreeIoUtils.toDot(tc, mappings, actions, true).toString());
@@ -102,6 +105,7 @@ public class TestGeneration {
 //		System.out.println(ActionsIoUtils.toXml(tc, g.getActions(), m.getMappings()).toString());
         String out1 = "testMapping.txt";
         BufferedWriter wr1 = new BufferedWriter(new FileWriter(out1));
+//        System.out.println(ActionsIoUtils.toJson(tc, g.getActions(), m.getMappings()).toString());
         wr1.append(ActionsIoUtils.toXml(tc, g.getActions(), m.getMappings()).toString()); 
         wr1.flush();
         wr1.close();       
