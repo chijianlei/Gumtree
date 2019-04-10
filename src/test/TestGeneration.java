@@ -36,29 +36,35 @@ import utils.Utils;
 public class TestGeneration {
 	
 	public static void main(String args[]) throws Exception{
-		String input = "";
-		String path = "talker.cpp";
-//		String path = "migrations_test/Absolute3DLocalizationElement/Absolute3DLocalizationElement.cpp";
+//		String path = "talker.cpp";
+		String path = "Absolute3DLocalizationElement.cpp";
 		File cppfile = new File(path);
 		TreeContext tc = new SrcmlCppTreeGenerator().generateFromFile(cppfile);
-		String path2 = "talker2.cpp";
-//		String path2 = "migrations_test/Absolute3DLocalizationElement/Absolute3DLocalizationElement2.cpp";
+		ITree root = tc.getRoot();
+		System.out.println(root.getId()+","+tc.getTypeLabel(root));
+//		String path2 = "talker2.cpp";
+		String path2 = "Absolute3DLocalizationElement2.cpp";
 		File cppfile2 = new File(path2);
-		TreeContext tc2 = new SrcmlCppTreeGenerator().generateFromFile(cppfile2);       
-        System.out.println(tc.getRoot().getSize());
-        System.out.println(tc.getRoot().getType());
-        List<ITree> childs = tc2.getRoot().getChildren();
-        for(ITree tmp : childs) {
-        	System.out.println(tmp.getId());
-        }
+		TreeContext tc2 = new SrcmlCppTreeGenerator().generateFromFile(cppfile2);          
+        ITree root2 = tc2.getRoot();
+        System.out.println(root2.getId()+","+tc2.getTypeLabel(root2));
         
         Matcher m = Matchers.getInstance().getMatcher(tc.getRoot(), tc2.getRoot());
         m.match();
         MappingStore mappings = m.getMappings();
-        ActionGenerator g = new ActionGenerator(tc.getRoot(), tc2.getRoot(), m.getMappings());
+        ActionGenerator g = new ActionGenerator(tc.getRoot(), tc2.getRoot(), m.getMappings());      
         List<Action> actions = g.generate();
+//        ITree root3 = tc2.getRoot();
+//        System.out.println(root3.getId()+","+tc2.getTypeLabel(root3));
+//        if(root3.getParent()==null)
+//        	System.out.println(true);
+//        else System.out.println(false);
+
+        Utils.checkTCRoot(tc);
+        Utils.checkTCRoot(tc2);
         Pruning pt = new Pruning(tc, tc2, mappings);
-        pt.pruneTree();//Prune the tree.
+        pt.pruneTree();//Prune the tree.       
+
         String out = "testGraph.txt";
         BufferedWriter wr = new BufferedWriter(new FileWriter(out));
         wr.append(TreeIoUtils.toDot(tc, mappings, actions, true).toString());
@@ -72,7 +78,7 @@ public class TestGeneration {
         
 //        System.out.println(TreeIoUtils.toDot(tc, mappings, actions, true).toString());
 //        System.out.println(TreeIoUtils.toDot(tc2, mappings, actions, false).toString());
-        System.out.println(TreeIoUtils.toXml(tc).toString());
+//        System.out.println(TreeIoUtils.toXml(tc).toString());
         
         HashMap<Integer, Integer> mapping = new HashMap<>();       
         for(Mapping map : mappings) {
