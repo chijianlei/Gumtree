@@ -13,10 +13,10 @@ public class Migration {
 	private String miName;
 	
 	public Migration(TreeContext tc1, TreeContext tc2, MappingStore mappings, String name) {
-		srcT = tc1;
-		dstT = tc2;
+		this.srcT = tc1;
+		this.dstT = tc2;
 		this.mappings = mappings;
-		miName = name;
+		this.miName = name;
 	}
 
 	public TreeContext getSrcT() {

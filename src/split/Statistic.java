@@ -29,7 +29,6 @@ public class Statistic {
 		File[] dirs = (new File(path)).listFiles();
 		for(File dir : dirs) {
 			Split sp = new Split();
-			sp.getSize();
 			ArrayList<Migration> migrats = new ArrayList<>();
 			inputName = dir.getName();
 			File[] files = dir.listFiles(); 
@@ -59,7 +58,6 @@ public class Statistic {
 	public static void collectSpecificLeaves(String path, String parType) throws Exception {
 		ArrayList<Migration> migrats = new ArrayList<>();
 		Split sp = new Split();
-		sp.getSize();
 		migrats = sp.readMigration(path, "");
 		ArrayList<String> types1 = new ArrayList<String>();
 		ArrayList<String> types2 = new ArrayList<String>();

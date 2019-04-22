@@ -24,11 +24,11 @@ import gumtreediff.tree.TreeContext;
 import gumtreediff.tree.TreeUtils;
 import nodecluster.Cluster;
 import split.Split;
+import structure.ChangeTuple;
 import structure.DTree;
 import structure.SubTree;
 
 public class Utils {
-	private static Stack<String> blocks = new Stack<>();
 	
 	public static void main (String args[]) throws Exception{
 		String path = "talker.cpp";
@@ -151,6 +151,85 @@ public class Utils {
 		return src;		
 	}
 	
+	public static ChangeTuple filterChange(DTree sDT, DTree dDT) throws Exception {
+		ChangeTuple ct = new ChangeTuple();
+		TreeContext sTC = sDT.getTreeContext();
+		TreeContext dTC = dDT.getTreeContext();
+		ITree sRoot = sDT.getRoot();
+		ITree dRoot = dDT.getRoot();
+		List<ITree> sLeaves = new ArrayList<ITree>();
+		List<ITree> dLeaves = new ArrayList<ITree>();
+		sLeaves = traverse2Leaf(sRoot, sLeaves);
+		dLeaves = traverse2Leaf(dRoot, dLeaves);
+		ArrayList<Integer> sameLocation = new ArrayList<Integer>();
+		ArrayList<Integer> diffLocation = new ArrayList<Integer>();
+		for(ITree sLeaf : sLeaves) {
+			String sType = sTC.getTypeLabel(sLeaf);
+			String sValue = sLeaf.getLabel();
+			int pos1 = sLeaf.positionInParent();
+			for(ITree dLeaf : dLeaves) {
+				String dType = dTC.getTypeLabel(dLeaf);
+				String dValue = dLeaf.getLabel();
+				int pos2 = dLeaf.positionInParent();
+				if(sType.equals(dType)&&sValue.equals(dValue)) {										
+					if(pos1==pos2) 
+						sameLocation.add(pos1);
+				}else {
+					if(pos1==pos2)
+						diffLocation.add(pos1);
+				}
+			}		
+		}
+		Collections.sort(sameLocation);
+		Collections.sort(diffLocation);
+		String sString = "";
+		String dString = "";
+		ArrayList<ITree> sMoves = new ArrayList<ITree>();
+		ArrayList<ITree> dMoves = new ArrayList<ITree>();
+		if(diffLocation.size()!=0&&sameLocation.size()!=0) {
+			if(diffLocation.get(diffLocation.size()-1)<sameLocation.get(0)||
+					diffLocation.get(0)>sameLocation.get(sameLocation.size()-1)) {
+				for(int i=0;i<sameLocation.size();i++){
+					ITree sLeaf = sLeaves.get(sameLocation.get(i));
+					ITree dLeaf = dLeaves.get(sameLocation.get(i));
+					sMoves.add(sLeaf);
+					dMoves.add(dLeaf);
+				}
+				for(ITree node : sMoves) {
+					sLeaves.remove(node);
+				}
+				for(ITree node : dMoves) {
+					dLeaves.remove(node);
+				}
+				for(ITree leaf : sLeaves) {
+					String value = leaf.getLabel();
+					sString = sString + value;
+				}
+				for(ITree leaf : dLeaves) {
+					String value = leaf.getLabel();
+					dString = dString + value;
+				}
+				ct.setSrc(sString);
+				ct.setDst(dString);
+			//diff的最后一个位置编号也比same小或第一个位置编号就比same大，只保留diff部分，否则不改
+			}else {
+				sString = Utils.printLeaf(sDT);
+				dString = Utils.printLeaf(dDT);
+				ct.setSrc(sString);
+				ct.setDst(dString);
+			}
+		}else if(sameLocation.size()==0) {
+			sString = Utils.printLeaf(sDT);
+			dString = Utils.printLeaf(dDT);
+			ct.setSrc(sString);
+			ct.setDst(dString);
+		}else {
+			throw new Exception("error!");
+		}
+		
+		return ct;		
+	}//change中包含相同的不修改部分，需要过滤删除
+	
 	public static String recoverArguList(ITree root, List<ITree> arguLeaves, TreeContext srcT) throws Exception {
 		String arguSrc = "";
 		String end = "";
@@ -212,8 +291,10 @@ public class Utils {
 						arguSrc = arguSrc + recoverArguList(node2, leaves, srcT);
 					}else if(type2.equals("operator")) {
 						arguSrc = arguSrc+leaf2.getLabel();
+					}else if(type2.equals("modifier")) {
+						arguSrc = arguSrc+" *";
 					}else
-						throw new Exception("没考虑过的name情况:"+type2);					
+						throw new Exception("没考虑过的name情况:"+type2);																	
 				}else if(type1.equals("argument")||type1.equals("parameter")) {
 					if(type2.equals("argument")||type2.equals("parameter")) {
 						arguSrc = arguSrc+","+leaf2.getLabel();
@@ -372,6 +453,16 @@ public class Utils {
 		return dString;
 	}
 	
+	public static String printParents(ITree node, TreeContext tc) {
+		List<ITree> pars = node.getParents();
+		String parString = "";
+		for(ITree par : pars) {
+			String parType = tc.getTypeLabel(par);
+			parString = parString+parType;
+		}
+		return parString;
+	}
+	
 	public static List<ITree> traverse2Leaf(ITree node, List<ITree> leafList) throws Exception{//从根节点深度遍历至叶子节点，优先确定path相同的leaf mappings
 		List<ITree> childList = node.getChildren();
 		if(node.isLeaf()){
@@ -384,12 +475,21 @@ public class Utils {
 		return leafList;
 	}
 	
-	public static HashMap<String, LinkedList<Action>> collectAction(TreeContext tc1, TreeContext tc2) {
+	public static HashMap<String, LinkedList<Action>> collectAction(TreeContext tc1, TreeContext tc2, MappingStore mappings) {
 		Matcher m = Matchers.getInstance().getMatcher(tc1.getRoot(), tc2.getRoot());
         m.match();
-        ActionGenerator g = new ActionGenerator(tc1.getRoot(), tc2.getRoot(), m.getMappings());
+        ActionGenerator g = new ActionGenerator(tc1.getRoot(), tc2.getRoot(), mappings);
         List<Action> actions = g.generate();
         System.out.println("ActionSize:"+actions.size());
+        checkTCRoot(tc1);
+        checkTCRoot(tc2);
+        HashMap<Integer, Integer> mapping1 = new HashMap<Integer, Integer>();
+        for(Mapping map : m.getMappings()) {
+        	ITree src = map.getFirst();
+        	ITree dst = map.getSecond();
+        	mapping1.put(src.getId(), dst.getId());
+        }
+        System.out.println("mapSize:"+mapping1.size());	
         HashMap<String, LinkedList<Action>> actionMap = new HashMap<>();
         HashMap<Integer, Action> moves = new HashMap<Integer, Action>();
         HashMap<Integer, Action> updates = new HashMap<Integer, Action>();
@@ -502,7 +602,7 @@ public class Utils {
 	
 	public static Boolean ifSRoot(String typeLabel) {
 		if(typeLabel=="decl_stmt"||typeLabel=="expr_stmt"||typeLabel=="while"||typeLabel=="for"||
-					typeLabel=="function"||typeLabel=="constructor") {
+					typeLabel=="function"||typeLabel=="constructor"||typeLabel=="if") {
 			return true;
 		}else
 			return false;
@@ -520,6 +620,14 @@ public class Utils {
 		if(findNode==null)
 			findNode = false;
 		return findNode;
+	}
+	
+	public static void checkTCRoot(TreeContext tc){//发现action后有迷之根节点
+		ITree root = tc.getRoot();
+		if(root.getParent()!=null) {
+			System.err.println("find error root!!");
+			root.setParent(null);
+		}
 	}
 
 }

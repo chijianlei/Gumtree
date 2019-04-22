@@ -12,6 +12,7 @@ import java.util.Stack;
 
 import com.sun.tools.javah.Util;
 
+import gumtreediff.actions.ActionGenerator;
 import gumtreediff.actions.model.Action;
 import gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
 import gumtreediff.matchers.Mapping;
@@ -22,6 +23,7 @@ import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
 import gumtreediff.tree.TreeUtils;
 import nodecluster.Cluster;
+import structure.ChangeTuple;
 import structure.DTree;
 import structure.Migration;
 import structure.SubTree;
@@ -128,11 +130,26 @@ public class Split {
 	}
 	
 	public void splitSnippets() throws Exception {//finer-grained split statement into type snippets		
-		for(Transform tf : trans) {			
+		for(int i=0;i<trans.size();i++) {	
+			Transform tf = trans.get(i);
 			SubTree srcST = tf.getSTree();
 			SubTree dstST = tf.getDTree();
 			HashMap<DTree, DTree> dtMap = new HashMap<>();
-			dtMap = getDTmap(srcST, dstST, tf);	
+			ITree root = srcST.getRoot();
+			if(root.getDescendants().size()==0)
+				continue;//有剪枝和切断block之后while function类似节点只有节点本身的情况，跳过
+			TreeContext tc = srcST.getTC();
+			String type = tc.getTypeLabel(root);
+			int id = root.getId();
+//			if(type.equals("if")) {
+//				List<ITree> childs = root.getDescendants();
+//				for(ITree node : childs) {
+//					if(tc.getTypeLabel(node).equals("block"))
+//						System.err.println("find block!");
+//				}
+//			}
+			
+			searchDTmap(tf);	
 
 			
 			//find different kinds of actions
@@ -144,11 +161,24 @@ public class Split {
 		}
 	}
 	
-	public HashMap<DTree, DTree> getDTmap(SubTree srcST, SubTree dstST, Transform tf) throws Exception{
+	public HashMap<DTree, DTree> searchDTmap(Transform tf) throws Exception{
 		System.out.println("----getDTmap----");
-		TreeContext srcT = tf.getSrcT();
-		TreeContext dstT = tf.getDstT();//单叶子节点，不同value，no matching情况
 		HashMap<DTree, DTree> dtMap = new HashMap<>();
+		SubTree srcST = tf.getSTree();
+		SubTree dstST = tf.getDTree();
+		if(srcST==null) {
+			System.out.println("srcST is null!");
+			dtMap = addCondition(tf);
+			return dtMap;
+		}
+		if(dstST==null) {
+			System.out.println("dstST is null!");
+			dtMap = delCondition(tf);
+			return dtMap;
+		}	
+		TreeContext srcT = tf.getSrcT();
+		System.out.println("srcRootID:"+srcST.getRoot().getId());
+		TreeContext dstT = tf.getDstT();//单叶子节点，不同value，no matching情况	
         HashMap<Integer, Integer> subMap = tf.getSubMap();
 		HashMap<String, ArrayList<Action>> actMap = tf.getActMap();
 		ArrayList<Action> updates = actMap.get("update");
@@ -165,6 +195,9 @@ public class Split {
 			ITree node = act.getNode();
 			int id = node.getId();
 			updIds.add(id);
+		}
+		for(DTree sdt : sDTs) {
+			System.out.println(sdt.getRoot().getId());
 		}
 		
 		for(int i=0;i<sDTs.size();i++) {//Dwarf-tree level
@@ -215,15 +248,15 @@ public class Split {
 				}
 				double tmpSim1 = (2.0*tmpNum1)/(size1+size2);
 				double tmpSim2 = (2.0*tmpNum2)/(size1+size2);
-				if(sim1<tmpSim1) {
+				if(sim2<tmpSim1) {
 					candidateDT1 = dDT;
-					sim1=tmpSim1;
+					sim2=tmpSim1;
 				}	
-				if(sim2<tmpSim2) {
+				if(sim1<tmpSim2) {
 					candidateDT2 = dDT;
-					sim2=tmpSim2;
+					sim1=tmpSim2;
 				}					
-//				if(sDT.getRoot().getId()==94) {
+//				if(sDT.getRoot().getId()==821) {
 //					System.out.println(Utils.printDTree(sDT));
 //					System.out.println("dDT:"+dDT.getRoot().getId()+Utils.printDTree(dDT));
 //					System.out.println("sim:"+sim1+","+tmpNum1+","+sim2+","+tmpNum2);
@@ -235,54 +268,13 @@ public class Split {
 //					}				
 //				}
 			}
+			
 			if(sim1==1) {
-				if(leaves.size()==1&&candidateDT1.getLeaves().size()==1) {
-					int srcId = leaves.get(0).getId();
-					int candidateId = candidateDT1.getLeaves().get(0).getId();
-					System.out.println("Size1id:"+srcId+","+candidateId);
-					if(updIds.contains(srcId)) {
-						System.out.println("dtMapsize:"+dtMap.size());
-						String dstTString = Utils.printLeaf(candidateDT1);
-						System.out.println(sDT.getRoot().getId());
-						System.out.println("Change3:"+sDTString+"->"+dstTString);
-						dtMap.put(sDT, candidateDT1);
-						if(!(mappedsDTs.contains(sDT)||mappeddDTs.contains(candidateDT1))) {
-							mappedsDTs.add(sDT);
-							mappeddDTs.add(candidateDT1);
-						}else if(mappedsDTs.contains(sDT)&&!mappeddDTs.contains(candidateDT1)) {
-							throw new Exception("error situation");
-						}else if(!mappedsDTs.contains(sDT)&&mappeddDTs.contains(candidateDT1)) {
-							throw new Exception("error situation");
-						}												
-					}
-				}
-			}//In some cases, A DTree only has one leaf. It should be discussed separately.
-			if(sim1>=0.3&&sim1!=1) {
-				System.out.println("dtMapsize:"+dtMap.size());
-				String dDTString = Utils.printLeaf(candidateDT1);
-				System.out.println(sDT.getRoot().getId());
-				System.out.println("Change1:"+sDTString+"->"+dDTString);
-//				System.out.println("Map:"+sDT.getRoot().getId()+"->"+candidateDT1.getRoot().getId());
-				if((dtMap.containsKey(sDT)&&!dtMap.containsValue(candidateDT1))) {
-					throw new Exception("error candidateDT!");
-				}else if(!dtMap.containsKey(sDT)&&dtMap.containsValue(candidateDT1)){
-					throw new Exception("error sDT!");
-				}else {
-					dtMap.put(sDT, candidateDT1);
-				}	
-				if(!(mappedsDTs.contains(sDT)||mappeddDTs.contains(candidateDT1))) {
-					mappedsDTs.add(sDT);
-					mappeddDTs.add(candidateDT1);
-				}else if(mappedsDTs.contains(sDT)&&!mappeddDTs.contains(candidateDT1)) {
-					throw new Exception("error situation");
-				}else if(!mappedsDTs.contains(sDT)&&mappeddDTs.contains(candidateDT1)) {
-					throw new Exception("error situation");
-				}
-			}
-			if(sim2==1) {
 				String dDTString = Utils.printLeaf(candidateDT2);
 				if(!sDTString.equals(dDTString)) {
-					System.out.println("Change4:"+sDTString+"->"+dDTString);
+					System.out.println("Change3:"+sDTString+"->"+dDTString);
+					ChangeTuple ct = Utils.filterChange(sDT, candidateDT2);
+					System.out.println("AfterFilter:"+ct.toString());
 					if((dtMap.containsKey(sDT)&&!dtMap.containsValue(candidateDT2))) {
 						throw new Exception("error candidateDT!");
 					}else if(!dtMap.containsKey(sDT)&&dtMap.containsValue(candidateDT2)){
@@ -320,9 +312,11 @@ public class Split {
 					}
 				}
 			}//全部matching，若叶子完全相同，移除，不然是全部需要改的特殊情况
-			if(sim2>=0.5&&sim2!=1) {
+			if(sim1>=0.5&&sim1!=1) {
 				String dstTString = Utils.printLeaf(candidateDT2);
-				System.out.println("Change2:"+sDTString+"->"+dstTString);
+				System.out.println("Change1:"+sDTString+"->"+dstTString);
+				ChangeTuple ct = Utils.filterChange(sDT, candidateDT2);
+				System.out.println("AfterFilter:"+ct.toString());
 //				System.out.println("Map:"+sDT.getRoot().getId()+"->"+candidateDT2.getRoot().getId());
 				if((dtMap.containsKey(sDT)&&!dtMap.containsValue(candidateDT2))) {
 					throw new Exception("error candidateDT!");
@@ -340,7 +334,52 @@ public class Split {
 					throw new Exception("error situation");
 				}
 			}
-		}		
+			if(sim2==1) {
+				if(leaves.size()==1&&candidateDT1.getLeaves().size()==1) {
+					int srcId = leaves.get(0).getId();
+					int candidateId = candidateDT1.getLeaves().get(0).getId();
+					System.out.println("Size1id:"+srcId+","+candidateId);
+					if(updIds.contains(srcId)) {
+						System.out.println("dtMapsize:"+dtMap.size());
+						String dstTString = Utils.printLeaf(candidateDT1);
+						System.out.println(sDT.getRoot().getId());
+						System.out.println("Change4:"+sDTString+"->"+dstTString);
+						ChangeTuple ct = Utils.filterChange(sDT, candidateDT1);
+						System.out.println("AfterFilter:"+ct.toString());
+						dtMap.put(sDT, candidateDT1);
+						if(!(mappedsDTs.contains(sDT)||mappeddDTs.contains(candidateDT1))) {
+							mappedsDTs.add(sDT);
+							mappeddDTs.add(candidateDT1);
+						}else if(mappedsDTs.contains(sDT)&&!mappeddDTs.contains(candidateDT1)) {
+							throw new Exception("error situation");
+						}else if(!mappedsDTs.contains(sDT)&&mappeddDTs.contains(candidateDT1)) {
+							throw new Exception("error situation");
+						}												
+					}
+				}
+			}//In some cases, A DTree only has one leaf. It should be discussed separately.
+			if(sim2>=0.3&&sim2!=1) {
+				System.out.println("dtMapsize:"+dtMap.size());
+				String dDTString = Utils.printLeaf(candidateDT1);
+//				System.out.println("Map:"+sDT.getRoot().getId()+"->"+candidateDT1.getRoot().getId());
+				if(!(dtMap.containsKey(sDT)||dtMap.containsValue(candidateDT1))) {
+					System.out.println(sDT.getRoot().getId());
+					System.out.println("Change2:"+sDTString+"->"+dDTString);
+					ChangeTuple ct = Utils.filterChange(sDT, candidateDT1);
+					System.out.println("AfterFilter:"+ct.toString());
+					dtMap.put(sDT, candidateDT1);
+				}else {
+					System.out.println("existing sDT or candidateDT");
+				}	
+				if(!(mappedsDTs.contains(sDT)||mappeddDTs.contains(candidateDT1))) {
+					mappedsDTs.add(sDT);
+					mappeddDTs.add(candidateDT1);
+				}else{
+					System.out.println("existing maapingDT");
+				}
+			}
+		}
+		
 		for(DTree dt : mappedsDTs) {
 			sDTs.remove(dt);
 		}
@@ -361,12 +400,7 @@ public class Split {
 			if(ifMatch==true)
 				continue;//若是match上且不需要修改的DTree，不要记录直接continue
 			String sRootType = srcT.getTypeLabel(sRoot);
-			List<ITree> sPars = sRoot.getParents();
-			String sParsString = sRootType;
-			for(ITree tmpPar : sPars) {
-				String parType = srcT.getTypeLabel(tmpPar);
-				sParsString = sParsString + parType;
-			}
+			String sParsString = sRootType+Utils.printParents(sRoot, srcT);
 			float sim = 0;
 			String sDTString = Utils.printLeaf(sDT);
 			DTree candidateDT = null;
@@ -375,12 +409,7 @@ public class Split {
 				ITree dRoot = dDT.getRoot();
 				String dRootType = dstT.getTypeLabel(dRoot);
 				if(sRootType.equals(dRootType)) {
-					List<ITree> dPars = sRoot.getParents();
-					String dParsString = sRootType;
-					for(ITree tmpPar : dPars) {
-						String parType = srcT.getTypeLabel(tmpPar);
-						dParsString = dParsString + parType;
-					}
+					String dParsString = dRootType+Utils.printParents(dRoot, dstT);
 					tmpSim = Levenshtein.getSimilarityRatio(sParsString, dParsString);
 					if(tmpSim>sim) {
 						candidateDT = dDT;
@@ -388,26 +417,25 @@ public class Split {
 					}
 				}			
 			}
-			if(sim>0.5) {
+			if(sim>0.7) {
 				String dDTString = Utils.printLeaf(candidateDT);
 				if(!sDTString.equals(dDTString)) {
+					System.out.println("Levenshtein:"+sim);
 					System.out.println("Change5:"+sDTString+"->"+dDTString);
+					ChangeTuple ct = Utils.filterChange(sDT, candidateDT);
+					System.out.println("AfterFilter:"+ct.toString());
 //					System.out.println("Map:"+sDT.getRoot().getId()+"->"+candidateDT2.getRoot().getId());			
 				}				
-				if((dtMap.containsKey(sDT)&&!dtMap.containsValue(candidateDT))) {
-					throw new Exception("error candidateDT!");
-				}else if(!dtMap.containsKey(sDT)&&dtMap.containsValue(candidateDT)){
-					throw new Exception("error sDT!");
-				}else {
+				if(!(dtMap.containsKey(sDT)||dtMap.containsValue(candidateDT))) {
 					dtMap.put(sDT, candidateDT);
+				}else {
+					System.out.println("existing sDT or candidate");
 				}
 				if(!(mappedsDTs.contains(sDT)||mappeddDTs.contains(candidateDT))) {
 					mappedsDTs.add(sDT);
 					mappeddDTs.add(candidateDT);
-				}else if(mappedsDTs.contains(sDT)&&!mappeddDTs.contains(candidateDT)) {
-					throw new Exception("error situation");
-				}else if(!mappedsDTs.contains(sDT)&&mappeddDTs.contains(candidateDT)) {
-					throw new Exception("error situation");
+				}else {
+					System.out.println("existing maapingDT");
 				}
 			}
 		}
@@ -430,7 +458,7 @@ public class Split {
 				String dRootType = dstT.getTypeLabel(dRoot);
 				if(sRootType.equals(dRootType)) {
 					ifDEL = false;
-					throw new Exception("why not matching?"+sDTString);
+					System.out.println("why not matching?"+sDTString);
 				}else
 					continue;					
 			}
@@ -448,7 +476,7 @@ public class Split {
 				String sRootType = srcT.getTypeLabel(sRoot);
 				if(sRootType.equals(dRootType)) {
 					ifADD = false;
-					throw new Exception("why not matching?"+dDTString);
+					System.out.println("why not matching?"+dDTString);
 				}else
 					continue;
 			}
@@ -462,10 +490,11 @@ public class Split {
 	}//Matching sDTs and dDTs
 	
 	public ArrayList<DTree> getDwarfTrees(SubTree st) throws Exception{
+		ArrayList<DTree> orderedDTs = new ArrayList<DTree>();
 		ITree root = st.getRoot();
 		TreeContext tc = st.getTC();
-		if(root.getHeight()<=2)
-			throw new Exception("error subtree, plz check!");		
+		if(root.getHeight()<2)
+			throw new Exception("error subtree id "+root.getId()+", plz check!");		
 		List<ITree> leaves = new ArrayList<>();		
 		leaves = Utils.traverse2Leaf(root, leaves);
 		ArrayList<DTree> dwarfTrees = new ArrayList<>();
@@ -474,6 +503,10 @@ public class Split {
 			ITree leaf = leaves.get(i);
 			String type = tc.getTypeLabel(leaf);			
 			ITree par = leaf.getParent();
+			if(par==null) {
+				System.out.println("par is null, maybe leaf is block node");
+				continue;
+			}				
 			String parType = tc.getTypeLabel(par);
 			if(type.equals("argument_list"))
 				continue;//"argument_list"的叶子节点不包含任何信息，还可能扰乱匹配
@@ -484,8 +517,6 @@ public class Split {
 					parType = tc.getTypeLabel(par);
 				}//name或operator的parent不能为name					
 			}//考虑name DTree发现的特殊情况, 不然多个name leaf的par跟单个name leaf会匹配异常
-			if(par==null)
-				throw new Exception("error par!!");
 			if(parMap.get(par)==null) {
 				ArrayList<ITree> leafList = new ArrayList<>();
 				leafList.add(leaf);
@@ -511,8 +542,22 @@ public class Split {
 				dwarfTrees.add(dt);
 			}else 
 				throw new Exception("error par!!");			
-		}				
-		return dwarfTrees;
+		}	
+		
+		while(orderedDTs.size()!=dwarfTrees.size()) {
+			int max = Integer.MAX_VALUE;
+			DTree candidate = null;
+			for(DTree DT : dwarfTrees) {
+				int id = DT.getRoot().getId();
+				if(!orderedDTs.contains(DT)&&id<max) {
+					candidate = DT;
+					max = id;
+				}
+			}
+			orderedDTs.add(candidate);
+		}	
+		
+		return orderedDTs;
 	}//sub-subtree whose height is 2
 	
 	public ArrayList<Migration> readMigration(String path, String input) throws Exception {
@@ -536,8 +581,6 @@ public class Split {
 			Matcher m = Matchers.getInstance().getMatcher(tc1.getRoot(), tc2.getRoot());
 	        m.match();
 	        MappingStore mappings = m.getMappings();
-			Pruning pt = new Pruning(tc1, tc2, mappings);
-			pt.pruneTree();//Prune the ContextTree in order to get accurate matching rules.
 			Migration mi = new Migration(tc1, tc2, mappings, dir.getName()+".cpp");
 			migrats.add(mi);
 		}
@@ -551,6 +594,7 @@ public class Split {
 			TreeContext srcT = migrat.getSrcT();
 			TreeContext dstT = migrat.getDstT();
 			MappingStore mappings = migrat.getMappings();
+
 			
 //			ArrayList<SubTree> sub2 = splitSubTree(dstT, miName);
 //	        double similarity = Similarity.getSimilarity(sub1.get(0), sub2.get(0));
@@ -565,16 +609,22 @@ public class Split {
 	
 	public ArrayList<Transform> splitTransform(TreeContext srcT, TreeContext dstT, MappingStore mappings, String miName) throws Exception {
 		System.out.println("Analyse:"+miName);
+		Matcher m = Matchers.getInstance().getMatcher(srcT.getRoot(), dstT.getRoot());
+        m.match();
 		ArrayList<Transform> trans = new ArrayList<>();
 		ArrayList<SubTree> actSubTree = new ArrayList<>();
-		HashMap<String, LinkedList<Action>> actions = Utils.collectAction(srcT, dstT);		
+		HashMap<String, LinkedList<Action>> actions = Utils.collectAction(srcT, dstT, mappings);		
 //		HashMap<SubTree, Integer> st2lineNum = new HashMap<>();				
 		LinkedList<Action> updates = actions.get("update");
 		LinkedList<Action> deletes = actions.get("delete");
 		LinkedList<Action> inserts = actions.get("insert");
 		LinkedList<Action> moves = actions.get("move");	
 		ArrayList<Integer> srcActIds = Utils.collectSrcActNodeIds(srcT, dstT, actions);
-//		System.out.println("IdNum:"+srcActIds.size());
+//		System.out.println("IdNum:"+srcActIds.size());		
+		
+		Pruning pt = new Pruning(srcT, dstT, mappings);
+		pt.pruneTree();//Prune the ContextTree in order to get accurate matching rules.
+		
 		Cluster cl = new Cluster(srcT, dstT);
 		ArrayList<SubTree> sub1 = splitSubTree(srcT, miName);//Subtree中割裂过block,注意
 		ArrayList<SubTree> sub2 = splitSubTree(dstT, miName);//先计算action,再split ST
@@ -637,22 +687,22 @@ public class Split {
     			}
     			
     		}   		
-    		for(int j=0;j<inserts.size();j++) {	
-    			Action a = inserts.get(j);
-    			ITree sRoot = cl.traverseSRoot(a);			
-    			if(nodeList.contains(sRoot)) {
-    				subInserts.add(a);
-//    				inserts.remove(a);
-    			}
-    		}   		
-    		for(int j=0;j<moves.size();j++) {
-    			Action a = moves.get(j);
-    			ITree sRoot = cl.findMovRoot(a);			
-    			if(nodeList.contains(sRoot)) {
-    				subMoves.add(a);
-//    				moves.remove(a);
-    			}
-    		}
+//    		for(int j=0;j<inserts.size();j++) {	
+//    			Action a = inserts.get(j);
+//    			ITree sRoot = cl.traverseSRoot(a);			
+//    			if(nodeList.contains(sRoot)) {
+//    				subInserts.add(a);
+////    				inserts.remove(a);
+//    			}
+//    		}   		
+//    		for(int j=0;j<moves.size();j++) {
+//    			Action a = moves.get(j);
+//    			ITree sRoot = cl.findMovRoot(a);			
+//    			if(nodeList.contains(sRoot)) {
+//    				subMoves.add(a);
+////    				moves.remove(a);
+//    			}
+//    		}
 //    		System.out.println("subupdsize:"+subUpdates.size());    		
 //    		System.out.println("subdelsize:"+subDeletes.size());  		
 //    		System.out.println("subaddsize:"+subInserts.size());  		
@@ -709,7 +759,7 @@ public class Split {
 				for(ITree tmp : list) {
 					String type = tc.getTypeLabel(tmp);
 					if(type.equals("block")) {
-						subRoot.getChildren().remove(tmp);//断开父亲和所有block node的连接	
+						tmp.getParent().getChildren().remove(tmp);//断开父亲和所有block node的连接	
 						tmp.setParent(null);//是否需要断开block node跟父亲的连接呢?	
 					}									
 				}
@@ -722,9 +772,20 @@ public class Split {
 		return subRootList;
 	}
 	
-	public void getSize() {
-		System.out.println(trans.size());
-		System.out.println(count);
-	}
+	public HashMap<DTree, DTree> delCondition(Transform tf) throws Exception {
+		HashMap<DTree, DTree> dtMap = new HashMap<>();
+		SubTree srcST = tf.getSTree();
+		String code = Utils.subtree2src(srcST);
+		System.out.println("DELStmt:"+code);
+		return null;
+	}//dstST为空的特殊情况，代表srcST找不到对应的dstST，直接删除整颗srcST即可
+	
+	public HashMap<DTree, DTree> addCondition(Transform tf) throws Exception {
+		HashMap<DTree, DTree> dtMap = new HashMap<>();
+		SubTree dstST = tf.getDTree();
+		String code = Utils.subtree2src(dstST);
+		System.out.println("ADDStmt:"+code);
+		return null;
+	}//dstST为空的特殊情况，代表srcST找不到对应的dstST，直接删除整颗srcST即可
 	
 }

@@ -20,11 +20,11 @@ public class Transform {
 	
 	public Transform(SubTree st, SubTree dt, HashMap<Integer, Integer> map,
 			HashMap<String, ArrayList<Action>> actions, String name) {
-		sTree = st;
-		dTree = dt;
-		subMap = map;
-		actMap = actions;
-		miName = name;
+		this.sTree = st;
+		this.dTree = dt;
+		this.subMap = map;
+		this.actMap = actions;
+		this.miName = name;
 	}
 	
 	public ITree getSRoot() {
@@ -44,11 +44,11 @@ public class Transform {
 	}
 
 	public TreeContext getSrcT() {
-		return sTree.getTC();
+		return sTree.getTC();	
 	}
 
 	public TreeContext getDstT() {
-		return dTree.getTC();
+		return dTree.getTC();	
 	}
 	
 	public int getlineNum() {

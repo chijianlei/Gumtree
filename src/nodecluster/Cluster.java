@@ -50,7 +50,7 @@ public class Cluster {
 		for(Migration m : migrates) {
 			TreeContext tc1 = m.getSrcT();
 			TreeContext tc2 = m.getDstT();
-			HashMap<String, LinkedList<Action>> actions = Utils.collectAction(tc1, tc2);
+			HashMap<String, LinkedList<Action>> actions = Utils.collectAction(tc1, tc2, mapping);
 			LinkedList<Action> updates = actions.get("update");
 			for(Action a : updates) {	
 				String src = tc1.getTypeLabel(a.getNode());
@@ -66,7 +66,7 @@ public class Cluster {
 	}
 	
 	public void clusterActions(TreeContext tC1, TreeContext tC2) throws Exception {
-		HashMap<String, LinkedList<Action>> actions = Utils.collectAction(tc1, tc2);
+		HashMap<String, LinkedList<Action>> actions = Utils.collectAction(tc1, tc2, mapping);
         
         for(Mapping map : mapping) {
         	ITree src = map.getFirst();
@@ -282,8 +282,11 @@ public class Cluster {
 	        	if(node2rootMap.get(par2)!=null) {
 	        		par1 = node2rootMap.get(par2); 
 	        		node2rootMap.put(dst, par1);
-	        	}else
-        			throw new Exception("error childAction!");
+	        	}else {
+	        		System.out.println("error id:"+par2.getId());
+	        		throw new Exception("error childAction!");
+	        	}
+        			
 	        }
 			target = par1;			
 		}
