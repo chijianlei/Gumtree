@@ -85,7 +85,7 @@ public class CrossMoveMatcherThetaF implements Matcher {
 
             @Override
             public int compare(Mapping o1, Mapping o2) {
-                if (o1.first.getMetrics().position != o2.first.getMetrics().position) {
+                if (!o1.first.getMetrics().position().equalsTo(o2.first)) {
                     return Integer.compare(positionSrc.get(o1.first.getMetrics().position),
                             positionSrc.get(o2.first.getMetrics().position));
                 }

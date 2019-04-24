@@ -24,6 +24,7 @@ import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.matchers.Matcher;
 import com.github.gumtreediff.matchers.MultiMappingStore;
 import com.github.gumtreediff.tree.ITree;
+import com.github.gumtreediff.tree.TreeMetrics;
 import com.github.gumtreediff.utils.Pair;
 import com.github.gumtreediff.matchers.Mapping;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -101,14 +102,9 @@ public class CliqueSubtreeMatcher extends AbstractSubtreeMatcher implements Matc
             }
 
             private int minDepth(Pair<List<ITree>, List<ITree>> trees) {
-                int depth = Integer.MAX_VALUE;
-                for (ITree t : trees.first)
-                    if (depth > t.getMetrics().depth)
-                        depth = t.getMetrics().depth;
-                for (ITree t : trees.second)
-                    if (depth > t.getMetrics().depth)
-                        depth = t.getMetrics().depth;
-                return depth;
+                int depthFirst = TreeMetrics.Comparators.depth().min(trees.first);
+                int depthSecond = TreeMetrics.Comparators.depth().min(trees.second);
+                return depthFirst < depthSecond ? depthFirst : depthSecond;
             }
 
             private int size(Pair<List<ITree>, List<ITree>> trees) {

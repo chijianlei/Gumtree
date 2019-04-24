@@ -22,6 +22,7 @@ package com.github.gumtreediff.matchers.heuristic.gt;
 import com.github.gumtreediff.matchers.Mapping;
 import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.tree.ITree;
+import com.github.gumtreediff.tree.TreeMetrics;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -49,12 +50,8 @@ public abstract class AbstractMappingComparator implements Comparator<Mapping> {
         if (similarities.get(m2).compareTo(similarities.get(m1)) != 0) {
             return Double.compare(similarities.get(m2), similarities.get(m1));
         }
-        int srcPos = m1.first.getMetrics().position;
-        int dstPos = m2.first.getMetrics().position;
-        if (srcPos != dstPos) {
-            return Integer.compare(srcPos, dstPos);
-        }
-        return Integer.compare(m1.second.getMetrics().position, m2.second.getMetrics().position);
+        int diff = m1.first.getMetrics().position().compare(m2.first);
+        return (diff != 0) ? diff : m1.second.getMetrics().position().compare(m2.second);
     }
 
     protected abstract double similarity(ITree src, ITree dst);
