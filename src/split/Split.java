@@ -622,8 +622,8 @@ public class Split {
 		ArrayList<Integer> srcActIds = Utils.collectSrcActNodeIds(srcT, dstT, actions);
 //		System.out.println("IdNum:"+srcActIds.size());		
 		
-		Pruning pt = new Pruning(srcT, dstT, mappings);
-		pt.pruneTree();//Prune the ContextTree in order to get accurate matching rules.
+//		Pruning pt = new Pruning(srcT, dstT, mappings);
+//		pt.pruneTree();//Prune the ContextTree in order to get accurate matching rules.
 		
 		Cluster cl = new Cluster(srcT, dstT);
 		ArrayList<SubTree> sub1 = splitSubTree(srcT, miName);//Subtree中割裂过block,注意
@@ -726,7 +726,7 @@ public class Split {
                 		break;
     				}      			
     			}
-    		}   			       			     		       			
+    		}//是否会漏掉src中没有语句，dst中加入的情况   			       			     		       			
     		List<ITree> nodes = TreeUtils.preOrder(st.getRoot());
     		HashMap<Integer, Integer> subMap = new HashMap<>();
     		for(ITree src : nodes) {
@@ -761,7 +761,10 @@ public class Split {
 					if(type.equals("block")) {
 						tmp.getParent().getChildren().remove(tmp);//断开父亲和所有block node的连接	
 						tmp.setParent(null);//是否需要断开block node跟父亲的连接呢?	
-					}									
+					}else if(type.equals("elseif"))	{
+						tmp.getParent().getChildren().remove(tmp);//断开父亲和所有elseif node的连接	
+						tmp.setParent(null);//是否需要断开elseif node跟父亲的连接呢?	
+					}
 				}
 				SubTree st = new SubTree(subRoot, tc, count, miName);
 				subRootList.add(st);

@@ -60,6 +60,9 @@ public class Test {
 			System.out.println(true);
 		else
 			System.out.println(false);
+		String test3 = "test st";
+		test3 = test3.substring(0, test3.length()-1);
+		System.out.println(test3);
 	} 
 
 

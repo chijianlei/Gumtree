@@ -109,8 +109,14 @@ public class Utils {
 //							throw new Exception("wrong sharePar!");
 					}				
 				}//找sharePar的下一个leaf1,leaf2对应父节点(或其本身)
-				String type1 = srcT.getTypeLabel(node1);
-				String type2 = srcT.getTypeLabel(node2);
+				String type1 = "";
+				String type2 = "";
+				if(node1!=null&&node2!=null) {
+					type1 = srcT.getTypeLabel(node1);
+					type2 = srcT.getTypeLabel(node2);
+				}else 
+					System.out.println("why node is null?"+st.getMiName()+","+st.getRoot().getId());
+				
 				if(type1.equals("name")) {
 					if(type2.equals("argument_list")||type2.equals("parameter_list")) {						
 						List<ITree> arguLeaves = new ArrayList<>();
@@ -122,13 +128,19 @@ public class Utils {
 						src = src+"="+leaf2.getLabel();
 					}else if(type2.equals("operator")) {
 						src = src+leaf2.getLabel();
-					}else
-						throw new Exception("没考虑过的name情况:"+type2);
+					}else {
+						src = "error situation"; 
+						break;
+//						throw new Exception("没考虑过的name情况:"+type2);
+					}					
 				}else if(type1.equals("type")) {
 					if(type2.equals("name")) {	
 						src = src+" "+leaf2.getLabel();
-					}else
-						throw new Exception("没考虑过的type情况:"+type2);
+					}else {
+						src = "error situation"; 
+						break;
+//						throw new Exception("没考虑过的type情况:"+type2);
+					}						
 				}else if(type1.equals("operator")) {
 					if(type2.equals("call")) {//好像有node2为call的情况
 						node2 = node2.getChildren().get(0);
@@ -136,20 +148,144 @@ public class Utils {
 					}						
 					if(type2.equals("name")||type2.equals("operator")) {
 						src = src+leaf2.getLabel();
-					}else						
-						throw new Exception("没考虑过的operator情况:"+type2);
+					}else {
+						src = "error situation";
+						break;
+//						throw new Exception("没考虑过的operator情况:"+type2);
+					}					
 				}else if(type1.equals("specifier")) {
 					if(type2.equals("name")){
 						src = src+" "+leaf2.getLabel();
-					}else
-						throw new Exception("没考虑过的type情况:"+type2);
+					}else {
+						src = "error situation";
+						break;
+//						throw new Exception("没考虑过的type情况:"+type2);
+					}						
 				}
-			}else						
-				throw new Exception("没考虑过的children情况");
+			}else {
+				src = "error situation";
+				break;
+//				throw new Exception("没考虑过的children情况");
+			}				
 		}
 		src = src+loopEnd;
 		return src;		
 	}
+	
+	public static String recoverArguList(ITree root, List<ITree> arguLeaves, TreeContext srcT) throws Exception {
+		String arguSrc = "";
+		String end = "";
+		ITree node = root.getParent();
+		String type = srcT.getTypeLabel(node);//找到argument_list父节点
+		if(type.equals("name")) {//name情况用<>
+			arguSrc = arguSrc+"<";
+			end = ">";
+		}else if(type.equals("call")||type.equals("decl")) {//call的情况下用()
+			arguSrc = arguSrc+"(";
+			end = ")";
+		}else if(type.equals("constructor")||type.equals("function")) {
+			arguSrc = arguSrc+"(";
+			end = ")";
+		}			
+		if(arguLeaves.size()==0) {
+			arguSrc = arguSrc+end;
+			return 	arguSrc;
+		}//返回空括号
+		if(arguLeaves.size()==1) {
+			arguSrc = arguSrc + arguLeaves.get(0).getLabel()+end;
+			return 	arguSrc;
+		}//返回单个元素+括号
+				
+		arguSrc = arguSrc + arguLeaves.get(0).getLabel();
+		for(int i=0;i<arguLeaves.size()-1;i++) {
+			ITree leaf1 = arguLeaves.get(i);
+			ITree leaf2 = arguLeaves.get(i+1);
+			ITree sharePar = findShareParent(leaf1, leaf2, srcT);
+//			String parType = srcT.getTypeLabel(sharePar);
+			List<ITree> childs = sharePar.getChildren();
+			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//同一层的两个叶子节点，还原时候直接拼起来就行
+				arguSrc = arguSrc+ leaf2.getLabel();
+			}else if(childs.size()>=2){
+				ITree node1 = null;
+				ITree node2 = null;
+				for(ITree child : childs) {
+					if(child.isLeaf()) {
+						if(child.equals(leaf1))
+							node1 = child;
+						if(child.equals(leaf2))
+							node2 = child;
+					}else {
+						List<ITree> list = TreeUtils.preOrder(child);
+						if(list.contains(leaf1))
+							node1 = child;
+						if(list.contains(leaf2))
+							node2 = child;
+//						if(list.contains(leaf1)&&list.contains(leaf1))
+//							throw new Exception("wrong sharePar!");
+					}				
+				}//找sharePar的下一个leaf1,leaf2对应父节点(或其本身)
+				String type1 = srcT.getTypeLabel(node1);
+				String type2 = srcT.getTypeLabel(node2);
+				if(type1.equals("name")) {
+					if(type2.equals("argument_list")||type2.equals("parameter_list")) {	
+						List<ITree> leaves = new ArrayList<>();
+						leaves = traverse2Leaf(node2, leaves);//找到argulist中所有叶子
+						arguSrc = arguSrc + recoverArguList(node2, leaves, srcT);
+					}else if(type2.equals("operator")) {
+						arguSrc = arguSrc+leaf2.getLabel();
+					}else if(type2.equals("modifier")) {
+						arguSrc = arguSrc+" *";
+					}else {
+						arguSrc = "error situation";
+						break;
+//						throw new Exception("没考虑过的name情况:"+type2);	
+					}																						
+				}else if(type1.equals("argument")||type1.equals("parameter")) {
+					if(type2.equals("argument")||type2.equals("parameter")) {
+						arguSrc = arguSrc+","+leaf2.getLabel();
+					}else {
+						arguSrc = "error situation";
+						break;
+//						throw new Exception("没考虑过的argument情况:"+type2);
+					}					
+				}else if(type1.equals("type")) {
+					if(type2.equals("name")) {	
+						arguSrc = arguSrc+" "+leaf2.getLabel();
+					}else {
+						arguSrc = "error situation";
+						break;
+//						throw new Exception("没考虑过的type情况:"+type2);
+					}						
+				}else if(type1.equals("operator")) {
+					if(type2.equals("call")) {//好像有node2为call的情况
+						node2 = node2.getChildren().get(0);
+						type2 = srcT.getTypeLabel(node2);
+					}						
+					if(type2.equals("name")||type2.equals("operator")) {
+						arguSrc = arguSrc+leaf2.getLabel();
+					}else {
+						arguSrc = "error situation";
+						break;
+//						throw new Exception("没考虑过的operator情况:"+type2);
+					}						
+				}else if(type1.equals("specifier")) {
+					if(type2.equals("name")){
+						arguSrc = arguSrc+" "+leaf2.getLabel();
+					}else {
+						arguSrc = "error situation";
+						break;
+//						throw new Exception("没考虑过的type情况:"+type2);
+					}						
+				}else {
+					arguSrc = "error situation";
+					break;
+//					throw new Exception("没考虑过的children情况");
+				}					
+			}		
+		}
+		arguSrc = arguSrc+end;//加上收尾
+		return arguSrc;		
+	}//argulist相当于subtree中的subtree，单独还原
 	
 	public static ChangeTuple filterChange(DTree sDT, DTree dDT) throws Exception {
 		ChangeTuple ct = new ChangeTuple();
@@ -230,102 +366,7 @@ public class Utils {
 		return ct;		
 	}//change中包含相同的不修改部分，需要过滤删除
 	
-	public static String recoverArguList(ITree root, List<ITree> arguLeaves, TreeContext srcT) throws Exception {
-		String arguSrc = "";
-		String end = "";
-		ITree node = root.getParent();
-		String type = srcT.getTypeLabel(node);//找到argument_list父节点
-		if(type.equals("name")) {//name情况用<>
-			arguSrc = arguSrc+"<";
-			end = ">";
-		}else if(type.equals("call")||type.equals("decl")) {//call的情况下用()
-			arguSrc = arguSrc+"(";
-			end = ")";
-		}else if(type.equals("constructor")||type.equals("function")) {
-			arguSrc = arguSrc+"(";
-			end = ")";
-		}			
-		if(arguLeaves.size()==0) {
-			arguSrc = arguSrc+end;
-			return 	arguSrc;
-		}//返回空括号
-		if(arguLeaves.size()==1) {
-			arguSrc = arguSrc + arguLeaves.get(0).getLabel()+end;
-			return 	arguSrc;
-		}//返回单个元素+括号
-				
-		arguSrc = arguSrc + arguLeaves.get(0).getLabel();
-		for(int i=0;i<arguLeaves.size()-1;i++) {
-			ITree leaf1 = arguLeaves.get(i);
-			ITree leaf2 = arguLeaves.get(i+1);
-			ITree sharePar = findShareParent(leaf1, leaf2, srcT);
-//			String parType = srcT.getTypeLabel(sharePar);
-			List<ITree> childs = sharePar.getChildren();
-			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//同一层的两个叶子节点，还原时候直接拼起来就行
-				arguSrc = arguSrc+ leaf2.getLabel();
-			}else if(childs.size()>=2){
-				ITree node1 = null;
-				ITree node2 = null;
-				for(ITree child : childs) {
-					if(child.isLeaf()) {
-						if(child.equals(leaf1))
-							node1 = child;
-						if(child.equals(leaf2))
-							node2 = child;
-					}else {
-						List<ITree> list = TreeUtils.preOrder(child);
-						if(list.contains(leaf1))
-							node1 = child;
-						if(list.contains(leaf2))
-							node2 = child;
-//						if(list.contains(leaf1)&&list.contains(leaf1))
-//							throw new Exception("wrong sharePar!");
-					}				
-				}//找sharePar的下一个leaf1,leaf2对应父节点(或其本身)
-				String type1 = srcT.getTypeLabel(node1);
-				String type2 = srcT.getTypeLabel(node2);
-				if(type1.equals("name")) {
-					if(type2.equals("argument_list")||type2.equals("parameter_list")) {	
-						List<ITree> leaves = new ArrayList<>();
-						leaves = traverse2Leaf(node2, leaves);//找到argulist中所有叶子
-						arguSrc = arguSrc + recoverArguList(node2, leaves, srcT);
-					}else if(type2.equals("operator")) {
-						arguSrc = arguSrc+leaf2.getLabel();
-					}else if(type2.equals("modifier")) {
-						arguSrc = arguSrc+" *";
-					}else
-						throw new Exception("没考虑过的name情况:"+type2);																	
-				}else if(type1.equals("argument")||type1.equals("parameter")) {
-					if(type2.equals("argument")||type2.equals("parameter")) {
-						arguSrc = arguSrc+","+leaf2.getLabel();
-					}else
-						throw new Exception("没考虑过的argument情况:"+type2);
-				}else if(type1.equals("type")) {
-					if(type2.equals("name")) {	
-						arguSrc = arguSrc+" "+leaf2.getLabel();
-					}else
-						throw new Exception("没考虑过的type情况:"+type2);
-				}else if(type1.equals("operator")) {
-					if(type2.equals("call")) {//好像有node2为call的情况
-						node2 = node2.getChildren().get(0);
-						type2 = srcT.getTypeLabel(node2);
-					}						
-					if(type2.equals("name")||type2.equals("operator")) {
-						arguSrc = arguSrc+leaf2.getLabel();
-					}else						
-						throw new Exception("没考虑过的operator情况:"+type2);
-				}else if(type1.equals("specifier")) {
-					if(type2.equals("name")){
-						arguSrc = arguSrc+" "+leaf2.getLabel();
-					}else
-						throw new Exception("没考虑过的type情况:"+type2);
-				}else						
-					throw new Exception("没考虑过的children情况");
-			}		
-		}
-		arguSrc = arguSrc+end;//加上收尾
-		return arguSrc;		
-	}//argulist相当于subtree中的subtree，单独还原
+	
 	
 	
 	public static ITree findShareParent(ITree leaf1, ITree leaf2, TreeContext tc) throws Exception {
@@ -430,7 +471,26 @@ public class Utils {
 			srcActIds.add(id);
 		}
 		return srcActIds;        
-	}	
+	}
+	
+	public static String printToken(SubTree st) throws Exception {
+		String tokens = "";
+		ITree sRoot = st.getRoot();
+		List<ITree> leaves = new ArrayList<ITree>();
+		leaves = traverse2Leaf(sRoot, leaves);
+		for(int i=0;i<leaves.size();i++) {
+			ITree leaf = leaves.get(i);
+			String label = leaf.getLabel();
+//			if(!label.equals("")) {
+//				tokens = tokens+label;
+//			}
+			tokens = tokens+leaf.getId()+":"+label;
+			if(i!=leaves.size()-1) {
+				tokens = tokens+" ";
+			}
+		}	
+		return tokens;
+	}
 	
 	public static String printLeaf(DTree dt) throws Exception {
 		String values = "";

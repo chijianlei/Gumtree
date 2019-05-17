@@ -36,15 +36,15 @@ import utils.Utils;
 public class TestGeneration {
 	
 	public static void main(String args[]) throws Exception{
-		String path = "talker.cpp";
-//		String path = "Absolute3DLocalizationElement.cpp";
+//		String path = "talker.cpp";
+		String path = "Absolute3DLocalizationElement.cpp";
 //		String path = "migrations_test\\astra_driver\\astra_driver.cpp";
 		File cppfile = new File(path);
 		TreeContext tc = new SrcmlCppTreeGenerator().generateFromFile(cppfile);
 		ITree root = tc.getRoot();
 		System.out.println(root.getId()+","+tc.getTypeLabel(root));
-		String path2 = "talker2.cpp";
-//		String path2 = "Absolute3DLocalizationElement2.cpp";
+//		String path2 = "talker2.cpp";
+		String path2 = "Absolute3DLocalizationElement2.cpp";
 //		String path2 = "migrations_test\\astra_driver\\astra_driver2.cpp";
 		File cppfile2 = new File(path2);
 		TreeContext tc2 = new SrcmlCppTreeGenerator().generateFromFile(cppfile2);          
