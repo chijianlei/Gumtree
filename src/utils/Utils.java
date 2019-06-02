@@ -643,8 +643,7 @@ public class Utils {
         for(int i=0;i<deletes.size();i++) {
         	Delete act = (Delete)deletes.get(i);
         	System.out.println("Del:"+act.getNode().getId());
-        }
-        	
+        }       	
 	}	
 	
 	public static ITree findNode(TreeContext tc, int id) throws Exception{
