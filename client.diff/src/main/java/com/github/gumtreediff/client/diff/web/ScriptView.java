@@ -61,7 +61,7 @@ public class ScriptView implements Renderable {
         dst = Generators.getInstance().getTree(fDst.getAbsolutePath());
         Matcher matcher = Matchers.getInstance().getMatcher();
         mappings = matcher.match(src.getRoot(), dst.getRoot());
-        this.script = new ChawatheScriptGenerator().computeActions(mappings);
+        this.script = new ChawatheScriptGenerator().computeActions(src, dst, mappings);
     }
 
     @Override

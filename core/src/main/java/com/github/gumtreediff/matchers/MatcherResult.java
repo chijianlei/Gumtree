@@ -15,18 +15,21 @@
  * along with GumTree.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright 2019 Jean-Rémy Falleri <jr.falleri@gmail.com>
+ * Copyright 2019 Floréal Morandat <florealm@gmail.com>
  */
 
-package com.github.gumtreediff.actions;
+package com.github.gumtreediff.matchers;
 
-import com.github.gumtreediff.matchers.MappingStore;
-import com.github.gumtreediff.matchers.MatcherResult;
 import com.github.gumtreediff.tree.TreeContext;
 
-public interface EditScriptGenerator {
-    EditScript computeActions(MatcherResult matched);
+public class MatcherResult {
+    public final TreeContext src;
+    public final TreeContext dst;
+    public final MappingStore mappings;
 
-    default EditScript computeActions(TreeContext src, TreeContext dst, MappingStore ms) {
-        return computeActions(new MatcherResult(src, dst, ms));
+    public MatcherResult(TreeContext src, TreeContext dst, MappingStore mappings) {
+        this.src = src;
+        this.dst = dst;
+        this.mappings = mappings;
     }
 }

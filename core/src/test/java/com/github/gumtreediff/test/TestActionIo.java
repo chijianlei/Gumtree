@@ -57,7 +57,7 @@ public class TestActionIo {
         ms.addMapping(src.getChild("0.0"), dst.getChild("1.0.0"));
         ms.addMapping(src.getChild(4), dst.getChild(3));
         ms.addMapping(src.getChild("4.0"), dst.getChild("3.0.0.0"));
-        actions = new ChawatheScriptGenerator().computeActions(ms);
+        actions = new ChawatheScriptGenerator().computeActions(p.first, p.second, ms);
     }
 
     @Test

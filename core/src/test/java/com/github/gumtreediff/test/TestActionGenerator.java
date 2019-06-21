@@ -51,7 +51,7 @@ public class TestActionGenerator {
         ms.addMapping(src.getChild("0.0"), dst.getChild("1.0.0"));
         ms.addMapping(src.getChild(4), dst.getChild(3));
         ms.addMapping(src.getChild("4.0"), dst.getChild("3.0.0.0"));
-        EditScript actions = new SimplifiedChawatheScriptGenerator().computeActions(ms);
+        EditScript actions = new SimplifiedChawatheScriptGenerator().computeActions(trees.first, trees.second, ms);
         assertEquals(9, actions.size());
 
         Action a = actions.get(0);
@@ -117,8 +117,13 @@ public class TestActionGenerator {
     public void testWithUnmappedRoot() {
         ITree src = new Tree(TypeSet.type("foo"), "");
         ITree dst = new Tree(TypeSet.type("bar"), "");
+        TreeContext cSrc = new TreeContext();
+        cSrc.setRoot(src);
+        TreeContext cDst = new TreeContext();
+        cDst.setRoot(dst);
+
         MappingStore ms = new MappingStore(src, dst);
-        EditScript actions = new SimplifiedChawatheScriptGenerator().computeActions(ms);
+        EditScript actions = new SimplifiedChawatheScriptGenerator().computeActions(cSrc, cDst, ms);
         for (Action a : actions)
             System.out.println(a.toString());
     }
@@ -138,7 +143,7 @@ public class TestActionGenerator {
         ms.addMapping(src.getChild(4), dst.getChild(3));
         ms.addMapping(src.getChild(4).getChild(0), dst.getChild(3).getChild(0).getChild(0).getChild(0));
 
-        EditScript actions = new InsertDeleteChawatheScriptGenerator().computeActions(ms);
+        EditScript actions = new InsertDeleteChawatheScriptGenerator().computeActions(trees.first, trees.second, ms);
 
         for (Action a : actions)
             System.out.println(a.toString());
@@ -157,7 +162,7 @@ public class TestActionGenerator {
         ms.addMapping(src.getChild("1.2"), dst.getChild("0.1.2"));
         ms.addMapping(src.getChild("1.3"), dst.getChild("0.1.3"));
 
-        EditScript actions = new ChawatheScriptGenerator().computeActions(ms);
+        EditScript actions = new ChawatheScriptGenerator().computeActions(trees.first, trees.second, ms);
         assertEquals(5, actions.size());
         assertThat(actions, hasItems(
                 new Insert(dst, null, 0),
@@ -167,7 +172,7 @@ public class TestActionGenerator {
                 new Delete(src.getChild("1.1"))
         ));
 
-        actions = new SimplifiedChawatheScriptGenerator().computeActions(ms);
+        actions = new SimplifiedChawatheScriptGenerator().computeActions(trees.first, trees.second, ms);
         assertEquals(5, actions.size());
         assertThat(actions, hasItems(
                 new Insert(dst, null, 0),
@@ -179,7 +184,7 @@ public class TestActionGenerator {
 
 
 
-        actions = new InsertDeleteChawatheScriptGenerator().computeActions(ms);
+        actions = new InsertDeleteChawatheScriptGenerator().computeActions(trees.first, trees.second, ms);
         assertEquals(7, actions.size());
         assertThat(actions, hasItems(
                 new Insert(dst, null, 0),

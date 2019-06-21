@@ -23,6 +23,7 @@ package com.github.gumtreediff.test;
 import com.github.gumtreediff.actions.*;
 import com.github.gumtreediff.actions.model.*;
 import com.github.gumtreediff.matchers.MappingStore;
+import com.github.gumtreediff.matchers.MatcherResult;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeContext;
@@ -42,6 +43,7 @@ public class TestITreeClassifier {
         Pair<TreeContext, TreeContext> trees = TreeLoader.getActionPair();
         ITree src = trees.first.getRoot();
         ITree dst = trees.second.getRoot();
+
         MappingStore ms = new MappingStore(src, dst);
         ms.addMapping(src, dst);
         ms.addMapping(src.getChild(1), dst.getChild(0));
@@ -51,7 +53,8 @@ public class TestITreeClassifier {
         ms.addMapping(src.getChild("0.0"), dst.getChild("1.0.0"));
         ms.addMapping(src.getChild(4), dst.getChild(3));
         ms.addMapping(src.getChild("4.0"), dst.getChild("3.0.0.0"));
-        EditScript actions = new SimplifiedChawatheScriptGenerator().computeActions(ms);
+        EditScript actions = new SimplifiedChawatheScriptGenerator().computeActions(trees.first, trees.second, ms);
+
         Diff diff = new Diff(trees.first, trees.second, ms, actions);
         ITreeClassifier c = diff.createAllNodeClassifier();
         assertThat(c.getUpdatedSrcs(), hasSize(1));
@@ -88,7 +91,7 @@ public class TestITreeClassifier {
         ms.addMapping(src.getChild("0.0"), dst.getChild("1.0.0"));
         ms.addMapping(src.getChild(4), dst.getChild(3));
         ms.addMapping(src.getChild("4.0"), dst.getChild("3.0.0.0"));
-        EditScript actions = new SimplifiedChawatheScriptGenerator().computeActions(ms);
+        EditScript actions = new SimplifiedChawatheScriptGenerator().computeActions(trees.first, trees.second, ms);
         Diff diff = new Diff(trees.first, trees.second, ms, actions);
         ITreeClassifier c = diff.createRootNodesClassifier();
         assertThat(c.getUpdatedSrcs(), hasSize(1));

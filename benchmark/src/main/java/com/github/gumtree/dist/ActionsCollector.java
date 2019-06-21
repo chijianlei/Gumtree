@@ -75,7 +75,7 @@ public class ActionsCollector {
             TreeContext src = TreeIoUtils.fromXml().generateFrom().file(path.toString());
             TreeContext dst = TreeIoUtils.fromXml().generateFrom().file(otherPath.toString());
             MappingStore mappings = new CompositeMatchers.ClassicGumtree().match(src.getRoot(), dst.getRoot());
-            EditScript actions = new ChawatheScriptGenerator().computeActions(mappings);
+            EditScript actions = new ChawatheScriptGenerator().computeActions(src, dst, mappings);
 
             String res = Paths.get(OUTPUT_DIR, outputPath.getFileName().toString()).toString();
             ActionsIoUtils.toText(src, actions, mappings).writeTo(new FileWriter(res));
@@ -96,7 +96,7 @@ public class ActionsCollector {
             TreeContext src = TreeIoUtils.fromXml().generateFrom().file(path.toString());
             TreeContext dst = TreeIoUtils.fromXml().generateFrom().file(otherPath.toString());
             MappingStore mappings = new CompositeMatchers.ClassicGumtree().match(src.getRoot(), dst.getRoot());
-            EditScript actions = new ChawatheScriptGenerator().computeActions(mappings);
+            EditScript actions = new ChawatheScriptGenerator().computeActions(src, dst, mappings);
             StringWriter w = new StringWriter();
             ActionsIoUtils.toText(src, actions, mappings).writeTo(w);
             Path refPath = Paths.get(path.toString().replace("_v0_","_actions_"));

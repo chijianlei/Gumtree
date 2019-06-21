@@ -45,7 +45,7 @@ public class JsonDiff extends AbstractDiffClient<AbstractDiffClient.Options> {
     @Override
     public void run() {
         MappingStore ms = matchTrees();
-        EditScript actions = new ChawatheScriptGenerator().computeActions(ms);
+        EditScript actions = new ChawatheScriptGenerator().computeActions(getSrcTreeContext(), getDstTreeContext(), ms);
         try {
             ActionsIoUtils.toJson(getSrcTreeContext(), actions, ms).writeTo(System.out);
         } catch (Exception e) {

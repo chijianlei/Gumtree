@@ -49,7 +49,7 @@ public class DiffView implements Renderable {
         this.fDst = fDst;
         Matcher matcher = Matchers.getInstance().getMatcher();
         MappingStore mappings = matcher.match(src.getRoot(), dst.getRoot());
-        Diff diff = new Diff(src, dst, mappings, new ChawatheScriptGenerator().computeActions(mappings));
+        Diff diff = new Diff(src, dst, mappings, new ChawatheScriptGenerator().computeActions(src, dst, mappings));
         diffs = new HtmlDiffs(fSrc, fDst, diff);
         diffs.produce();
     }

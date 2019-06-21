@@ -20,7 +20,7 @@
 package com.github.gumtreediff.actions;
 
 import com.github.gumtreediff.actions.model.*;
-import com.github.gumtreediff.matchers.MappingStore;
+import com.github.gumtreediff.matchers.MatcherResult;
 import com.github.gumtreediff.tree.ITree;
 
 import java.util.HashMap;
@@ -30,8 +30,8 @@ public class SimplifiedChawatheScriptGenerator implements EditScriptGenerator {
     private EditScript actions;
 
     @Override
-    public EditScript computeActions(MappingStore ms) {
-        this.actions = new ChawatheScriptGenerator().computeActions(ms);
+    public EditScript computeActions(MatcherResult matched) {
+        this.actions = new ChawatheScriptGenerator().computeActions(matched);
         simplify();
         return actions;
     }

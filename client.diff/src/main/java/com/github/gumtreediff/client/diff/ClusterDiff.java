@@ -41,7 +41,7 @@ public class ClusterDiff extends AbstractDiffClient<AbstractDiffClient.Options> 
     @Override
     public void run() {
         MappingStore ms = matchTrees();
-        EditScript actions = new ChawatheScriptGenerator().computeActions(ms);
+        EditScript actions = new ChawatheScriptGenerator().computeActions(getSrcTreeContext(), getDstTreeContext(), ms);
         ActionClusterFinder f = new ActionClusterFinder(getSrcTreeContext(), getDstTreeContext(), actions);
         for (Set<Action> cluster: f.getClusters()) {
             System.out.println("New cluster:");

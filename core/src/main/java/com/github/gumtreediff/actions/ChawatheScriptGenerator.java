@@ -22,6 +22,7 @@ package com.github.gumtreediff.actions;
 import com.github.gumtreediff.actions.model.*;
 import com.github.gumtreediff.matchers.Mapping;
 import com.github.gumtreediff.matchers.MappingStore;
+import com.github.gumtreediff.matchers.MatcherResult;
 import com.github.gumtreediff.tree.FakeTree;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeUtils;
@@ -50,17 +51,17 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
     private Map<ITree, ITree> copyToOrig;
 
     @Override
-    public EditScript computeActions(MappingStore ms) {
-        initWith(ms);
+    public EditScript computeActions(MatcherResult matched) {
+        initWith(matched);
         generate();
         return actions;
     }
 
-    public void initWith(MappingStore ms) {
-        this.origSrc = ms.src;
+    public void initWith(MatcherResult matched) {
+        this.origSrc = matched.src.getRoot();
         this.cpySrc = this.origSrc.deepCopy();
-        this.origDst = ms.dst;
-        this.origMappings = ms;
+        this.origDst = matched.dst.getRoot();
+        this.origMappings = matched.mappings;
 
         origToCopy = new HashMap<>();
         copyToOrig = new HashMap<>();
@@ -71,7 +72,7 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
             copyToOrig.put(cpyTree, origTree);
         }
 
-        cpyMappings = new MappingStore(ms.src, ms.dst);
+        cpyMappings = new MappingStore(origSrc, origDst);
         for (Mapping m: origMappings)
             cpyMappings.addMapping(origToCopy.get(m.first), m.second);
     }

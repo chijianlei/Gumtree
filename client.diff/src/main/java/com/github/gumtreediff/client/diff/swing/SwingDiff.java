@@ -45,7 +45,7 @@ public final class SwingDiff extends AbstractDiffClient<AbstractDiffClient.Optio
                 JFrame frame = new JFrame("GumTree");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 Diff diff = new Diff(getSrcTreeContext(), getDstTreeContext(), mappings,
-                        new ChawatheScriptGenerator().computeActions(mappings));
+                        new ChawatheScriptGenerator().computeActions(getSrcTreeContext(), getDstTreeContext(), mappings));
                 frame.add(new MappingsPanel(opts.src, opts.dst, diff));
                 frame.pack();
                 frame.setVisible(true);

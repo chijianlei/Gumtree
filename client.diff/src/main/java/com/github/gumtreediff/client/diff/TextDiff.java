@@ -96,7 +96,7 @@ public class TextDiff extends AbstractDiffClient<TextDiff.Options> {
     @Override
     public void run() {
         MappingStore ms = matchTrees();
-        EditScript actions = new ChawatheScriptGenerator().computeActions(ms);
+        EditScript actions = new ChawatheScriptGenerator().computeActions(getSrcTreeContext(), getDstTreeContext(), ms);
         try {
             ActionsIoUtils.ActionSerializer serializer = opts.format.getSerializer(
                     getSrcTreeContext(), actions, ms);

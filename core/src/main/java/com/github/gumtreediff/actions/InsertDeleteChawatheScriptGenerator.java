@@ -21,6 +21,7 @@ package com.github.gumtreediff.actions;
 
 import com.github.gumtreediff.actions.model.*;
 import com.github.gumtreediff.matchers.MappingStore;
+import com.github.gumtreediff.matchers.MatcherResult;
 import com.github.gumtreediff.tree.ITree;
 
 public class InsertDeleteChawatheScriptGenerator implements EditScriptGenerator {
@@ -28,9 +29,9 @@ public class InsertDeleteChawatheScriptGenerator implements EditScriptGenerator 
     private MappingStore origMappings;
 
     @Override
-    public EditScript computeActions(MappingStore ms) {
-        this.origMappings = ms;
-        this.actions = new SimplifiedChawatheScriptGenerator().computeActions(ms);
+    public EditScript computeActions(MatcherResult matched) {
+        this.origMappings = matched.mappings;
+        this.actions = new SimplifiedChawatheScriptGenerator().computeActions(matched);
         return removeMovesAndUpdates();
     }
 
