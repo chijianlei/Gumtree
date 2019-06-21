@@ -46,19 +46,25 @@ public final class D {
         this.editScript = editScript;
     }
 
-    static class Producer<G extends TreeGenerator, M extends Matcher,
-                        A extends EditScriptGenerator, C extends ITreeClassifier> {
+    public static <G extends TreeGenerator, M extends Matcher, A extends EditScriptGenerator, C extends ITreeClassifier>
+            Producer<G, M, A, C> produce(Supplier<G> treeGenerator, Supplier<M> matcherGenerator,
+                                         Supplier<A> editScriptGenerator, Supplier<C> classifierGenerator) {
+        return new Producer<>(treeGenerator, matcherGenerator, editScriptGenerator, classifierGenerator);
+    }
 
+    static class Producer<G extends TreeGenerator, M extends Matcher,
+            A extends EditScriptGenerator, C extends ITreeClassifier> {
         protected final Supplier<G> generatorFactory;
         protected final Supplier<M> matcherFactory;
         protected final Supplier<A> editScriptGeneratorFactory;
-//    protected abstract C makeClassifier();
+        protected final Supplier<C> classifierFactory;
 
         public Producer(Supplier<G> generatorFactory, Supplier<M> matcherFactory,
-                        Supplier<A> editScriptGeneratorFactory) {
+                        Supplier<A> editScriptGeneratorFactory, Supplier<C> classifierFactory) {
             this.generatorFactory = generatorFactory;
             this.matcherFactory = matcherFactory;
             this.editScriptGeneratorFactory = editScriptGeneratorFactory;
+            this.classifierFactory = classifierFactory;
         }
 
         final D diff(Reader srcSource, Reader dstSource) throws IOException {
