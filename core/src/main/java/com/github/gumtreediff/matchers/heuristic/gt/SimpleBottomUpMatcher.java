@@ -24,6 +24,7 @@ import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.matchers.Matcher;
 import com.github.gumtreediff.matchers.SimilarityMetrics;
 import com.github.gumtreediff.tree.ITree;
+import com.github.gumtreediff.tree.TreeUtils;
 import com.github.gumtreediff.utils.SequenceAlgorithms;
 
 import java.util.ArrayList;
@@ -65,13 +66,8 @@ public class SimpleBottomUpMatcher implements Matcher {
                     double max = -1D;
 
                     for (ITree cand : candidates) {
-                        double sim = SimilarityMetrics.jaccardSimilarity(t, cand, mappings);
+                        double sim = SimilarityMetrics.overlapSimilarity(t, cand, mappings);
                         if (sim > max && sim >= SIM_THRESHOLD) {
-                            if (t.getMetrics().depth == cand.getMetrics().depth) {
-                                lastChanceMatch(t, best);
-                                mappings.addMapping(t, best);
-                                return;
-                            }
                             max = sim;
                             best = cand;
                         }
@@ -89,7 +85,8 @@ public class SimpleBottomUpMatcher implements Matcher {
             List<ITree> seeds = new ArrayList<>();
             for (ITree c : src.getDescendants()) {
                 ITree m = mappings.getDstForSrc(c);
-                if (m != null) seeds.add(m);
+                if (m != null)
+                    seeds.add(m);
             }
             List<ITree> candidates = new ArrayList<>();
             Set<ITree> visited = new HashSet<>();
@@ -112,13 +109,13 @@ public class SimpleBottomUpMatcher implements Matcher {
             List<ITree> srcChildren = src.getChildren();
             List<ITree> dstChildren = dst.getChildren();
 
-            List<int[]> lcs = SequenceAlgorithms.longestCommonSubsequenceWithTypeAndLabel(srcChildren, dstChildren);
+            List<int[]> lcs = SequenceAlgorithms.longestCommonSubsequenceWithIsostructure(srcChildren, dstChildren);
             for (int[] x : lcs) {
-
                 ITree t1 = srcChildren.get(x[0]);
                 ITree t2 = dstChildren.get(x[1]);
-                if (mappings.isMappingAllowed(t1, t2))
-                    mappings.addMapping(t1, t2);
+                if (mappings.areSrcsUnmapped(TreeUtils.preOrder(t1))
+                        && mappings.areDstsUnmapped(TreeUtils.preOrder(t2)))
+                    mappings.addMappingRecursively(t1, t2);
             }
         }
     }

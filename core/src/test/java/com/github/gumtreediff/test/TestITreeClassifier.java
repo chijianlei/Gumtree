@@ -54,7 +54,6 @@ public class TestITreeClassifier {
         ms.addMapping(src.getChild(4), dst.getChild(3));
         ms.addMapping(src.getChild("4.0"), dst.getChild("3.0.0.0"));
         EditScript actions = new SimplifiedChawatheScriptGenerator().computeActions(trees.first, trees.second, ms);
-
         Diff diff = new Diff(trees.first, trees.second, ms, actions);
         ITreeClassifier c = diff.createAllNodeClassifier();
         assertThat(c.getUpdatedSrcs(), hasSize(1));
