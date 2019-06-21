@@ -30,28 +30,48 @@ import com.github.gumtreediff.tree.TreeContext;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.function.Supplier;
 
-public abstract class D<G extends TreeGenerator, M extends Matcher,
+public final class D {
+
+    public final TreeContext src;
+    public final TreeContext dst;
+    public final MappingStore ms;
+    public final EditScript editScript;
+
+    public D(TreeContext src, TreeContext dst, MappingStore ms, EditScript editScript) {
+        this.src = src;
+        this.dst = dst;
+        this.ms = ms;
+        this.editScript = editScript;
+    }
+
+    static class Producer<G extends TreeGenerator, M extends Matcher,
                         A extends EditScriptGenerator, C extends ITreeClassifier> {
 
-    protected abstract G makeGenerator();
-
-    protected abstract M makeMatcher();
-
-    protected abstract A makeEditScriptGenerator();
-
+        protected final Supplier<G> generatorFactory;
+        protected final Supplier<M> matcherFactory;
+        protected final Supplier<A> editScriptGeneratorFactory;
 //    protected abstract C makeClassifier();
 
-    final void diff(Reader srcSource, Reader dstSource) throws IOException {
-        TreeContext src = makeGenerator().generateFrom().reader(srcSource);
-        TreeContext dst = makeGenerator().generateFrom().reader(dstSource);
-        MappingStore ms = new MappingStore(src.getRoot(), dst.getRoot());
-        MatcherResult matcherResult = new MatcherResult(src, dst, ms);
+        public Producer(Supplier<G> generatorFactory, Supplier<M> matcherFactory,
+                        Supplier<A> editScriptGeneratorFactory) {
+            this.generatorFactory = generatorFactory;
+            this.matcherFactory = matcherFactory;
+            this.editScriptGeneratorFactory = editScriptGeneratorFactory;
+        }
 
-        makeMatcher().match(src.getRoot(), dst.getRoot(), ms);
+        final D diff(Reader srcSource, Reader dstSource) throws IOException {
+            TreeContext src = generatorFactory.get().generateFrom().reader(srcSource);
+            TreeContext dst = generatorFactory.get().generateFrom().reader(dstSource);
+            MappingStore ms = new MappingStore(src.getRoot(), dst.getRoot());
+            MatcherResult matcherResult = new MatcherResult(src, dst, ms);
 
-        EditScript editScript = makeEditScriptGenerator().computeActions(matcherResult);
+            matcherFactory.get().match(src.getRoot(), dst.getRoot(), ms);
 
-//        makeClassifier().
+            EditScript editScript = editScriptGeneratorFactory.get().computeActions(matcherResult);
+
+            return new D(src, dst, ms, editScript);
+        }
     }
 }
