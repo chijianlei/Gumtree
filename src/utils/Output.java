@@ -19,6 +19,7 @@ import java.util.Map;
 
 import gumtreediff.actions.model.Action;
 import gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
+import gumtreediff.io.TreeIoUtils;
 import gumtreediff.matchers.MappingStore;
 import gumtreediff.matchers.Matcher;
 import gumtreediff.matchers.Matchers;
@@ -34,13 +35,14 @@ import structure.Transform;
 public class Output {
 
 	public static void main (String args[]) throws Exception{
-		String path = args[0];
-//		String path = "migrations_test";
+//		String path = args[0];
+		String path = "migrations_test";
 //		Output.collectTokens(sp.trans);
 //		Output.collectChangePairs(path, "");
 //		Output.collectDefUse(path, "", "");
+//		Output.printJson(path, null);
 //		String path = "talker.cpp";
-		Output.tokensFromInputFile(path);
+//		Output.tokensFromInputFile(path);
 	}
 	
 	public static void tokensFromInputFile(String path) throws Exception {
@@ -91,6 +93,41 @@ public class Output {
 		}
 		wr.close();	
 		wr1.close();
+	}
+	
+	public static void printJson(String path, String filter) throws Exception {
+		Split sp = new Split();
+		ArrayList<Migration> migrats = new ArrayList<>();
+		migrats = sp.readMigration(path, filter);
+		sp.storeTrans(migrats);
+		ArrayList<Transform> trans = sp.trans;
+		for(int i=0;i<trans.size();i++) {
+			Transform tf = trans.get(i);
+			System.out.println("Analyse:"+tf.getMiName());
+			SubTree srcT = tf.getSTree();
+			SubTree dstT = tf.getDTree();
+			if(srcT!=null&&dstT!=null) {
+                if(srcT.getTC()!=null&&dstT.getTC()!=null) {
+                	TreeContext sub1 = new TreeContext();
+        			TreeContext sub2 = new TreeContext();
+        			sub1.importTypeLabels(srcT.getTC());
+        			sub2.importTypeLabels(dstT.getTC());
+        			sub1.setRoot(srcT.getRoot());
+        			sub2.setRoot(dstT.getRoot());
+        			String out = "jsons\\pair"+String.valueOf(i)+"_src.json";
+        			BufferedWriter wr = new BufferedWriter(new FileWriter(new File(out)));
+        			wr.append(TreeIoUtils.toJson(sub1).toString());
+        			wr.flush();
+        			wr.close();
+        			String out1 = "jsons\\pair"+String.valueOf(i)+"_tgt.json";
+        			BufferedWriter wr1 = new BufferedWriter(new FileWriter(new File(out1)));
+        			wr1.append(TreeIoUtils.toJson(sub2).toString());
+        			wr1.flush();
+        			wr1.close();
+				}
+			}		
+		}
+		
 	}
 	
 	public static void collectChangePairs(String path, String filter) throws Exception {
@@ -476,8 +513,8 @@ public class Output {
 							String sLine = subtree2src(st);
 							sLine = absVariable(sLine, varMap);
 							System.out.println(st.getRoot().getId()+" DefLine: "+sLine);
-//							wr.append(sLine+" ; ");
-//							wr1.append(sLine+" ; ");
+							wr.append(sLine+" ; ");
+							wr1.append(sLine+" ; ");
 						}
 						String sLine = subtree2src(srcT);
 						sLine = absVariable(sLine, varMap);
@@ -492,8 +529,8 @@ public class Output {
 							String dLine = subtree2src(dt);
 							dLine = absVariable(dLine, varMap);
 							System.out.println(dt.getRoot().getId()+" DefLine: "+dLine);
-//							wr.append(dLine+" ; ");
-//							wr2.append(dLine+" ; ");
+							wr.append(dLine+" ; ");
+							wr2.append(dLine+" ; ");
 						}
 						String dLine = subtree2src(dstT);
 						dLine = absVariable(dLine, varMap);
@@ -950,6 +987,7 @@ public class Output {
 						newLine = newLine+" "+token;
 				}
 			}
+			newLine = newLine+" "+srcs[srcs.length-1];//²¹ÉÏÎ²°Í
 		}		
 		return newLine;
 	}

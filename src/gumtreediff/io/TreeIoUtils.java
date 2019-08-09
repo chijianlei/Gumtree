@@ -584,7 +584,7 @@ public final class TreeIoUtils {
         	int id = tree.getId();   	
             String label = id+" "+context.getTypeLabel(tree);
             if (tree.hasLabel()) 
-            	label = label+tree.getLabel();           
+            	label = label+":"+tree.getLabel();           
             label = formate(label);
            
             if(isSrc==true) {

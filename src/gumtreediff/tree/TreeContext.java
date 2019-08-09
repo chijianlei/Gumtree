@@ -63,7 +63,7 @@ public class TreeContext{
         return tl;
     }
 
-    protected void registerTypeLabel(int type, String name) {
+    public void registerTypeLabel(int type, String name) {
         if (name == null || name.equals(ITree.NO_LABEL))
             return;
         String typeLabel = typeLabels.get(type);
