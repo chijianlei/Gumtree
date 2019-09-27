@@ -45,7 +45,8 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
     private LineReader lr;
 
     private Set<String> labeled = new HashSet<String>(
-            Arrays.asList("specifier", "name", "comment", "literal", "operator"));
+            Arrays.asList("specifier", "name", "comment", "literal", "operator",
+            		"modifier", "include", "directive", "file", "argument"));//第二行gumtree本身未添加
 
     private StringBuilder currentLabel;
 
@@ -70,9 +71,14 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
                 if (ev.isStartElement()) {
                     StartElement s = ev.asStartElement();
                     String typeLabel = s.getName().getLocalPart();
-                    if (typeLabel.equals("position"))
-                        setLength(trees.peekFirst(), s);
-                    else {
+                    if (typeLabel.equals("position")) {
+                    	setLength(trees.peekFirst(), s);
+                    }else if(typeLabel.equals("comment")) {
+                    	int type = typeLabel.hashCode();
+                    	ITree t = context.createTree(type, "", typeLabel);
+                    	trees.addFirst(t);
+                    	continue;//不需要comment节点
+                    }else {
                         int type = typeLabel.hashCode();
                         ITree t = context.createTree(type, "", typeLabel);
 
@@ -87,6 +93,7 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
                     }
                 } else if (ev.isEndElement()) {
                     EndElement end = ev.asEndElement();
+//                    System.out.println("ev:"+end.toString());
                     if (!end.getName().getLocalPart().equals("position")) {
                         if (isLabeled(trees))
                             trees.peekFirst().setLabel(currentLabel.toString());
@@ -134,6 +141,8 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
             int line = Integer.parseInt(e.getAttributeByName(LINE).getValue());
             int column = Integer.parseInt(e.getAttributeByName(COLUMN).getValue());
             t.setPos(lr.positionFor(line, column));
+            t.setLine(line);
+            t.setColumn(column);
         }
     }
 
@@ -152,8 +161,11 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
 //    	BufferedWriter wr = new BufferedWriter(new FileWriter(new File(path)));
         //FIXME this is not efficient but I am not sure how to speed up things here.
         File f = File.createTempFile("gumtree", "");
+        File xmlFile = new File("raw.xml");
+        BufferedWriter wr = new BufferedWriter(new FileWriter(xmlFile));
         try (
                 Writer w = Files.newBufferedWriter(f.toPath(), Charset.forName("UTF-8"));
+       		
                 BufferedReader br = new BufferedReader(r);
         ) {
             String line = br.readLine();
@@ -181,10 +193,15 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
             p.destroy();
 //            Thread.sleep(1000);
             String xml = buf.toString();
+//            System.out.println("xml:"+xml);
+            wr.append(xml);
+            wr.newLine();
+            wr.flush();
             return xml;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
+        	wr.close();
             f.delete();           
         }        
            

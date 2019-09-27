@@ -22,6 +22,10 @@
 package gumtreediff.gen.jdt;
 
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.eclipse.jdt.core.dom.*;
 
 public class JdtVisitor  extends AbstractJdtVisitor {
@@ -32,7 +36,25 @@ public class JdtVisitor  extends AbstractJdtVisitor {
     @Override
     public void preVisit(ASTNode n) {
         pushNode(n, getLabel(n));
+    	String type = n.getClass().getSimpleName();
+    	System.out.println(type);
+        if(type.equals("Block")) {
+        	System.out.println("size:"+getChildren(n).size());
+        }
     }
+    
+    public static List<ASTNode> getChildren(ASTNode node) {
+        List<ASTNode> children = new ArrayList<ASTNode>();
+        List list = node.structuralPropertiesForType();
+        for (int i = 0; i < list.size(); i++) {
+            Object child = node.getStructuralProperty((StructuralPropertyDescriptor)list.get(i));
+            if (child instanceof ASTNode) {
+                children.add((ASTNode) child);
+            }
+        }
+        return children;
+    }
+    
 
     protected String getLabel(ASTNode n) {
         if (n instanceof Name) return ((Name) n).getFullyQualifiedName();

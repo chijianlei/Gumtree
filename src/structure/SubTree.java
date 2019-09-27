@@ -1,5 +1,7 @@
 package structure;
 
+import java.util.ArrayList;
+
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
 
@@ -9,6 +11,7 @@ public class SubTree {
 	private TreeContext tc;
 	private int stNum;
 	private String miName;
+	private ArrayList<ITree> parBlocks;
 	
 	public SubTree(ITree node, TreeContext context, int count, String name) {
 		root = node;
@@ -33,5 +36,12 @@ public class SubTree {
 		return miName;
 	}
 
+	public ArrayList<ITree> getParBlocks() {
+		return parBlocks;
+	}
+
+	public void setParBlocks(ArrayList<ITree> parBlocks) {
+		this.parBlocks = parBlocks;
+	}
 
 }

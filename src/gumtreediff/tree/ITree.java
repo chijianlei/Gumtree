@@ -165,6 +165,14 @@ public interface ITree {
     int getPos();
 
     void setPos(int pos);
+    
+    int getLine();
+    
+    void setLine(int line);
+    
+    int getColumn();
+    
+    void setColumn(int column);
 
     int getLength();
 

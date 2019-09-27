@@ -190,7 +190,7 @@ public class Cluster {
 		if(node2rootMap.get(dst)==null) {
 			ITree sRoot = mapping.getDst(dst);
 			if(sRoot == null)
-				throw new Exception("map error!");
+				System.err.println("error id:"+dst.getId());
 			return sRoot;
 		}//发现另一种情况,move连接的节点不在insert结果中，直接从mapping中找	
 		
@@ -260,7 +260,7 @@ public class Cluster {
 	        	ITree first = map.getFirst();
 	        	ITree second = map.getSecond();
 	        	if(second.equals(par2)) {
-//	        		System.out.println("getMap:"+first.getId()+"->"+second.getId());
+	        		System.out.println("getMap:"+first.getId()+"->"+second.getId());
 	        		par1 = first;
 	        		typeLabel = tc1.getTypeLabel(par1);
 	        		while(!Utils.ifSRoot(typeLabel)) {//可能有问题，要注意循环条件
@@ -283,8 +283,8 @@ public class Cluster {
 	        		par1 = node2rootMap.get(par2); 
 	        		node2rootMap.put(dst, par1);
 	        	}else {
-	        		System.out.println("error id:"+par2.getId());
-	        		throw new Exception("error childAction!");
+	        		System.err.println("error id:"+par2.getId());
+//	        		throw new Exception("error childAction!");
 	        	}
         			
 	        }

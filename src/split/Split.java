@@ -756,19 +756,32 @@ public class Split {
 			if(Utils.ifSRoot(typeLabel)) {
 				ITree subRoot = t;
 				List<ITree> list = TreeUtils.preOrder(subRoot);
+				List<ITree> pars = t.getParents();
+				ArrayList<ITree> parBlocks = new ArrayList<ITree>();
+				for(ITree par : pars) {
+					String type = tc.getTypeLabel(par);
+					if(type.equals("block")) {
+						parBlocks.add(par);
+					}
+				}//将sRoot所有父亲节点中的block节点备份
 				for(ITree tmp : list) {
 					String type = tc.getTypeLabel(tmp);
 					if(type.equals("block")) {
-						tmp.getParent().getChildren().remove(tmp);//断开父亲和所有block node的连接	
-						tmp.setParent(null);//是否需要断开block node跟父亲的连接呢?	
-					}else if(type.equals("elseif"))	{
-						tmp.getParent().getChildren().remove(tmp);//断开父亲和所有elseif node的连接	
-						tmp.setParent(null);//是否需要断开elseif node跟父亲的连接呢?	
+						List<ITree> desendants = tmp.getDescendants();
+						if(desendants.size()>5) {//block节点太少就不断开了
+							tmp.getParent().getChildren().remove(tmp);//断开父亲和所有block node的连接	
+							tmp.setParent(null);//是否需要断开block node跟父亲的连接呢?	
+						}						
 					}
+//					else if(type.equals("elseif")||type.equals("else"))	{
+//						tmp.getParent().getChildren().remove(tmp);//断开父亲和所有elseif node的连接	
+//						tmp.setParent(null);//是否需要断开elseif node跟父亲的连接呢?	
+//					}
 				}
 				SubTree st = new SubTree(subRoot, tc, count, miName);
+				st.setParBlocks(parBlocks);
 				subRootList.add(st);
-				count++;
+				count++;			
 			}//if是否考虑typeLabel=="return"?			
 		}
 //		System.out.println("subTreeNum:"+count);

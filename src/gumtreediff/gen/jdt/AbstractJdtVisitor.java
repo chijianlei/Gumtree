@@ -23,10 +23,8 @@ package gumtreediff.gen.jdt;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import gumtreediff.gen.jdt.cd.EntityType;
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 
@@ -50,16 +48,11 @@ public abstract class AbstractJdtVisitor extends ASTVisitor {
         push(type, typeName, label, n.getStartPosition(), n.getLength());
     }
 
-    protected void pushFakeNode(EntityType n, int startPosition, int length) {
-        int type = -n.ordinal(); // Fake types have negative types (but does it matter ?)
-        String typeName = n.name();
-        push(type, typeName, "", startPosition, length);
-    }
-
     private void push(int type, String typeName, String label, int startPosition, int length) {
         ITree t = context.createTree(type, label, typeName);
         t.setPos(startPosition);
         t.setLength(length);
+//        System.out.println(t.getId()+typeName);
 
         if (trees.isEmpty())
             context.setRoot(t);

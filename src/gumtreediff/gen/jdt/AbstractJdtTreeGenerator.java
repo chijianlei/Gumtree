@@ -22,7 +22,6 @@ package gumtreediff.gen.jdt;
 
 import gumtreediff.gen.TreeGenerator;
 import gumtreediff.tree.TreeContext;
-
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -51,7 +50,7 @@ public abstract class AbstractJdtTreeGenerator extends TreeGenerator {
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public TreeContext generate(Reader r) throws IOException {
-        ASTParser parser = ASTParser.newParser(AST.JLS9);
+        ASTParser parser = ASTParser.newParser(AST.JLS4);
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
         Map pOptions = JavaCore.getOptions();
         pOptions.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_9);
@@ -59,7 +58,11 @@ public abstract class AbstractJdtTreeGenerator extends TreeGenerator {
         pOptions.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_9);
         pOptions.put(JavaCore.COMPILER_DOC_COMMENT_SUPPORT, JavaCore.ENABLED);
         parser.setCompilerOptions(pOptions);
-        parser.setSource(readerToCharArray(r));
+        char[] chars = readerToCharArray(r);
+        parser.setSource(chars);
+//        for(char tmp : chars) {
+//        	System.out.println(tmp);
+//        }
         AbstractJdtVisitor v = createVisitor();
         parser.createAST(null).accept(v);
         return v.getTreeContext();

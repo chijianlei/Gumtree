@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import gumtreediff.actions.model.Action;
 import gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
@@ -36,10 +37,10 @@ public class Output {
 
 	public static void main (String args[]) throws Exception{
 //		String path = args[0];
-		String path = "migrations_test";
+		String path = "tmp//output";
 //		Output.collectTokens(sp.trans);
 //		Output.collectChangePairs(path, "");
-//		Output.collectDefUse(path, "", "");
+		Output.collectDefUse(path, "", "");
 //		Output.printJson(path, null);
 //		String path = "talker.cpp";
 //		Output.tokensFromInputFile(path);
@@ -137,7 +138,7 @@ public class Output {
 		sp.storeTrans(migrats);
 		String out = "change.txt";
 		String out1 = "src-train.txt";
-		String out2 = "dst-train.txt";
+		String out2 = "tgt-train.txt";
 		BufferedWriter wr = new BufferedWriter(new FileWriter(new File(out)));
 		BufferedWriter wr1 = new BufferedWriter(new FileWriter(new File(out1)));
 		BufferedWriter wr2 = new BufferedWriter(new FileWriter(new File(out2)));
@@ -250,8 +251,8 @@ public class Output {
 			}else {
 				for(SubTree st : sub1) {
 					ITree t = st.getRoot();
-					List<ITree> nodeList = new ArrayList<>();
-					nodeList = Utils.collectNode(t, nodeList);
+					List<ITree> nodeList = t.getDescendants();
+					nodeList.add(t);
 		        	for(ITree node : nodeList) {
 		        		int id = node.getId();
 		        		if(srcActIds.contains(id)) {
@@ -356,7 +357,11 @@ public class Output {
 	    		System.out.println(sRoot.getId()+"->"+dRoot.getId());
 	    		
 	    		String src = subtree2src(srcT);
-	    		String tar = subtree2src(dstT);	    		
+	    		String tar = subtree2src(dstT);	 
+	    		if(src.contains("error")&&src.contains("situation"))
+	    			continue;
+	    		if(tar.contains("error")&&tar.contains("situation"))
+	    			continue;
 	    		if(((float)src.length()/(float)tar.length())<0.25||((float)tar.length()/(float)src.length())<0.25) {
 	    			continue;
 	    		}//长度相差太多的句子直接跳过
@@ -515,7 +520,7 @@ public class Output {
 							System.out.println(st.getRoot().getId()+" DefLine: "+sLine);
 							wr.append(sLine+" ; ");
 							wr1.append(sLine+" ; ");
-						}
+						}//print def
 						String sLine = subtree2src(srcT);
 						sLine = absVariable(sLine, varMap);
 						wr.append(sLine+"\t");
@@ -531,7 +536,7 @@ public class Output {
 							System.out.println(dt.getRoot().getId()+" DefLine: "+dLine);
 							wr.append(dLine+" ; ");
 							wr2.append(dLine+" ; ");
-						}
+						}//print def
 						String dLine = subtree2src(dstT);
 						dLine = absVariable(dLine, varMap);
 						System.out.println("CurrentLine: "+dLine);						
@@ -841,11 +846,11 @@ public class Output {
 			return 	arguSrc;
 		}//返回空括号
 		if(arguLeaves.size()==1) {
-			arguSrc = arguSrc + deleteLiteral(arguLeaves.get(0).getLabel())+end;
+			arguSrc = arguSrc + deleteLiteral(arguLeaves.get(0), srcT)+end;
 			return 	arguSrc;
 		}//返回单个元素+括号
 				
-		arguSrc = arguSrc + deleteLiteral(arguLeaves.get(0).getLabel());
+		arguSrc = arguSrc + deleteLiteral(arguLeaves.get(0), srcT);
 		for(int i=0;i<arguLeaves.size()-1;i++) {
 			ITree leaf1 = arguLeaves.get(i);
 			ITree leaf2 = arguLeaves.get(i+1);
@@ -853,7 +858,7 @@ public class Output {
 //			String parType = srcT.getTypeLabel(sharePar);
 			List<ITree> childs = sharePar.getChildren();
 			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//同一层的两个叶子节点，还原时候直接拼起来就行
-				arguSrc = arguSrc+" "+deleteLiteral(leaf2.getLabel());
+				arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 			}else if(childs.size()>=2){
 				ITree node1 = null;
 				ITree node2 = null;
@@ -881,7 +886,7 @@ public class Output {
 						leaves = Utils.traverse2Leaf(node2, leaves);//找到argulist中所有叶子
 						arguSrc = arguSrc + recoverArguList(node2, leaves, srcT);
 					}else if(type2.equals("operator")) {
-						arguSrc = arguSrc+" "+deleteLiteral(leaf2.getLabel());
+						arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 					}else if(type2.equals("modifier")) {
 						arguSrc = arguSrc+" * ";
 					}else {
@@ -891,7 +896,7 @@ public class Output {
 					}																						
 				}else if(type1.equals("argument")||type1.equals("parameter")) {
 					if(type2.equals("argument")||type2.equals("parameter")) {
-						arguSrc = arguSrc+" , "+deleteLiteral(leaf2.getLabel());
+						arguSrc = arguSrc+" , "+deleteLiteral(leaf2, srcT);
 					}else {
 						arguSrc = "error argumentArg situation";
 						break;
@@ -899,7 +904,7 @@ public class Output {
 					}					
 				}else if(type1.equals("type")) {
 					if(type2.equals("name")) {	
-						arguSrc = arguSrc+" "+deleteLiteral(leaf2.getLabel());
+						arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 					}else {
 						arguSrc = "error typeArg situation";
 						break;
@@ -907,7 +912,7 @@ public class Output {
 					}						
 				}else if(type1.equals("call")) {
 					if(type2.equals("operator")) {	
-						arguSrc = arguSrc+" "+deleteLiteral(leaf2.getLabel());
+						arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 					}else {
 						arguSrc = "error callArg situation";
 						break;
@@ -919,7 +924,7 @@ public class Output {
 						type2 = srcT.getTypeLabel(node2);
 					}						
 					if(type2.equals("name")||type2.equals("operator")) {
-						arguSrc = arguSrc+" "+deleteLiteral(leaf2.getLabel());
+						arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 					}else {
 						arguSrc = "error operatorArg situation";
 						break;
@@ -927,7 +932,7 @@ public class Output {
 					}						
 				}else if(type1.equals("specifier")) {
 					if(type2.equals("name")){
-						arguSrc = arguSrc+" "+deleteLiteral(leaf2.getLabel());
+						arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 					}else {
 						arguSrc = "error specifierArg situation";
 						break;
@@ -944,10 +949,20 @@ public class Output {
 		return arguSrc;		
 	}//argulist相当于subtree中的subtree，单独还原
 	
-	public static String deleteLiteral(String label) {
-		if(label.contains("\"")) {
-			label = "\"\"";
-		}
+	public static String deleteLiteral(ITree leaf, TreeContext tc) {
+		String label = leaf.getLabel();
+		String type = tc.getTypeLabel(leaf);
+		if(type.equals("literal")) {
+			if(isNumber(label)==true) {
+				if(isInteger(label)==true) {
+					label = "Int";
+				}else if(isDouble(label)==true){
+					label = "Float";
+				}
+			}
+			if(label.contains("\"")) 
+				label = "\"\"";
+		}		
 		return label;
 	}	
 	
@@ -991,5 +1006,39 @@ public class Output {
 		}		
 		return newLine;
 	}
-		
+	
+	private static boolean isNumber (Object obj) {
+		if (obj instanceof Number) {
+			return true;
+		} else if (obj instanceof String){
+			try{
+				Double.parseDouble((String)obj);
+				return true;
+			}catch (Exception e) {
+				return false;
+			}
+		}
+		return false;
+	}
+	
+	/* 
+	  * 判断是否为整数  
+	  * @param str 传入的字符串  
+	  * @return 是整数返回true,否则返回false  
+	*/  
+	  public static boolean isInteger(String str) {    
+	    Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");    
+	    return pattern.matcher(str).matches();    
+	  }  
+
+
+	/*  
+	  * 判断是否为浮点数，包括double和float  
+	  * @param str 传入的字符串  
+	  * @return 是浮点数返回true,否则返回false  
+	*/    
+	  public static boolean isDouble(String str) {    
+	    Pattern pattern = Pattern.compile("^[-\\+]?[.\\d]*$");    
+	    return pattern.matcher(str).matches();    
+	  }
 }

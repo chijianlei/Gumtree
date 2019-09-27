@@ -65,6 +65,9 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
             ITree m = mappings.getDst(c);
             if (m != null) seeds.add(m);
         }
+        if(src.getId()==8) {
+        	System.out.println("Seed:"+seeds.size());
+        }
         List<ITree> candidates = new ArrayList<>();
         Set<ITree> visited = new HashSet<>();
         for (ITree seed: seeds) {
@@ -79,6 +82,11 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
             }
         }
 
+        if(src.getId()==514) {
+        	for(ITree candi : candidates) {
+        		System.out.println("Candidate:"+candi.getId());
+        	}
+        }
         return candidates;
     }
 
@@ -97,6 +105,7 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
                 ITree left = srcIds.getTree(candidate.getFirst().getId());
                 ITree right = dstIds.getTree(candidate.getSecond().getId());
 
+//                System.out.println("ZsMatcher"+src.getId()+" :"+left.getId()+","+right.getId());
                 if (left.getId() == src.getId() || right.getId() == dst.getId()) {
 //                    System.err.printf("Trying to map already mapped source node (%d == %d || %d == %d)\n",
 //                            left.getId(), src.getId(), right.getId(), dst.getId());
@@ -104,18 +113,33 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
                 } else if (!isMappingAllowed(left, right)) {
 //                    System.err.printf("Trying to map incompatible nodes (%s, %s)\n",
 //                            left.toShortString(), right.toShortString());
-                    continue;
-                } else if (!left.getParent().hasSameType(right.getParent())) {
-//                    System.err.printf("Trying to map nodes with incompatible parents (%s, %s)\n",
-//                            left.getParent().toShortString(), right.getParent().toShortString());
-                    continue;
-                } else
-                    addMapping(left, right);
+                	continue;
+                } else {
+//                	if(left.getId()==514) {
+//                		System.err.println("find514");
+//                		Matcher m1 = new ZsMatcher(left, right, new MappingStore());
+//                		m1.match();
+//                		System.out.println("514size:"+m1.getMappings().asSet().size());
+//                		for (Mapping map: m1.getMappings()) {
+//                			ITree left1 = map.first;
+//                			ITree right1 = map.second;
+//                			System.out.println("Recover:"+left1.getId()+","+right1.getId());
+//                		}
+//                	}
+                	double sim = diceSimilarity(left, right);
+                	if(!left.isLeaf()){
+                		if(sim >= SIM_THRESHOLD)
+                    		addMapping(left, right);
+                	}else {
+                		addMapping(left, right);
+                	}
+                	               	
+//                	System.out.println("ZsMatcher"+src.getId()+" :"+left.getId()+","+right.getId());
+                }                   
             }
         }
-
-        mappedSrc.putTrees(src);
-        mappedDst.putTrees(dst);
+//        mappedSrc.putTrees(src);
+//        mappedDst.putTrees(dst);
     }
 
     /**

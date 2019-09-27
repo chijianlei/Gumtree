@@ -22,6 +22,7 @@ import gumtreediff.matchers.Matchers;
 import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeContext;
 import gumtreediff.tree.TreeUtils;
+import net.sf.saxon.functions.KeyFn.SubtreeFilter;
 import nodecluster.Cluster;
 import split.Split;
 import structure.ChangeTuple;
@@ -415,6 +416,20 @@ public class Utils {
 		return subRoot;
 	}//往上追溯某节点在子树内的根节点
 	
+	public static ITree searchBlock(SubTree sub) throws Exception {
+		ITree sRoot = sub.getRoot();
+		TreeContext tc = sub.getTC();
+		ITree par = sRoot.getParent();
+		while(par!=null&&!tc.getTypeLabel(par).equals("block")) {
+			par = par.getParent();
+		}
+		if(par==null) {
+			return null;
+		}else {
+			return par;
+		}					
+	}//搜索并定位父亲节点中的第一个block节点
+	
 	public static List<ITree> collectNode(ITree node, List<ITree> nodes) throws Exception {
 		if(nodes.isEmpty())
 			nodes.add(node);
@@ -460,13 +475,17 @@ public class Utils {
 		}
 		
 		for(Action a : inserts) {			
-			ITree sRoot = cl.traverseSRoot(a);			
+			ITree sRoot = cl.traverseSRoot(a);
+			if(sRoot==null)
+				continue;//碰见一次，原因未知
 			int id = sRoot.getId();
 			srcActIds.add(id);
 		}
 		
 		for(Action a : moves) {
-			ITree sRoot = cl.findMovRoot(a);			
+			ITree sRoot = cl.findMovRoot(a);
+			if(sRoot==null)
+				continue;//碰见一次，原因未知
 			int id = sRoot.getId();
 			srcActIds.add(id);
 		}
@@ -661,11 +680,14 @@ public class Utils {
 	
 	public static Boolean ifSRoot(String typeLabel) {
 		if(typeLabel=="decl_stmt"||typeLabel=="expr_stmt"||typeLabel=="while"||typeLabel=="for"||
-					typeLabel=="function"||typeLabel=="constructor"||typeLabel=="if") {
+					typeLabel=="function"||typeLabel=="constructor"||typeLabel=="if"||
+					typeLabel=="class"||typeLabel=="return"||typeLabel=="ternary"||
+					typeLabel=="include") {
 			return true;
 		}else
 			return false;
 	}//SRoot条件可能有遗漏
+	
 	
 	public static Boolean ifChild(ITree root, ITree target) throws Exception {
 		Boolean findNode = null;

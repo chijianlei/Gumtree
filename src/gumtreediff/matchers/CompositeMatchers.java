@@ -35,11 +35,12 @@ public class CompositeMatchers {
     @Register(id = "gumtree", defaultMatcher = true, priority = Registry.Priority.HIGH)
     public static class ClassicGumtree extends CompositeMatcher {
 
-        public ClassicGumtree(ITree src, ITree dst, MappingStore store) {
+        public ClassicGumtree(ITree src, ITree dst, MappingStore store) {       	
             super(src, dst, store, new Matcher[]{
                     new GreedySubtreeMatcher(src, dst, store),
                     new GreedyBottomUpMatcher(src, dst, store)
             });
+            System.out.println("ClassicGumtree");
         }
     }
 
@@ -50,6 +51,7 @@ public class CompositeMatchers {
             super(src, dst, store, new Matcher[]{
                     new GreedySubtreeMatcher(src, dst, store)
             });
+            System.out.println("GumtreeTopDown");
         }
     }
 
@@ -61,6 +63,7 @@ public class CompositeMatchers {
                     new CliqueSubtreeMatcher(src, dst, store),
                     new CompleteBottomUpMatcher(src, dst, store)
             });
+            System.out.println("CompleteGumtreeMatcher");
         }
     }
 
@@ -72,6 +75,7 @@ public class CompositeMatchers {
                     new ChangeDistillerLeavesMatcher(src, dst, store),
                     new ChangeDistillerBottomUpMatcher(src, dst, store)
             });
+            System.out.println("change-distiller");
         }
     }
 
@@ -83,6 +87,7 @@ public class CompositeMatchers {
                     new GreedySubtreeMatcher(src, dst, store),
                     new XyBottomUpMatcher(src, dst, store)
             });
+            System.out.println("xy");
         }
     }
 }

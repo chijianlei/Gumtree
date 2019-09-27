@@ -82,6 +82,11 @@ public abstract class Matcher {
         int max = Math.max(src.getDescendants().size(), dst.getDescendants().size());
         return (double) numberOfCommonDescendants(src, dst) / (double) max;
     }
+    
+    protected double overlapSimilarity(ITree src, ITree dst, MappingStore mappings) {
+        int min = Math.min(src.getDescendants().size(), dst.getDescendants().size());
+        return (double) numberOfCommonDescendants(src, dst) / (double) min;
+    }
 
     protected double diceSimilarity(ITree src, ITree dst) {
         double c = (double) numberOfCommonDescendants(src, dst);

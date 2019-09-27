@@ -20,7 +20,6 @@
 
 package gumtreediff.gen.jdt;
 
-
 import gumtreediff.gen.Register;
 import gumtreediff.gen.Registry;
 

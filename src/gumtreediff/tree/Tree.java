@@ -35,6 +35,9 @@ public class Tree extends AbstractTree implements ITree {
     private int pos;
     private int length;
     // End position
+    
+    private int line;
+    private int column;
 
     private AssociationMap metadata;
 
@@ -157,6 +160,16 @@ public class Tree extends AbstractTree implements ITree {
     public void setPos(int pos) {
         this.pos = pos;
     }
+    
+    @Override
+    public void setLine(int line) {
+        this.line = line;
+    }
+    
+    @Override
+    public void setColumn(int column) {
+        this.column = column;
+    }
 
     @Override
     public void setType(int type) {
@@ -189,4 +202,16 @@ public class Tree extends AbstractTree implements ITree {
             return new EmptyEntryIterator();
         return metadata.iterator();
     }
+
+	@Override
+	public int getLine() {
+		// TODO Auto-generated method stub
+		return line;
+	}
+
+	@Override
+	public int getColumn() {
+		// TODO Auto-generated method stub
+		return column;
+	}
 }

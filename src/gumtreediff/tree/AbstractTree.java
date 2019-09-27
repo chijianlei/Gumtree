@@ -33,6 +33,10 @@ public abstract class AbstractTree implements ITree {
     protected List<ITree> children;
 
     protected int height;
+    
+    protected int line;
+    
+    protected int column;
 
     protected int size;
 
@@ -123,10 +127,18 @@ public abstract class AbstractTree implements ITree {
 
     @Override
     public boolean isIsomorphicTo(ITree tree) {
-        if (this.getHash() != tree.getHash())
+        if (!hasSameTypeAndLabel(tree))
             return false;
-        else
-            return this.toStaticHashString().equals(tree.toStaticHashString());
+
+        if (getChildren().size() != tree.getChildren().size())
+            return false;
+
+        for (int i = 0; i < getChildren().size(); i++)  {
+            boolean isChildrenIsomophic = getChild(i).isIsomorphicTo(tree.getChild(i));
+            if (!isChildrenIsomophic)
+                return false;
+        }
+        return true;
     }
 
     @Override
@@ -224,6 +236,16 @@ public abstract class AbstractTree implements ITree {
     public void setSize(int size) {
         this.size = size;
     }
+    
+    @Override
+    public void setLine(int line) {
+    	this.line = line;
+    }
+    
+    @Override
+    public void setColumn(int column) {
+    	this.column = column;;
+    }
 
     @Override
     public String toStaticHashString() {
@@ -307,6 +329,16 @@ public abstract class AbstractTree implements ITree {
         public int getPos() {
             return Collections.min(children, (t1, t2) -> t2.getPos() - t1.getPos()).getPos();
         }
+        
+        @Override
+        public int getLine() {
+            throw unsupportedOperation();
+        }
+        
+        @Override
+        public int getColumn() {
+            throw unsupportedOperation();
+        }
 
         @Override
         public int getEndPos() {
@@ -341,7 +373,7 @@ public abstract class AbstractTree implements ITree {
         @Override
         public void setPos(int pos) {
             throw unsupportedOperation();
-        }
+        }       
 
         @Override
         public void setType(int type) {

@@ -35,6 +35,7 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
 
     public GreedyBottomUpMatcher(ITree src, ITree dst, MappingStore store) {
         super(src, dst, store);
+        System.out.println("GreedyBottomUpMatcher");
     }
 
     @Override
@@ -49,8 +50,37 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
                 ITree best = null;
                 double max = -1D;
 
+
                 for (ITree cand: candidates) {
-                    double sim = jaccardSimilarity(t, cand);
+                    double sim = diceSimilarity(t, cand);
+                    if (sim > max && sim >= SIM_THRESHOLD) {
+                        max = sim;
+                        best = cand;
+                    }
+                }
+                if(t.getId()==8) {
+                	System.err.println("find 8: "+candidates.size());
+                }
+
+                if (best != null) {
+                    lastChanceMatch(t, best);
+                    addMapping(t, best);
+                }               
+
+            }
+        }
+        
+        for (ITree t: src.postOrder())  {
+            if (t.isRoot()) {
+                break;
+            } else if (!(isSrcMatched(t) || t.isLeaf())) {
+                List<ITree> candidates = getDstCandidates(t);
+                ITree best = null;
+                double max = -1D;
+
+
+                for (ITree cand: candidates) {
+                    double sim = diceSimilarity(t, cand);
                     if (sim > max && sim >= SIM_THRESHOLD) {
                         max = sim;
                         best = cand;
@@ -58,9 +88,9 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
                 }
 
                 if (best != null) {
-                    lastChanceMatch(t, best);
                     addMapping(t, best);
-                }
+                }               
+
             }
         }
     }
