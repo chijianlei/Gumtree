@@ -37,6 +37,10 @@ public abstract class AbstractTree implements ITree {
     protected int line;
     
     protected int column;
+    
+    protected int lastLine;
+    
+    protected int lastColumn;
 
     protected int size;
 
@@ -244,7 +248,17 @@ public abstract class AbstractTree implements ITree {
     
     @Override
     public void setColumn(int column) {
-    	this.column = column;;
+    	this.column = column;
+    }
+    
+    @Override
+    public void setLastLine(int lastLine) {
+    	this.lastLine = lastLine;
+    }
+    
+    @Override
+    public void setLastColumn(int lastColumn) {
+    	this.lastColumn = lastColumn;
     }
 
     @Override
@@ -339,6 +353,16 @@ public abstract class AbstractTree implements ITree {
         public int getColumn() {
             throw unsupportedOperation();
         }
+        
+        @Override
+        public int getLastLine() {
+            throw unsupportedOperation();
+        }
+        
+        @Override
+        public int getLastColumn() {
+            throw unsupportedOperation();
+        }
 
         @Override
         public int getEndPos() {
@@ -408,6 +432,7 @@ public abstract class AbstractTree implements ITree {
         public Iterator<Map.Entry<String, Object>> getMetadata() {
             return new EmptyEntryIterator();
         }
+
     }
 
     protected static class EmptyEntryIterator implements Iterator<Map.Entry<String, Object>> {

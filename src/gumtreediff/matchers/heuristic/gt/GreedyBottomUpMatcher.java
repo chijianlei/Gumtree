@@ -56,10 +56,10 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
                     if (sim > max && sim >= SIM_THRESHOLD) {
                         max = sim;
                         best = cand;
-                    }
+                    }//如果sim=max，是否应有多个候选集
                 }
-                if(t.getId()==8) {
-                	System.err.println("find 8: "+candidates.size());
+                if(t.getId()==11) {
+                	System.err.println("find 11: "+candidates.size());
                 }
 
                 if (best != null) {
@@ -85,6 +85,10 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
                         max = sim;
                         best = cand;
                     }
+                }
+                
+                if(t.getId()==11) {
+                	System.err.println("find 11 第二次: "+candidates.size());
                 }
 
                 if (best != null) {

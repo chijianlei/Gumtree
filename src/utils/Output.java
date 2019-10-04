@@ -754,6 +754,8 @@ public class Output {
 						List<ITree> arguLeaves = new ArrayList<>();
 						arguLeaves = Utils.traverse2Leaf(node2, arguLeaves);//找到argulist中所有叶子
 						src = src + recoverArguList(node2, arguLeaves, srcT);//argulist单独处理
+						if(src.substring(src.length()-1)==" ")
+							src = src.substring(0, src.length()-1);//去除空格
 						size = arguLeaves.size();
 						i=i+size-1;
 					}else if(type2.equals("init")) {

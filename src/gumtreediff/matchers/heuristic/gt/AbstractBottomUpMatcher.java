@@ -105,6 +105,9 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
                 ITree left = srcIds.getTree(candidate.getFirst().getId());
                 ITree right = dstIds.getTree(candidate.getSecond().getId());
 
+                if(left.getId()==11) {
+                	System.err.println("findZM 11: "+right.getId());
+                }
 //                System.out.println("ZsMatcher"+src.getId()+" :"+left.getId()+","+right.getId());
                 if (left.getId() == src.getId() || right.getId() == dst.getId()) {
 //                    System.err.printf("Trying to map already mapped source node (%d == %d || %d == %d)\n",

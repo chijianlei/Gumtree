@@ -170,6 +170,14 @@ public interface ITree {
     
     void setLine(int line);
     
+    int getLastLine();
+    
+    void setLastLine(int lastLine);
+    
+    int getLastColumn();
+    
+    void setLastColumn(int lastColumn);
+    
     int getColumn();
     
     void setColumn(int column);

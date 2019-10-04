@@ -681,9 +681,8 @@ public class Utils {
 	public static Boolean ifSRoot(String typeLabel) {
 		if(typeLabel=="decl_stmt"||typeLabel=="expr_stmt"||typeLabel=="while"||typeLabel=="for"||
 					typeLabel=="function"||typeLabel=="constructor"||typeLabel=="if"||
-					typeLabel=="class"||typeLabel=="return"||typeLabel=="ternary"||
-					typeLabel=="include") {
-			return true;
+					typeLabel=="class"||typeLabel=="return"||typeLabel=="ternary") {
+			return true;//include暂时不算typelabel， mapping有问题
 		}else
 			return false;
 	}//SRoot条件可能有遗漏

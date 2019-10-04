@@ -27,50 +27,56 @@ public class SubtreeTest {
 		File cppfile = new File(path1);
 		TreeContext tc1 = new SrcmlCppTreeGenerator().generateFromFile(cppfile);
 		String miName = path1.split("/")[path1.split("/").length-1];//标记文件名
-		String path2 = "talker2.cpp";
-		File cppfile2 = new File(path2);
-		TreeContext tc2 = new SrcmlCppTreeGenerator().generateFromFile(cppfile2);
+//		String path2 = "talker2.cpp";
+//		File cppfile2 = new File(path2);
+//		TreeContext tc2 = new SrcmlCppTreeGenerator().generateFromFile(cppfile2);
 		Split sp = new Split();		
-		Matcher m = Matchers.getInstance().getMatcher(tc1.getRoot(), tc2.getRoot());
-        m.match();
-        MappingStore mappings = m.getMappings();
+//		Matcher m = Matchers.getInstance().getMatcher(tc1.getRoot(), tc2.getRoot());
+//        m.match();
+//        MappingStore mappings = m.getMappings();
         ArrayList<SubTree> sts1 = sp.splitSubTree(tc1, miName);
-        ArrayList<SubTree> sts2 = sp.splitSubTree(tc2, miName);
-        BufferedWriter wr = new BufferedWriter(new FileWriter(new File("mapping.txt")));
-        for(Mapping map : mappings) {
-        	ITree src = map.getFirst();
-        	ITree dst = map.getSecond();
-        	wr.append(src.getId()+"->"+dst.getId());
-        	wr.newLine();
-//        	System.out.println("Mapping:"+src.getId()+"->"+dst.getId());
-//        	if(dst.getId()==553) {
-//        		System.err.println("find it!"+src.getId());
-//        	}
-        }
-        wr.close();
-        System.out.println("Msize:"+mappings.asSet().size());
+//        ArrayList<SubTree> sts2 = sp.splitSubTree(tc2, miName);
+//        BufferedWriter wr = new BufferedWriter(new FileWriter(new File("mapping.txt")));
+//        for(Mapping map : mappings) {
+//        	ITree src = map.getFirst();
+//        	ITree dst = map.getSecond();
+//        	wr.append(src.getId()+"->"+dst.getId());
+//        	wr.newLine();
+////        	System.out.println("Mapping:"+src.getId()+"->"+dst.getId());
+////        	if(dst.getId()==553) {
+////        		System.err.println("find it!"+src.getId());
+////        	}
+//        }
+//        wr.close();
+//        System.out.println("Msize:"+mappings.asSet().size());
         for(SubTree st : sts1) {
         	ITree root = st.getRoot();
-        	System.out.println("StID:"+root.getId());
-        	if(root.getId()==41) {
-        		for(ITree node : root.postOrder()) {
-        			System.out.println("ID:"+node.getId());
-        		}
-        		List<ITree> des = root.getDescendants();
-            	for(ITree node : des) {
-            		System.out.println(node.getId());
-            		ITree dst = mappings.getDst(node);
-            		if(dst!=null)
-            		System.out.println(node.getId()+"->"+dst.getId());
-            	}
-        	}      	       		       	
+        	System.out.println("StID:"+root.getId()+":"+root.getLine()+","+root.getColumn()+
+        			"->"+root.getLastLine()+","+root.getLastColumn()+" Len:"+root.getLength());
+    		List<ITree> des = root.getDescendants();
+        	for(ITree node : des) {
+        		System.out.println(node.getId()+":"+node.getLine()+","+node.getColumn()+
+        				"->"+node.getLastLine()+","+node.getLastColumn()+" Len:"+node.getLength());
+        	}
+//        	if(root.getId()==41) {
+//        		for(ITree node : root.postOrder()) {
+//        			System.out.println("ID:"+node.getId());
+//        		}
+//        		List<ITree> des = root.getDescendants();
+//            	for(ITree node : des) {
+//            		System.out.println(node.getId());
+//            		ITree dst = mappings.getDst(node);
+//            		if(dst!=null)
+//            		System.out.println(node.getId()+"->"+dst.getId());
+//            	}
+//        	}      	       		       	
         }
-        System.out.println("-----");
-        for(SubTree st : sts2) {
-        	ITree root = st.getRoot();
-        	String dst = Output.subtree2src(st);
-//        	System.out.println(dst);   	       		       	
-        }
+//        System.out.println("-----");
+//        for(SubTree st : sts2) {
+//        	ITree root = st.getRoot();
+//        	String dst = Output.subtree2src(st);
+////        	System.out.println(dst);   	       		       	
+//        }
 	}
 	
 	public void breakBlock() throws Exception {

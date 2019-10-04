@@ -38,6 +38,8 @@ public class Tree extends AbstractTree implements ITree {
     
     private int line;
     private int column;
+    private int lastLine;
+    private int lastColumn;
 
     private AssociationMap metadata;
 
@@ -170,6 +172,16 @@ public class Tree extends AbstractTree implements ITree {
     public void setColumn(int column) {
         this.column = column;
     }
+    
+    @Override
+    public void setLastLine(int lastLine) {
+        this.lastLine = lastLine;
+    }
+    
+    @Override
+    public void setLastColumn(int lastColumn) {
+        this.lastColumn = lastColumn;
+    }
 
     @Override
     public void setType(int type) {
@@ -213,5 +225,17 @@ public class Tree extends AbstractTree implements ITree {
 	public int getColumn() {
 		// TODO Auto-generated method stub
 		return column;
+	}
+
+	@Override
+	public int getLastLine() {
+		// TODO Auto-generated method stub
+		return lastLine;
+	}
+
+	@Override
+	public int getLastColumn() {
+		// TODO Auto-generated method stub
+		return lastColumn;
 	}
 }

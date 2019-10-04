@@ -46,7 +46,7 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
 
     private Set<String> labeled = new HashSet<String>(
             Arrays.asList("specifier", "name", "comment", "literal", "operator",
-            		"modifier", "include", "directive", "file", "argument"));//第二行gumtree本身未添加
+            		"modifier", "include", "directive", "file", "argument", "value"));//第二行gumtree本身未添加
 
     private StringBuilder currentLabel;
 
@@ -70,7 +70,9 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
                 XMLEvent ev = r.nextEvent();
                 if (ev.isStartElement()) {
                     StartElement s = ev.asStartElement();
+                    System.out.println("StartElL:"+ev.toString());
                     String typeLabel = s.getName().getLocalPart();
+                    System.out.println("typeLabel:"+typeLabel);
                     if (typeLabel.equals("position")) {
                     	setLength(trees.peekFirst(), s);
                     }else if(typeLabel.equals("comment")) {
@@ -153,6 +155,8 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
             int line = Integer.parseInt(e.getAttributeByName(LINE).getValue());
             int column = Integer.parseInt(e.getAttributeByName(COLUMN).getValue());
             t.setLength(lr.positionFor(line, column) - t.getPos() + 1);
+            t.setLastLine(line);
+            t.setLastColumn(column);
         }
     }
 
