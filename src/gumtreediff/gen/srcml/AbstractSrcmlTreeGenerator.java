@@ -70,9 +70,9 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
                 XMLEvent ev = r.nextEvent();
                 if (ev.isStartElement()) {
                     StartElement s = ev.asStartElement();
-                    System.out.println("StartElL:"+ev.toString());
+//                    System.out.println("StartElL:"+ev.toString());
                     String typeLabel = s.getName().getLocalPart();
-                    System.out.println("typeLabel:"+typeLabel);
+//                    System.out.println("typeLabel:"+typeLabel);
                     if (typeLabel.equals("position")) {
                     	setLength(trees.peekFirst(), s);
                     }else if(typeLabel.equals("comment")) {

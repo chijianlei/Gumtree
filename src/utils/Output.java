@@ -29,6 +29,7 @@ import gumtreediff.tree.TreeContext;
 import gumtreediff.tree.TreeUtils;
 import nodecluster.Cluster;
 import split.Split;
+import structure.Definition;
 import structure.Migration;
 import structure.SubTree;
 import structure.Transform;
@@ -36,20 +37,18 @@ import structure.Transform;
 public class Output {
 
 	public static void main (String args[]) throws Exception{
-//		String path = args[0];
-		String path = "tmp//output";
+		String path = args[0];
+//		String path = "Absolute3DLocalizationElement.cpp";
 //		Output.collectTokens(sp.trans);
 //		Output.collectChangePairs(path, "");
-		Output.collectDefUse(path, "", "");
+//		Output.collectDefUse(path, "", "");
 //		Output.printJson(path, null);
 //		String path = "talker.cpp";
-//		Output.tokensFromInputFile(path);
+		Output.tokensFromInputFile(path);
 	}
 	
 	public static void tokensFromInputFile(String path) throws Exception {
 		Split sp = new Split();
-//		DelComment.clearComment(path);
-//		DelComment.clearInclude(path);
 		File output = new File("src-test.txt");
 		File outLine = new File("lineNum.txt");
 		BufferedWriter wr = new BufferedWriter(new FileWriter(output));
@@ -59,37 +58,52 @@ public class Output {
 		String cppName = cppFile.getName();	
 		System.out.println("Reading file: "+cppName);
 		ArrayList<SubTree> sub1 = sp.splitSubTree(tc, cppName);//Subtree中割裂过block,注意
-		int lastLineNum = 0;
-		for(SubTree srcT : sub1) {
-			if(srcT!=null) {
-				if(srcT.getTC()!=null) {					
-					String src = subtree2src(srcT);
-					wr.append(src);
-					wr.newLine();
-					wr.flush();
-					ArrayList<Integer> nums = locateLineNum(srcT, path);
-					int candidate = 0;
-					if(nums.size()>1) {	
-						int diffValue = Integer.MAX_VALUE;
-						for(int tmp : nums) {
-							int tmpdiff = Math.abs(tmp-lastLineNum);
-							if(tmpdiff<diffValue) {
-								candidate = tmp;
-								diffValue = tmpdiff;
-							}
-						}
-					}else if(nums.size()==1) {
-						candidate = nums.get(0);
-					}else {
-						wr.close();	
-						wr1.close();
-						throw new Exception("Why no lineNum???");
-					}						
-					wr1.append(String.valueOf(candidate));
-					wr1.newLine();
-					wr1.flush();
-					lastLineNum = candidate;
-				}							
+		for(SubTree srcT : sub1) {			
+			ITree root = srcT.getRoot();			
+			List<ITree> candidates = root.getDescendants();
+			if(srcT!=null&&srcT.getTC()!=null) {
+				String src = subtree2src(srcT);
+				wr.append(src);
+				wr.newLine();
+				wr.flush();		
+					
+				candidates.add(root);
+				int beginLine = 0;
+				int beginColumn = 0;
+				int endLine = 0;
+				int endColumn = 0;
+				for(ITree node : candidates) {
+					int line = node.getLine();
+					int column = node.getColumn();
+					if(line==0)
+						continue;//null
+					int lastLine = node.getLastLine();
+					int lastColumn = node.getLastColumn();
+					if(beginLine==0&&line>beginLine) {
+						beginLine = line;
+					}else if(line<beginLine&&line!=0){
+						beginLine = line;
+					}
+					if(beginColumn==0&&column>beginColumn) {
+						beginColumn = column;
+					}else if(column<beginColumn&&column!=0){
+						beginColumn = column;
+					}
+					if(endLine==0&&lastLine>endLine) {
+						endLine = lastLine;						
+					}else if(lastLine>endLine) {
+						endLine = lastLine;
+					}
+					if(endColumn==0&&lastColumn>endColumn) {
+						endColumn = lastColumn;						
+					}else if(lastColumn>endColumn) {
+						endColumn = lastColumn;
+					}
+				}				
+				wr1.append(String.valueOf(beginLine)+","+String.valueOf(beginColumn)+
+						"->"+String.valueOf(endLine)+","+String.valueOf(endColumn));
+				wr1.newLine();
+				wr1.flush();
 			}
 		}
 		wr.close();	
@@ -218,423 +232,6 @@ public class Output {
 		wr2.close();
 	}
 	
-	public static void collectDefUse(String path, String mode, String filter) throws Exception {//获取DefUse	
-		Split sp = new Split();		
-		ArrayList<Migration> migrats = sp.readMigration(path, filter);
-		File output = new File("defuse.txt");
-		File output1 = new File("src-val.txt");
-		File output2 = new File("tgt-val.txt");
-		BufferedWriter wr = new BufferedWriter(new FileWriter(output));
-		BufferedWriter wr1 = new BufferedWriter(new FileWriter(output1));
-		BufferedWriter wr2 = new BufferedWriter(new FileWriter(output2));
-		for(Migration migrat : migrats) {
-			HashMap<String, ArrayList<Integer>> sDefMap = new HashMap<String, ArrayList<Integer>>();
-			HashMap<String, ArrayList<Integer>> dDefMap = new HashMap<String, ArrayList<Integer>>();
-			HashMap<Integer, SubTree> stMap = new HashMap<Integer, SubTree>();
-			HashMap<Integer, SubTree> dtMap = new HashMap<Integer, SubTree>();
-			String miName = migrat.getMiName();
-			TreeContext sTC = migrat.getSrcT();
-			TreeContext dTC = migrat.getDstT();
-			MappingStore mappings = migrat.getMappings();
-			
-			System.out.println("Analyse:"+miName);
-			Matcher m = Matchers.getInstance().getMatcher(sTC.getRoot(), dTC.getRoot());
-	        m.match();
-			ArrayList<SubTree> changedSTree = new ArrayList<>();
-			HashMap<String, LinkedList<Action>> actions = Utils.collectAction(sTC, dTC, mappings);					
-			ArrayList<Integer> srcActIds = Utils.collectSrcActNodeIds(sTC, dTC, actions);
-			ArrayList<SubTree> sub1 = sp.splitSubTree(sTC, miName);//Subtree中割裂过block,注意
-			ArrayList<SubTree> sub2 = sp.splitSubTree(dTC, miName);//先计算action,再split ST
-
-			if(mode.equals("allDef")) {//allDef输出全集即可
-				changedSTree = sub1;
-			}else {
-				for(SubTree st : sub1) {
-					ITree t = st.getRoot();
-					List<ITree> nodeList = t.getDescendants();
-					nodeList.add(t);
-		        	for(ITree node : nodeList) {
-		        		int id = node.getId();
-		        		if(srcActIds.contains(id)) {
-		        			changedSTree.add(st);
-//		        			System.out.println("find a action subtree!");
-		        			break;
-		        		}
-		        	}
-				}//先找包含action的subtree
-			}					
-			
-			for(SubTree st : sub1) {
-				ITree sRoot = st.getRoot();
-				String sType = sTC.getTypeLabel(sRoot);
-				if(sType.equals("decl_stmt")) {
-					List<ITree> children = sRoot.getChildren();
-					for(ITree root : children) {
-						if(sTC.getTypeLabel(root).equals("decl")) {
-							List<ITree> childs = root.getChildren();
-							for(ITree child : childs) {
-								String type = sTC.getTypeLabel(child);
-								if(type.equals("name")) {//只有decl下的name节点的value才被认为是一条def
-									String label = child.getLabel();
-									int sID = sRoot.getId();
-									stMap.put(sID, st);
-									if(sDefMap.get(label)==null) {
-										ArrayList<Integer> ids = new ArrayList<Integer>();
-										ids.add(sID);
-										sDefMap.put(label, ids);
-									}else {
-										sDefMap.get(label).add(sID);										
-									}
-								}
-							}
-						}else {
-							wr.close();
-							wr1.close();
-							wr2.close();
-							throw new Exception("error type!"+sTC.getTypeLabel(root));
-						}						
-					}			
-				}
-			}
-			for(SubTree dt : sub2) {
-				ITree dRoot = dt.getRoot();
-				String dType = sTC.getTypeLabel(dRoot);
-				if(dType.equals("decl_stmt")) {	
-					List<ITree> children = dRoot.getChildren();
-					for(ITree root : children) {
-						if(sTC.getTypeLabel(root).equals("decl")) {
-							List<ITree> childs = root.getChildren();
-							for(ITree child : childs) {
-								String type = dTC.getTypeLabel(child);
-								if(type.equals("name")) {//只有decl下的name节点的value才被认为是一条def
-									String label = child.getLabel();
-									int dID = dRoot.getId();
-									dtMap.put(dID, dt);
-									if(dDefMap.get(label)==null) {
-										ArrayList<Integer> ids = new ArrayList<Integer>();
-										ids.add(dID);
-										dDefMap.put(label, ids);
-									}else {
-										dDefMap.get(label).add(dID);
-									}
-								}
-							}
-						}
-					}														
-				}
-			}
-						
-			System.out.println("changeSize:"+changedSTree.size());			
-			for(SubTree srcT : changedSTree) {
-				HashMap<String, SubTree> sMap = new HashMap<String, SubTree>();
-				HashMap<String, SubTree> dMap = new HashMap<String, SubTree>();
-				ArrayList<SubTree> sDef = new ArrayList<SubTree>();
-				ArrayList<SubTree> dDef = new ArrayList<SubTree>();
-				ArrayList<String> commonDef = new ArrayList<String>();//change pair的def交集
-				HashMap<String, String> varMap = new HashMap<String, String>();//change pair的def总集
-				System.out.println("===================");
-				ITree sRoot = srcT.getRoot();
-	    		ITree dRoot = mappings.getDst(sRoot);
-	    		SubTree dstT = null;
-	    		if(dRoot==null) {
-	    			System.out.println("SID:"+sRoot.getId()); //发现有整颗srcST删除的情况 
-	    			continue;
-	    		}else {//根据mapping来找dt
-	    			for(SubTree dt : sub2) {
-	    				ITree root = dt.getRoot();
-	    				if(root.equals(dRoot)) {
-	    					dstT = dt;
-	                		break;
-	    				}      			
-	    			}
-	    		}
-	    		if(dstT==null) {
-	    			wr.close();
-	    			wr1.close();
-					wr2.close();
-	    			throw new Exception("why is null?");
-	    		}
-	    		System.out.println(sRoot.getId()+"->"+dRoot.getId());
-	    		
-	    		String src = subtree2src(srcT);
-	    		String tar = subtree2src(dstT);	 
-	    		if(src.contains("error")&&src.contains("situation"))
-	    			continue;
-	    		if(tar.contains("error")&&tar.contains("situation"))
-	    			continue;
-	    		if(((float)src.length()/(float)tar.length())<0.25||((float)tar.length()/(float)src.length())<0.25) {
-	    			continue;
-	    		}//长度相差太多的句子直接跳过
-	    			
-				String sType = sTC.getTypeLabel(sRoot);
-				String dType = dTC.getTypeLabel(dRoot);
-				if(!sType.equals("decl_stmt")&&!dType.equals("decl_stmt")) {					
-					List<ITree> sLeaves = new ArrayList<ITree>();
-					Utils.traverse2Leaf(sRoot, sLeaves);
-					List<ITree> dLeaves = new ArrayList<ITree>();
-					Utils.traverse2Leaf(dRoot, dLeaves);
-					for(ITree leaf : sLeaves) {												
-						String type = sTC.getTypeLabel(leaf);
-						if(type.equals("name")) {
-							String label = leaf.getLabel();
-							ArrayList<Integer> map = sDefMap.get(label);
-							if(map!=null) {
-								if(map.size()==1) {
-									int defID = map.get(0);
-									SubTree st = stMap.get(defID);
-									sMap.put(label, st);
-									System.out.println("1Line");
-								}else {//发现有多个def line同一个关键字的情况，可能发生在不同的method
-									Collections.sort(map);
-									ArrayList<Integer> subMap = new ArrayList<Integer>();
-									for(int id : map) {//只取该条语句之前的subtree,抛弃掉之后的
-										if(id<sRoot.getId())
-											subMap.add(id);
-									}
-									if(subMap.size()==0)
-										continue;//好像有defid全在rootid之后的情况，跳过
-									int defID = subMap.get(subMap.size()-1);//取离该def最近的
-									SubTree st = stMap.get(defID);
-									sMap.put(label, st);
-									System.out.println("mLine");
-								}							
-							}
-						}
-					}					
-					for(ITree leaf : dLeaves) {
-						String type = dTC.getTypeLabel(leaf);
-						if(type.equals("name")) {
-							String label = leaf.getLabel();
-							ArrayList<Integer> map = dDefMap.get(label);
-							if(map!=null) {
-								if(map.size()==1) {
-									int defID = map.get(0);
-									SubTree st = dtMap.get(defID);
-									dMap.put(label, st);
-									System.out.println("1Line");
-								}else {
-									Collections.sort(map);
-									ArrayList<Integer> subMap = new ArrayList<Integer>();
-									for(int id : map) {//只取该条语句之前的subtree,抛弃掉之后的
-										if(id<dRoot.getId())
-											subMap.add(id);
-									}
-									if(subMap.size()==0)
-										continue;//好像有defid全在rootid之后的情况，跳过
-									int defID = subMap.get(subMap.size()-1);//取离该def最近的
-									SubTree st = dtMap.get(defID);
-									dMap.put(label, st);
-									System.out.println("mLine");
-								}							
-							}
-						}
-					}
-					if(sMap.size()>dMap.size()) {
-						for(Map.Entry<String, SubTree> entry : dMap.entrySet()) {
-							String keyword = entry.getKey();
-							SubTree dt = entry.getValue();
-							if(sMap.containsKey(keyword)) {//sMap和dMap取keyword交集
-								sDef.add(sMap.get(keyword));
-								dDef.add(dt);
-								commonDef.add(keyword);//共有的keyword放到commonDef
-								String absVarName = "var";
-								varMap.put(keyword, absVarName);//共有的keyword放到varMap
-							}
-						}
-					}else {
-						for(Map.Entry<String, SubTree> entry : sMap.entrySet()) {
-							String keyword = entry.getKey();
-							SubTree st = entry.getValue();
-							if(dMap.containsKey(keyword)) {//sMap和dMap取keyword交集
-								dDef.add(dMap.get(keyword));
-								sDef.add(st);
-								commonDef.add(keyword);//共有的keyword放到commonDef
-								String absVarName = "var";
-								varMap.put(keyword, absVarName);//共有的keyword放到varMap
-							}
-						}
-					}//change pair的DefMap取交集
-					for(Map.Entry<String, SubTree> entry : dMap.entrySet()) {
-						String keyword = entry.getKey();
-						if(!varMap.containsKey(keyword)) {
-							String absVarName = "var";
-							varMap.put(keyword, absVarName);//共有的keyword放到varMap
-						}
-					}
-					for(Map.Entry<String, SubTree> entry : sMap.entrySet()) {
-						String keyword = entry.getKey();
-						if(!varMap.containsKey(keyword)) {//sMap和dMap取keyword交集
-							String absVarName = "var";
-							varMap.put(keyword, absVarName);//共有的keyword放到varMap
-						}
-					}//私有def分别放入varMap										
-					
-					System.out.println("varSize:"+varMap.size());
-					for(Map.Entry<String, String> entry : varMap.entrySet()) {
-						String keyword = entry.getKey();
-						String value = entry.getValue();
-						System.out.println(keyword+","+value);
-					}
-					if(mode.equals("allDef")) {
-						System.out.println("------s-------");
-						for(SubTree st : sDef) {
-							String sLine = subtree2src(st);
-							sLine = absVariable(sLine, varMap);
-							System.out.println(st.getRoot().getId()+" DefLine: "+sLine);
-							wr.append(sLine+" ; ");
-							wr1.append(sLine+" ; ");
-						}
-						if(sDef.size()!=0) {//allDef时候输出了use就不输出def那行了
-							String sLine = subtree2src(srcT);
-							sLine = absVariable(sLine, varMap);
-							wr.append(sLine+"\t");
-							wr1.append(sLine+" ; ");
-							wr1.newLine();
-							wr1.flush();
-							System.out.println("CurrentLine: "+sLine);
-						}	
-						System.out.println("------d-------");
-						for(SubTree dt : dDef) {
-							String dLine = subtree2src(dt);
-							dLine = absVariable(dLine, varMap);
-							System.out.println(dt.getRoot().getId()+" DefLine: "+dLine);
-							wr.append(dLine+" ; ");
-							wr2.append(dLine+" ; ");
-						}
-						if(sDef.size()!=0) {
-							String dLine = subtree2src(dstT);
-							dLine = absVariable(dLine, varMap);
-							System.out.println("CurrentLine: "+dLine);
-							wr.append(dLine);
-							wr.newLine();
-							wr.flush();
-							wr2.append(dLine);
-							wr2.newLine();
-							wr2.flush();
-						}						
-					}else {																		
-						System.out.println("------s-------");
-						for(SubTree st : sDef) {
-							String sLine = subtree2src(st);
-							sLine = absVariable(sLine, varMap);
-							System.out.println(st.getRoot().getId()+" DefLine: "+sLine);
-							wr.append(sLine+" ; ");
-							wr1.append(sLine+" ; ");
-						}//print def
-						String sLine = subtree2src(srcT);
-						sLine = absVariable(sLine, varMap);
-						wr.append(sLine+"\t");
-						wr1.append(sLine);
-						wr1.newLine();
-						wr1.flush();
-						System.out.println("CurrentLine: "+sLine);
-//						System.out.println(Utils.printToken(srcT));
-						System.out.println("------d-------");
-						for(SubTree dt : dDef) {
-							String dLine = subtree2src(dt);
-							dLine = absVariable(dLine, varMap);
-							System.out.println(dt.getRoot().getId()+" DefLine: "+dLine);
-							wr.append(dLine+" ; ");
-							wr2.append(dLine+" ; ");
-						}//print def
-						String dLine = subtree2src(dstT);
-						dLine = absVariable(dLine, varMap);
-						System.out.println("CurrentLine: "+dLine);						
-						wr.append(dLine);
-						wr.newLine();
-						wr.flush();
-						wr2.append(dLine);
-						wr2.newLine();
-						wr2.flush();
-					}					
-				}else {
-					List<ITree> sLeaves = new ArrayList<ITree>();
-					Utils.traverse2Leaf(sRoot, sLeaves);
-					List<ITree> dLeaves = new ArrayList<ITree>();
-					Utils.traverse2Leaf(dRoot, dLeaves);
-					for(ITree leaf : sLeaves) {
-						String label = leaf.getLabel();
-						if(sDefMap.containsKey(label)) {
-							ArrayList<Integer> map = sDefMap.get(label);
-							if(map!=null) {
-								if(map.size()==1) {
-									int defID = map.get(0);
-									SubTree st = stMap.get(defID);
-									sMap.put(label, st);
-								}else {//发现有多个def line同一个关键字的情况，可能发生在不同的method
-									for(int id : map) {//只取该条语句的subtree
-										if(id==sRoot.getId()) {
-											SubTree st = stMap.get(id);
-											sMap.put(label, st);
-											break;
-										}																						
-									}
-								}							
-							}
-						}
-					}
-					for(ITree leaf : dLeaves) {
-						String label = leaf.getLabel();
-						if(dDefMap.containsKey(label)) {
-							ArrayList<Integer> map = dDefMap.get(label);
-							if(map!=null) {
-								if(map.size()==1) {
-									int defID = map.get(0);
-									SubTree dt = dtMap.get(defID);
-									dMap.put(label, dt);
-								}else {//发现有多个def line同一个关键字的情况，可能发生在不同的method
-									for(int id : map) {//只取该条语句的subtree
-										if(id==dRoot.getId()) {
-											SubTree dt = dtMap.get(id);
-											dMap.put(label, dt);
-											break;
-										}																						
-									}
-								}							
-							}
-						}
-					}
-					for(Map.Entry<String, SubTree> entry : sMap.entrySet()) {
-						String keyword = entry.getKey();
-						if(!varMap.containsKey(keyword)) {//sMap和dMap取keyword交集
-							String absVarName = "var";
-							varMap.put(keyword, absVarName);//共有的keyword放到varMap
-						}
-					}
-					for(Map.Entry<String, SubTree> entry : dMap.entrySet()) {
-						String keyword = entry.getKey();
-						if(!varMap.containsKey(keyword)) {
-							String absVarName = "var";
-							varMap.put(keyword, absVarName);//共有的keyword放到varMap
-						}
-					}//私有def分别放入varMap						
-					
-					System.out.println("------s-------");
-					String sLine = subtree2src(srcT);
-					sLine = absVariable(sLine, varMap);
-					System.out.println("CurrentLine: "+sLine);
-					wr.append(sLine+"\t");
-					wr1.append(sLine+"");
-					wr1.newLine();
-					wr1.flush();
-					System.out.println("------d-------");
-					String dLine = subtree2src(dstT);
-					dLine = absVariable(dLine, varMap);
-					System.out.println("CurrentLine: "+dLine);
-					wr.append(dLine);
-					wr.newLine();
-					wr.flush();
-					wr2.append(dLine);
-					wr2.newLine();
-					wr2.flush();				
-				}
-			}			
-		}	
-		wr.close();
-		wr1.close();
-		wr2.close();
-	}
-	
 	public static ArrayList<Integer> locateLineNum(SubTree st, String path) throws Exception {
 		ArrayList<Integer> candidates = new ArrayList<Integer>();
 		List<ITree> leaves = new ArrayList<ITree>();
@@ -676,6 +273,7 @@ public class Output {
 	}//search整份代码，找到包含最多tokens的行号(可能不唯一)
 	
 	public static String subtree2src(SubTree st) throws Exception {
+//		String src = String.valueOf(st.getRoot().getId());
 		String src = "";
 		String loopEnd = "";
 		ITree root = st.getRoot();
@@ -689,6 +287,8 @@ public class Output {
 			if(sType.equals("if"))
 				src = src+"if ( ";
 			loopEnd = " ) ";
+		}else if (sType.equals("return")){
+			src = src+"return ";
 		}
 		
 		List<ITree> leaves = new ArrayList<>();
@@ -713,8 +313,18 @@ public class Output {
 			int size = 0;
 			ITree leaf1 = leaves.get(i);
 			ITree leaf2 = leaves.get(i+1);
-			if(leaf2.getLabel().equals(""))
-				continue;//发现有截取block后的断点影响还原,跳过
+			if(leaf1.getLabel()==""&&leaf2.getLabel()=="")
+				continue;
+			if(leaf2.getLabel().equals("")&&
+					!srcT.getTypeLabel(leaf2).equals("argument_list")&&
+					!srcT.getTypeLabel(leaf2).equals("parameter_list")) {
+				i++;
+				if(i<leaves.size()-1) {					
+					leaf2 = leaves.get(i+1);
+				}else {
+					continue;
+				}
+			}//发现有截取block后的断点影响还原,跳过
 			if(leaf1.isRoot()||leaf2.isRoot())//叶子节点为总树根节点，可能么？
 				throw new Exception("why is root???");
 			ITree sharePar = Utils.findShareParent(leaf1, leaf2, srcT);
@@ -767,7 +377,7 @@ public class Output {
 					}else if(type2.equals("index")) {
 						src = src+" [ "+leaf2.getLabel()+" ] ";
 					}else {
-						src = "error name situation"; 
+						src = String.valueOf(st.getRoot().getId())+"error name situation"; 
 						break;
 //						throw new Exception("没考虑过的name情况:"+type2);
 					}					
@@ -775,7 +385,7 @@ public class Output {
 					if(type2.equals("name")) {	
 						src = src+" "+leaf2.getLabel();
 					}else {
-						src = "error type situation"; 
+						src = String.valueOf(st.getRoot().getId())+"error type situation"; 
 						break;
 //						throw new Exception("没考虑过的type情况:"+type2);
 					}						
@@ -787,7 +397,7 @@ public class Output {
 					if(type2.equals("name")||type2.equals("operator")) {
 						src = src+" "+leaf2.getLabel();
 					}else {
-						src = "error operator situation"; 
+						src = String.valueOf(st.getRoot().getId())+"error operator situation"; 
 						break;
 //						throw new Exception("没考虑过的operator情况:"+type2);
 					}					
@@ -797,7 +407,7 @@ public class Output {
 					}else if(type2.equals("call")) {
 						src = src+" , "+leaf2.getLabel();
 					}else {
-						src = src+ "error call situation";
+						src = String.valueOf(st.getRoot().getId())+ "error call situation";
 						break;
 //						throw new Exception("没考虑过的type情况:"+type2);
 					}
@@ -805,7 +415,7 @@ public class Output {
 					if(type2.equals("name")){
 						src = src+" "+leaf2.getLabel();
 					}else {
-						src = "error specifier situation"; 
+						src = String.valueOf(st.getRoot().getId())+"error specifier situation"; 
 						break;
 //						throw new Exception("没考虑过的type情况:"+type2);
 					}						
@@ -817,14 +427,25 @@ public class Output {
 					if(type2.equals("decl")) {
 						src = src+" , "+leaf2.getLabel();
 					}
+				}else if(type1.equals("init")) {
+					if(type2.equals("condition")) {
+						src = src+" ; "+leaf2.getLabel();
+					}
+				}else if(type1.equals("condition")) {
+					if(type2.equals("incr")) {
+						src = src+" ; "+leaf2.getLabel();
+					}
 				}else {
-					src = "error other situation";
+					src = src+"error other situation";
 					break;
 //					throw new Exception("没考虑过的children情况");
-				}
+				}				
 			}				
 		}
 		src = src+loopEnd;
+		if(src.contains("  "))
+			src = src.replace("  ", " ");
+		src = src.trim();
 		return src;		
 	}
 	
@@ -892,7 +513,7 @@ public class Output {
 					}else if(type2.equals("modifier")) {
 						arguSrc = arguSrc+" * ";
 					}else {
-						arguSrc = "error nameArg situation";
+						arguSrc = String.valueOf(srcT.getRoot().getId())+"error nameArg situation";
 						break;
 //						throw new Exception("没考虑过的name情况:"+type2);	
 					}																						
@@ -900,7 +521,7 @@ public class Output {
 					if(type2.equals("argument")||type2.equals("parameter")) {
 						arguSrc = arguSrc+" , "+deleteLiteral(leaf2, srcT);
 					}else {
-						arguSrc = "error argumentArg situation";
+						arguSrc = String.valueOf(srcT.getRoot().getId())+"error argumentArg situation";
 						break;
 //						throw new Exception("没考虑过的argument情况:"+type2);
 					}					
@@ -908,7 +529,7 @@ public class Output {
 					if(type2.equals("name")) {	
 						arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 					}else {
-						arguSrc = "error typeArg situation";
+						arguSrc = String.valueOf(srcT.getRoot().getId())+"error typeArg situation";
 						break;
 //						throw new Exception("没考虑过的type情况:"+type2);
 					}						
@@ -916,7 +537,7 @@ public class Output {
 					if(type2.equals("operator")) {	
 						arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 					}else {
-						arguSrc = "error callArg situation";
+						arguSrc = String.valueOf(srcT.getRoot().getId())+"error callArg situation";
 						break;
 //						throw new Exception("没考虑过的type情况:"+type2);
 					}
@@ -928,7 +549,7 @@ public class Output {
 					if(type2.equals("name")||type2.equals("operator")) {
 						arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 					}else {
-						arguSrc = "error operatorArg situation";
+						arguSrc = String.valueOf(srcT.getRoot().getId())+"error operatorArg situation";
 						break;
 //						throw new Exception("没考虑过的operator情况:"+type2);
 					}						
@@ -936,12 +557,12 @@ public class Output {
 					if(type2.equals("name")){
 						arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 					}else {
-						arguSrc = "error specifierArg situation";
+						arguSrc = String.valueOf(srcT.getRoot().getId())+"error specifierArg situation";
 						break;
 //						throw new Exception("没考虑过的type情况:"+type2);
 					}						
 				}else {
-					arguSrc = "error otherArg situation";
+					arguSrc = String.valueOf(srcT.getRoot().getId())+"error otherArg situation";
 					break;
 //					throw new Exception("没考虑过的children情况");
 				}					
@@ -955,13 +576,13 @@ public class Output {
 		String label = leaf.getLabel();
 		String type = tc.getTypeLabel(leaf);
 		if(type.equals("literal")) {
-			if(isNumber(label)==true) {
-				if(isInteger(label)==true) {
-					label = "Int";
-				}else if(isDouble(label)==true){
-					label = "Float";
-				}
-			}
+//			if(isNumber(label)==true) {
+//				if(isInteger(label)==true) {
+//					label = "Int";
+//				}else if(isDouble(label)==true){
+//					label = "Float";
+//				}
+//			}
 			if(label.contains("\"")) 
 				label = "\"\"";
 		}		
