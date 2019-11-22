@@ -25,6 +25,8 @@ import gumtreediff.tree.ITree;
 
 import java.util.List;
 
+import com.sun.source.tree.IfTree;
+
 /**
  * Match the nodes using a bottom-up approach. It browse the nodes of the source and destination trees
  * using a post-order traversal, testing if the two selected trees might be mapped. The two trees are mapped 
@@ -39,7 +41,7 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
     }
 
     @Override
-    public void match() {
+    public void match() {    	
         for (ITree t: src.postOrder())  {
             if (t.isRoot()) {
                 addMapping(t, this.dst);
@@ -50,6 +52,13 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
                 ITree best = null;
                 double max = -1D;
 
+                if(t.getId()==38) {
+                	System.out.println("candiNum:"+candidates.size());
+                    for (ITree cand: candidates) {
+                        double sim = diceSimilarity(t, cand);
+                        System.out.println("candiID:"+cand.getId()+","+sim);
+                    }
+                }
 
                 for (ITree cand: candidates) {
                     double sim = diceSimilarity(t, cand);
@@ -57,9 +66,6 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
                         max = sim;
                         best = cand;
                     }//如果sim=max，是否应有多个候选集
-                }
-                if(t.getId()==11) {
-                	System.err.println("find 11: "+candidates.size());
                 }
 
                 if (best != null) {
@@ -69,7 +75,7 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
 
             }
         }
-        
+        System.out.println("RecoveryMatcher");
         for (ITree t: src.postOrder())  {
             if (t.isRoot()) {
                 break;
@@ -85,11 +91,7 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
                         max = sim;
                         best = cand;
                     }
-                }
-                
-                if(t.getId()==11) {
-                	System.err.println("find 11 第二次: "+candidates.size());
-                }
+                }               
 
                 if (best != null) {
                     addMapping(t, best);

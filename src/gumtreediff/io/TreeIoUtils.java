@@ -129,6 +129,16 @@ public final class TreeIoUtils {
             }
         };
     }
+    
+    public static TreeSerializer toDot2(TreeContext ctx) {
+        return new TreeSerializer(ctx) {
+            @Override
+            protected TreeFormatter newFormatter(TreeContext ctx, MetadataSerializers serializer, Writer writer)
+                    throws Exception {
+                return new DotFormatter2(writer, ctx);
+            }
+        };
+    }
 
     public abstract static class AbstractSerializer {
 
@@ -777,6 +787,55 @@ public final class TreeIoUtils {
 
         public MetadataUnserializers getUnserializers() {
             return unserializers;
+        }
+    }
+    
+    static class DotFormatter2 extends TreeFormatterAdapter {
+        protected final Writer writer;
+        protected MappingStore map;
+        protected HashMap<Integer, Integer> mapping = new HashMap<>(); 
+        protected HashMap<Integer, Action> udActions = new HashMap<>();
+        protected HashMap<Integer, Action> amActions = new HashMap<>();
+        protected Boolean isSrc;
+
+        protected DotFormatter2(Writer w, TreeContext ctx) {
+            super(ctx);
+            writer = w;   
+        }  
+        
+        public String formate(String label) {
+            if (label.contains("\"") || label.contains("\\s"))
+                label = label.replaceAll("\"", "").replaceAll("\\s", "").replaceAll("\\\\", "");
+            if (label.contains("\"") || label.contains("\\n"))
+            	label = label.replaceAll("\"", "").replaceAll("(\r\n|\n)", "");
+//            if (label.length() > 30)
+//                label = label.substring(0, 30);
+            return label;
+        }
+
+        @Override
+        public void startSerialization() throws Exception { 
+            writer.write("digraph G {\n");
+        }
+
+        @Override
+        public void startTree(ITree tree) throws Exception { 
+        	int id = tree.getId();   	
+            String label = id+" "+context.getTypeLabel(tree);
+            if (tree.hasLabel()) 
+            	label = label+":"+tree.getLabel();           
+            label = formate(label);
+           
+            writer.write(id + " [label=\"" + label + "\"];\n"); 
+            	 	                  
+
+            if (tree.getParent() != null)
+                writer.write(tree.getParent().getId() + " -> " + id + ";\n");
+        }
+
+        @Override
+        public void stopSerialization() throws Exception {
+            writer.write("}");
         }
     }
 }

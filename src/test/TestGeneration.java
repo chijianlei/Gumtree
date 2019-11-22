@@ -37,15 +37,15 @@ import utils.Utils;
 public class TestGeneration {
 	
 	public static void main(String args[]) throws Exception{
-//		String path = "astra_frame_listener.cpp";
-		String path = "Absolute3DLocalizationElement.cpp";
+		String path = "talker.cpp";
+//		String path = "AccountInstance.java";
 //		String path = "migrations_test\\astra_driver\\astra_driver.cpp";
 		File cppfile = new File(path);
 		TreeContext tc = new SrcmlCppTreeGenerator().generateFromFile(cppfile);
 		ITree root = tc.getRoot();
 		System.out.println(root.getId()+","+tc.getTypeLabel(root));
-//		String path2 = "astra_frame_listener2.cpp";
-		String path2 = "Absolute3DLocalizationElement2.cpp";
+		String path2 = "talker2.cpp";
+//		String path2 = "AccountInstance2.java";
 //		String path2 = "migrations_test\\astra_driver\\astra_driver2.cpp";
 		File cppfile2 = new File(path2);
 		TreeContext tc2 = new SrcmlCppTreeGenerator().generateFromFile(cppfile2);          
@@ -68,7 +68,7 @@ public class TestGeneration {
         for(Mapping map : m.getMappings()) {
         	ITree src = map.getFirst();
         	ITree dst = map.getSecond();
-//        	System.out.println("Mapping:"+src.getId()+"->"+dst.getId());
+        	System.out.println(src.getId()+"->"+dst.getId());
         	mapping1.put(src.getId(), dst.getId());
         }
         System.out.println("mapSize:"+mapping1.size());
@@ -95,11 +95,13 @@ public class TestGeneration {
         String out = "testGraph.txt";
         BufferedWriter wr = new BufferedWriter(new FileWriter(out));
         wr.append(TreeIoUtils.toDot(tc, mappings, actions, true).toString());
+//        wr.append(TreeIoUtils.toDot2(tc).toString());
         wr.flush();
         wr.close();
         String out2 = "testGraph2.txt";
         BufferedWriter wr2 = new BufferedWriter(new FileWriter(out2));
         wr2.append(TreeIoUtils.toDot(tc2, mappings, actions, false).toString());
+//        wr2.append(TreeIoUtils.toDot2(tc2).toString());
         wr2.flush();
         wr2.close(); 
         

@@ -57,16 +57,12 @@ public abstract class AbstractSubtreeMatcher extends Matcher {
 
             List<ITree> currentHeightSrcTrees = srcTrees.pop();
             List<ITree> currentHeightDstTrees = dstTrees.pop();
-            for(ITree node : currentHeightSrcTrees) {
-            	System.out.print(node.getId()+",");
-            }
-            System.out.println();
-            System.out.println("----");
-            for(ITree node : currentHeightDstTrees) {
-            	System.out.print(node.getId()+",");
-            }
-            System.out.println();
-            System.out.println("====");
+//            for(ITree node : currentHeightSrcTrees) {
+//            	System.out.print(node.getId()+",");
+//            }
+//            for(ITree node : currentHeightDstTrees) {
+//            	System.out.print(node.getId()+",");
+//            }
             
 
             boolean[] marksForSrcTrees = new boolean[currentHeightSrcTrees.size()];
@@ -77,11 +73,8 @@ public abstract class AbstractSubtreeMatcher extends Matcher {
                     ITree src = currentHeightSrcTrees.get(i);
                     ITree dst = currentHeightDstTrees.get(j);
 
-                    if(src.getId()==871&&dst.getId()==1737) {
-                    	System.out.println("ifIso:"+src.isIsomorphicTo(dst));
-                    }
                     if (src.isIsomorphicTo(dst)) {
-                    	System.out.println("Iso ID:"+src.getId());
+//                    	System.out.println("Iso ID:"+src.getId());
                         multiMappings.link(src, dst);
                         marksForSrcTrees[i] = true;
                         marksForDstTrees[j] = true;
@@ -102,7 +95,7 @@ public abstract class AbstractSubtreeMatcher extends Matcher {
         for(Mapping map : mappings) {
         	ITree src = map.getFirst();
         	ITree dst = map.getSecond();
-        	System.out.println("greedyDownMap ID:"+src.getId()+"->"+dst.getId());
+//        	System.out.println("greedyDownMap ID:"+src.getId()+"->"+dst.getId());
         }
         
         filterMappings(multiMappings);
@@ -131,9 +124,11 @@ public abstract class AbstractSubtreeMatcher extends Matcher {
             Mapping mapping = mappings.remove(0);
             if (!(srcIgnored.contains(mapping.getFirst()) || dstIgnored.contains(mapping.getSecond()))) {
                 addMappingRecursively(mapping.getFirst(), mapping.getSecond());
-                System.out.println("retainBestMapping:"+mapping.getFirst().getId()+","+mapping.getSecond().getId());
+//                System.out.println("retainBestMapping:"+mapping.getFirst().getId()+","+mapping.getSecond().getId());
                 srcIgnored.add(mapping.getFirst());
+                srcIgnored.addAll(mapping.first.getDescendants());
                 dstIgnored.add(mapping.getSecond());
+                dstIgnored.addAll(mapping.second.getDescendants());
             }
         }
     }

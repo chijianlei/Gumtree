@@ -45,28 +45,71 @@ public class Output {
 //		Output.printJson(path, null);
 //		String path = "talker.cpp";
 		Output.tokensFromInputFile(path);
-	}
+	}	
 	
 	public static void tokensFromInputFile(String path) throws Exception {
 		Split sp = new Split();
 		File output = new File("src-test.txt");
 		File outLine = new File("lineNum.txt");
+		File outFile = new File("src-var.txt");
 		BufferedWriter wr = new BufferedWriter(new FileWriter(output));
 		BufferedWriter wr1 = new BufferedWriter(new FileWriter(outLine));
+		BufferedWriter wr2 = new BufferedWriter(new FileWriter(outFile));
 		File cppFile = new File(path);
 		TreeContext tc = new SrcmlCppTreeGenerator().generateFromFile(cppFile);
 		String cppName = cppFile.getName();	
 		System.out.println("Reading file: "+cppName);
+		Defuse def = new Defuse();
+		ArrayList<Definition> defs1 = def.getDef(tc, "src");//先计算action,再收集defs
+        HashMap<String, ArrayList<Definition>> defMap1 = def.transferDefs(defs1);
+        HashMap<ITree, ArrayList<Definition>> blockMap1 = def.transferBlockMap(defs1, tc, "src");
 		ArrayList<SubTree> sub1 = sp.splitSubTree(tc, cppName);//Subtree中割裂过block,注意
 		for(SubTree srcT : sub1) {			
 			ITree root = srcT.getRoot();			
 			List<ITree> candidates = root.getDescendants();
 			if(srcT!=null&&srcT.getTC()!=null) {
 				String src = subtree2src(srcT);
+				
+				ArrayList<ITree> leaves1 = new ArrayList<ITree>();				
+				Utils.traverse2Leaf(root, leaves1);
+				int labelCount = 0;
+				for(ITree leaf : leaves1) {
+					String label = leaf.getLabel();
+					if(!label.equals(""))
+						labelCount++;
+					String type = tc.getTypeLabel(leaf);
+					if(type.equals("literal")) {
+						leaf.setLabel(Output.deleteLiteral(leaf, tc));
+					}					
+					ArrayList<Definition> stringList = defMap1.get(label);
+					if(stringList!=null) {
+						ITree parBlock = def.searchBlock(leaf, tc);
+						ArrayList<Definition> blockList = blockMap1.get(parBlock);
+						for(Definition def1 : stringList) {
+							if(blockList!=null) {
+								if(blockList.contains(def1)) {
+									if(leaf.getId()>def1.getDefLabelID()) {
+										leaf.setLabel("var");									
+									}											
+								}
+							}							
+							if(def1.getDefLabelID()==leaf.getId()) {
+								leaf.setLabel("var");
+							}
+						}
+					}
+				}
+				if(labelCount<=1)
+					continue;
+				
 				wr.append(src);
 				wr.newLine();
-				wr.flush();		
-					
+				wr.flush();	
+				src = subtree2src(srcT);
+				wr2.append(src);
+				wr2.newLine();
+				wr2.flush();	
+				
 				candidates.add(root);
 				int beginLine = 0;
 				int beginColumn = 0;
@@ -108,6 +151,7 @@ public class Output {
 		}
 		wr.close();	
 		wr1.close();
+		wr2.close();
 	}
 	
 	public static void printJson(String path, String filter) throws Exception {

@@ -11,6 +11,8 @@ public class Migration {
 	private TreeContext dstT;
 	private MappingStore mappings;
 	private String miName;
+	private String srcHash;
+	private String dstHash;
 	
 	public Migration(TreeContext tc1, TreeContext tc2, MappingStore mappings, String name) {
 		this.srcT = tc1;
@@ -35,6 +37,20 @@ public class Migration {
 		return miName;
 	}
 
-	
+	public String getSrcHash() {
+		return srcHash;
+	}
+
+	public String getDstHash() {
+		return dstHash;
+	}
+
+	public void setSrcHash(String srcHash) {
+		this.srcHash = srcHash;
+	}
+
+	public void setDstHash(String dstHash) {
+		this.dstHash = dstHash;
+	}
 
 }

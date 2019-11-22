@@ -28,8 +28,10 @@ import gumtreediff.tree.ITree;
 import gumtreediff.tree.TreeMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractBottomUpMatcher extends Matcher {
@@ -65,9 +67,6 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
             ITree m = mappings.getDst(c);
             if (m != null) seeds.add(m);
         }
-        if(src.getId()==8) {
-        	System.out.println("Seed:"+seeds.size());
-        }
         List<ITree> candidates = new ArrayList<>();
         Set<ITree> visited = new HashSet<>();
         for (ITree seed: seeds) {
@@ -82,11 +81,6 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
             }
         }
 
-        if(src.getId()==514) {
-        	for(ITree candi : candidates) {
-        		System.out.println("Candidate:"+candi.getId());
-        	}
-        }
         return candidates;
     }
 
@@ -97,6 +91,7 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
         removeMatched(cSrc, true);
         removeMatched(cDst, false);
 
+        HashMap<ITree, ITree> newcandidates = new HashMap<ITree, ITree>();
         if (cSrc.getSize() < AbstractBottomUpMatcher.SIZE_THRESHOLD
                 || cDst.getSize() < AbstractBottomUpMatcher.SIZE_THRESHOLD) {
             Matcher m = new ZsMatcher(cSrc, cDst, new MappingStore());
@@ -105,9 +100,6 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
                 ITree left = srcIds.getTree(candidate.getFirst().getId());
                 ITree right = dstIds.getTree(candidate.getSecond().getId());
 
-                if(left.getId()==11) {
-                	System.err.println("findZM 11: "+right.getId());
-                }
 //                System.out.println("ZsMatcher"+src.getId()+" :"+left.getId()+","+right.getId());
                 if (left.getId() == src.getId() || right.getId() == dst.getId()) {
 //                    System.err.printf("Trying to map already mapped source node (%d == %d || %d == %d)\n",
@@ -131,14 +123,24 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
 //                	}
                 	double sim = diceSimilarity(left, right);
                 	if(!left.isLeaf()){
-                		if(sim >= SIM_THRESHOLD)
-                    		addMapping(left, right);
+                		if(sim >= SIM_THRESHOLD) {
+                			addMapping(left, right);
+                		}else {
+                			newcandidates.put(left, right);
+                		}
                 	}else {
                 		addMapping(left, right);
-                	}
-                	               	
+                	}               	               	
 //                	System.out.println("ZsMatcher"+src.getId()+" :"+left.getId()+","+right.getId());
                 }                   
+            }
+            for(Map.Entry<ITree, ITree> entry : newcandidates.entrySet()) {
+            	ITree left = entry.getKey();
+            	ITree right = entry.getValue();
+            	double sim = diceSimilarity(left, right);
+            	if(sim >= SIM_THRESHOLD) {
+        			addMapping(left, right);
+        		}
             }
         }
 //        mappedSrc.putTrees(src);

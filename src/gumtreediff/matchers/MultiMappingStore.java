@@ -95,6 +95,10 @@ public class MultiMappingStore implements Iterable<Mapping> {
     public boolean isSrcUnique(ITree src) {
         return srcs.get(src).size() == 1 && dsts.get(srcs.get(src).iterator().next()).size() == 1;
     }
+    
+    public boolean isDstUnique(ITree dst) {
+        return dsts.get(dst).size() == 1 && srcs.get(dsts.get(dst).iterator().next()).size() == 1;
+    }
 
     @Override
     public Iterator<Mapping> iterator() {
