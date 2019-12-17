@@ -668,10 +668,11 @@ public final class TreeIoUtils {
             writer.name("type").value(Integer.toString(t.getType()));
             if (t.hasLabel()) writer.name("label").value(t.getLabel());
             if (context.hasLabelFor(t.getType())) writer.name("typeLabel").value(context.getTypeLabel(t.getType()));
-            if (ITree.NO_VALUE != t.getPos()) {
-                writer.name("pos").value(Integer.toString(t.getPos()));
-                writer.name("length").value(Integer.toString(t.getLength()));
-            }
+//            if (ITree.NO_VALUE != t.getPos()) {
+//                writer.name("pos").value(Integer.toString(t.getPos()));
+//                writer.name("length").value(Integer.toString(t.getLength()));
+//            }
+            if (t.getId()>=0) writer.name("id").value(t.getId());
         }
 
         @Override

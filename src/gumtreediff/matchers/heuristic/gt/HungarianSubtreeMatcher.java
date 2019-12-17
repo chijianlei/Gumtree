@@ -20,10 +20,10 @@
 
 package gumtreediff.matchers.heuristic.gt;
 
+import gumtreediff.utils.HungarianAlgorithm;
 import gumtreediff.matchers.MappingStore;
 import gumtreediff.matchers.MultiMappingStore;
 import gumtreediff.tree.ITree;
-import gumtreediff.utils.HungarianAlgorithm;
 
 import java.util.*;
 

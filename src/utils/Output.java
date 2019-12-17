@@ -37,14 +37,14 @@ import structure.Transform;
 public class Output {
 
 	public static void main (String args[]) throws Exception{
-		String path = args[0];
+		String path = "migrations_test";
 //		String path = "Absolute3DLocalizationElement.cpp";
 //		Output.collectTokens(sp.trans);
 //		Output.collectChangePairs(path, "");
 //		Output.collectDefUse(path, "", "");
-//		Output.printJson(path, null);
+		Output.printJson(path, null);
 //		String path = "talker.cpp";
-		Output.tokensFromInputFile(path);
+//		Output.tokensFromInputFile(path);
 	}	
 	
 	public static void tokensFromInputFile(String path) throws Exception {
@@ -185,8 +185,30 @@ public class Output {
         			wr1.close();
 				}
 			}		
-		}
-		
+		}		
+	}
+	
+	public static void printJson1(String path, String filter) throws Exception {
+		Split sp = new Split();
+		ArrayList<Migration> migrats = new ArrayList<>();
+		migrats = sp.readMigration(path, filter);
+		for(int i=0;i<migrats.size();i++) {
+			Migration mi = migrats.get(i);
+			TreeContext srcT = mi.getSrcT();
+			TreeContext dstT = mi.getDstT();
+			if(srcT!=null&&dstT!=null) {
+				String out = "jsons\\pair"+String.valueOf(i)+"_src.json";
+    			BufferedWriter wr = new BufferedWriter(new FileWriter(new File(out)));
+    			wr.append(TreeIoUtils.toJson(srcT).toString());
+    			wr.flush();
+    			wr.close();
+    			String out1 = "jsons\\pair"+String.valueOf(i)+"_tgt.json";
+    			BufferedWriter wr1 = new BufferedWriter(new FileWriter(new File(out1)));
+    			wr1.append(TreeIoUtils.toJson(dstT).toString());
+    			wr1.flush();
+    			wr1.close();
+			}		
+		}		
 	}
 	
 	public static void collectChangePairs(String path, String filter) throws Exception {

@@ -31,7 +31,6 @@ public class GreedySubtreeMatcher extends AbstractSubtreeMatcher {
 
     public GreedySubtreeMatcher(ITree src, ITree dst, MappingStore store) {
         super(src, dst, store);
-        System.out.println("GreedySubtreeMatcher");
     }
 
     @Override
@@ -40,17 +39,9 @@ public class GreedySubtreeMatcher extends AbstractSubtreeMatcher {
         List<Mapping> ambiguousList = new ArrayList<>();
         Set<ITree> ignored = new HashSet<>();
         for (ITree src: multiMappings.getSrcs()) {
-        	boolean isMappingUnique = false;
-            if (multiMappings.isSrcUnique(src)) {            	
-                if (multiMappings.isSrcUnique(src)) {
-                    ITree dst = multiMappings.getDst(src).iterator().next();
-                    if (multiMappings.isDstUnique(dst)) {
-                        addMappingRecursively(src, dst);
-                        isMappingUnique = true;
-                    }
-                }
-            }           	
-            if (!(ignored.contains(src) || isMappingUnique)) {
+            if (multiMappings.isSrcUnique(src))
+                addMappingRecursively(src, multiMappings.getDst(src).iterator().next());
+            else if (!ignored.contains(src)) {
                 Set<ITree> adsts = multiMappings.getDst(src);
                 Set<ITree> asrcs = multiMappings.getSrc(multiMappings.getDst(src).iterator().next());
                 for (ITree asrc : asrcs)
@@ -59,11 +50,6 @@ public class GreedySubtreeMatcher extends AbstractSubtreeMatcher {
                 ignored.addAll(asrcs);
             }
         }
-//        for(Mapping map : ambiguousList) {
-//        	ITree src = map.first;
-//        	ITree dst = map.second;
-//        	System.out.println("ambiguousMap:"+src.getId()+","+dst.getId());
-//        }
 
         // Rank the mappings by score.
         Set<ITree> srcIgnored = new HashSet<>();

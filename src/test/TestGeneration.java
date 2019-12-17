@@ -43,13 +43,23 @@ public class TestGeneration {
 		File cppfile = new File(path);
 		TreeContext tc = new SrcmlCppTreeGenerator().generateFromFile(cppfile);
 		ITree root = tc.getRoot();
-		System.out.println(root.getId()+","+tc.getTypeLabel(root));
+		String json = "src.json";
+		BufferedWriter wr_json1 = new BufferedWriter(new FileWriter(new File(json)));
+		wr_json1.append(TreeIoUtils.toJson(tc).toString());
+		wr_json1.flush();
+		wr_json1.close();
+		System.out.println(root.getId()+","+tc.getTypeLabel(root)+","+root.getChildren().size());
 		String path2 = "talker2.cpp";
 //		String path2 = "AccountInstance2.java";
 //		String path2 = "migrations_test\\astra_driver\\astra_driver2.cpp";
 		File cppfile2 = new File(path2);
 		TreeContext tc2 = new SrcmlCppTreeGenerator().generateFromFile(cppfile2);          
         ITree root2 = tc2.getRoot();
+        json = "des.json";
+		BufferedWriter wr_json2 = new BufferedWriter(new FileWriter(new File(json)));
+		wr_json2.append(TreeIoUtils.toJson(tc2).toString());
+		wr_json2.flush();
+		wr_json2.close();
         System.out.println(root2.getId()+","+tc2.getTypeLabel(root2));
         
         Matcher m = Matchers.getInstance().getMatcher(tc.getRoot(), tc2.getRoot());
