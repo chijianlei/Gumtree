@@ -166,16 +166,28 @@ public interface ITree {
 
     void setPos(int pos);
     
+    /**
+     * @return the line number of the node (0 if not exists in source code).
+     */
     int getLine();
     
     void setLine(int line);
     
+    /**
+     * @return the last line number of the node (0 if not exists in source code).
+     */
     int getLastLine();
     
     void setLastLine(int lastLine);
     
+    /**
+     * @return the last column number of the node (0 if not exists in source code).
+     */
     int getLastColumn();
     
+    /**
+     * @return the column number of the node (0 if not exists in source code).
+     */
     void setLastColumn(int lastColumn);
     
     int getColumn();

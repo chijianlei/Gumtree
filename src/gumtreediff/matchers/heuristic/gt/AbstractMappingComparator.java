@@ -42,6 +42,7 @@ public abstract class AbstractMappingComparator implements Comparator<Mapping> {
         this.maxTreeSize = maxTreeSize;
         this.mappings = mappings;
         this.ambiguousMappings = ambiguousMappings;
+//        System.out.println("AbstractMappingComparator");
     }
 
     @Override

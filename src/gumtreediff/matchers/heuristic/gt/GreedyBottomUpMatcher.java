@@ -25,6 +25,8 @@ import gumtreediff.tree.ITree;
 
 import java.util.List;
 
+import com.sun.source.tree.IfTree;
+
 /**
  * Match the nodes using a bottom-up approach. It browse the nodes of the source and destination trees
  * using a post-order traversal, testing if the two selected trees might be mapped. The two trees are mapped 
@@ -35,10 +37,11 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
 
     public GreedyBottomUpMatcher(ITree src, ITree dst, MappingStore store) {
         super(src, dst, store);
+        System.out.println("GreedyBottomUpMatcher");
     }
 
     @Override
-    public void match() {
+    public void match() {    	
         for (ITree t: src.postOrder())  {
             if (t.isRoot()) {
                 addMapping(t, this.dst);
@@ -49,18 +52,51 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
                 ITree best = null;
                 double max = -1D;
 
+//                if(t.getId()==38) {
+//                	System.out.println("candiNum:"+candidates.size());
+//                    for (ITree cand: candidates) {
+//                        double sim = diceSimilarity(t, cand);
+//                        System.out.println("candiID:"+cand.getId()+","+sim);
+//                    }
+//                }
+
                 for (ITree cand: candidates) {
-                    double sim = jaccardSimilarity(t, cand);
+                    double sim = diceSimilarity(t, cand);
                     if (sim > max && sim >= SIM_THRESHOLD) {
                         max = sim;
                         best = cand;
-                    }
+                    }//如果sim=max，是否应有多个候选集
                 }
 
                 if (best != null) {
                     lastChanceMatch(t, best);
                     addMapping(t, best);
-                }
+                }               
+
+            }
+        }
+//        System.out.println("RecoveryMatcher");
+        for (ITree t: src.postOrder())  {
+            if (t.isRoot()) {
+                break;
+            } else if (!(isSrcMatched(t) || t.isLeaf())) {
+                List<ITree> candidates = getDstCandidates(t);
+                ITree best = null;
+                double max = -1D;
+
+
+                for (ITree cand: candidates) {
+                    double sim = diceSimilarity(t, cand);
+                    if (sim > max && sim >= SIM_THRESHOLD) {
+                        max = sim;
+                        best = cand;
+                    }
+                }               
+
+                if (best != null) {
+                    addMapping(t, best);
+                }               
+
             }
         }
     }

@@ -581,7 +581,7 @@ public class Split {
 			Matcher m = Matchers.getInstance().getMatcher(tc1.getRoot(), tc2.getRoot());
 	        m.match();
 	        MappingStore mappings = m.getMappings();
-			Migration mi = new Migration(tc1, tc2, mappings, dir.getName()+".cpp");
+			Migration mi = new Migration(tc1, tc2, mappings, srcFile.getAbsolutePath(), dstFile.getAbsolutePath());
 			migrats.add(mi);
 		}
 		System.out.println("Migration size:"+migrats.size());
@@ -768,7 +768,7 @@ public class Split {
 					String type = tc.getTypeLabel(tmp);
 					if(type.equals("block")) {
 						List<ITree> desendants = tmp.getDescendants();
-						if(desendants.size()>5) {//block节点太少就不断开了
+						if(desendants.size()>0) {//block节点太少就不断开了(该参数严重影响子树判定)
 							tmp.getParent().getChildren().remove(tmp);//断开父亲和所有block node的连接	
 							tmp.setParent(null);//是否需要断开block node跟父亲的连接呢?	
 						}						

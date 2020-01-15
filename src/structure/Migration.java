@@ -10,15 +10,18 @@ public class Migration {
 	private TreeContext srcT;
 	private TreeContext dstT;
 	private MappingStore mappings;
-	private String miName;
+	private String repoName;
+	private String miName_src;
+	private String miName_dst;
 	private String srcHash;
 	private String dstHash;
 	
-	public Migration(TreeContext tc1, TreeContext tc2, MappingStore mappings, String name) {
+	public Migration(TreeContext tc1, TreeContext tc2, MappingStore mappings, String src, String dst) {
 		this.srcT = tc1;
 		this.dstT = tc2;
 		this.mappings = mappings;
-		this.miName = name;
+		this.miName_src = src;
+		this.miName_dst = dst;
 	}
 
 	public TreeContext getSrcT() {
@@ -33,8 +36,25 @@ public class Migration {
 		return mappings;
 	}
 
+	public String getRepoName() {
+		return repoName;
+	}
+
+	public void setRepoName(String repoName) {
+		this.repoName = repoName;
+	}
+	
 	public String getMiName() {
-		return miName;
+		String[] tmps = miName_src.split("\\");
+		return tmps[tmps.length-1];
+	}
+
+	public String getMiName_src() {
+		return miName_src;
+	}
+	
+	public String getMiName_dst() {
+		return miName_dst;
 	}
 
 	public String getSrcHash() {

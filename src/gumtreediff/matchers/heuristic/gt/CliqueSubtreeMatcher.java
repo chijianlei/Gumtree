@@ -20,12 +20,12 @@
 
 package gumtreediff.matchers.heuristic.gt;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gumtreediff.matchers.Mapping;
 import gumtreediff.matchers.MappingStore;
 import gumtreediff.matchers.MultiMappingStore;
 import gumtreediff.tree.ITree;
 import gumtreediff.utils.Pair;
-import gumtreediff.matchers.Mapping;
-import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.util.*;
 
