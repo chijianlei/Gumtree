@@ -78,7 +78,7 @@ public class TestGeneration {
         for(Mapping map : m.getMappings()) {
         	ITree src = map.getFirst();
         	ITree dst = map.getSecond();
-        	System.out.println(src.getId()+"->"+dst.getId());
+//        	System.out.println(src.getId()+"->"+dst.getId());
         	mapping1.put(src.getId(), dst.getId());
         }
         System.out.println("mapSize:"+mapping1.size());

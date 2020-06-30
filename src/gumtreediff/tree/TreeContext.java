@@ -38,6 +38,8 @@ public class TreeContext{
     private final MetadataSerializers serializers = new MetadataSerializers();
 
     private ITree root;
+    
+    private int size = 0;
 
     @Override
     public String toString() {
@@ -52,7 +54,15 @@ public class TreeContext{
         return root;
     }
 
-    public String getTypeLabel(ITree tree) {
+    public int getSize() {
+		return size;
+	}
+    
+    public void setSize(int size) {
+    	this.size = size;
+    }
+
+	public String getTypeLabel(ITree tree) {
         return getTypeLabel(tree.getType());
     }
 

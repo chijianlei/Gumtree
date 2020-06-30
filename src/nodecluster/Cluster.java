@@ -24,6 +24,7 @@ public class Cluster {
 	private MappingStore mapping;
 	private HashMap<ITree, ITree> node2rootMap = new HashMap<>();//insert专用
 	private HashMap<ITree, ITree> parMap = new HashMap<>();//insert专用
+	private Boolean hasBuildMap = false;
 	
 	public static void main (String args[]) throws Exception{
 		String path = "talker.cpp";
@@ -37,11 +38,17 @@ public class Cluster {
 	}
 	
 	public Cluster(TreeContext tC1, TreeContext tC2) {
-		tc1 = tC1;
-		tc2 = tC2;
+		this.tc1 = tC1;
+		this.tc2 = tC2;
 		Matcher m = Matchers.getInstance().getMatcher(tc1.getRoot(), tc2.getRoot());
         m.match();
-        mapping = m.getMappings();
+        this.mapping = m.getMappings();
+	}
+	
+	public Cluster(TreeContext tC1, TreeContext tC2, MappingStore mappings) {
+		this.tc1 = tC1;
+		this.tc2 = tC2;
+        this.mapping = mappings;
 	}
 	
 	public ArrayList<String> extraceUPD(ArrayList<Migration> migrates) {
@@ -181,23 +188,7 @@ public class Cluster {
 			System.out.println("downRootname:"+tc1.getTypeLabel(newRoot));
 			printPath(newRoot);
 		}				
-	}
-	
-	public ITree findMovRoot(Action a) throws Exception {
-		if(!(a instanceof Move))
-			throw new Exception("action is not move!");
-		ITree dst = ((Move)a).getParent();
-		if(node2rootMap.get(dst)==null) {
-			ITree sRoot = mapping.getDst(dst);
-			if(sRoot == null)
-				System.err.println("error id:"+dst.getId());
-			return sRoot;
-		}//发现另一种情况,move连接的节点不在insert结果中，直接从mapping中找	
-		
-		ITree sRoot = node2rootMap.get(dst);
-		//move连接的父亲是tc2中节点，直接从insert结果中找，必然因为insert插入到tc1中了		
-		return sRoot;	
-	}
+	}//需要debug
 	
 	public void printPath(ITree newRoot) {//打印从newRoot到SRoot
 		ITree SRoot = newRoot;
@@ -211,29 +202,84 @@ public class Cluster {
 		System.out.println(allPath);
 	}
 	
-	public ITree traverseRealParent(Action a) throws Exception {
-//		System.out.println("parMapSize:"+parMap.size());
-		ITree dst = a.getNode();
-		ITree par1 = null;
-		ITree par2 = dst.getParent();;
-		for(Mapping map : mapping) {			
-			ITree first = map.getFirst();
-        	ITree second = map.getSecond();
-        	if(second.equals(par2)) {
-//        		System.out.println("getMap:"+first.getId()+"->"+second.getId());
-        		par1 = first;
-        		parMap.put(dst, par1);
-        	}
+	public void buildInsertMap(LinkedList<Action> inserts) throws Exception {
+		for(Action act : inserts) {//insert方法不涉及src节点，只在dst树中插入
+			if(!(act instanceof Insert))
+				throw new Exception("Action type error!");
+			ITree dst = act.getNode();
+			ITree par1 = null;
+			ITree par2 = dst.getParent();
+			ITree map_par2 = mapping.getSrc(par2);//the mapping node of par2 if exists
+//			if(par2.getId()==3134) {
+//				if(map_par2!=null)
+//					System.err.println("exist!"+map_par2.getId());
+//				else
+//					System.err.println("not exist!");
+//			}
+			if(map_par2!=null) {//说明直接连接在insert_root上且有对应的src_root
+				par1 = map_par2;
+				parMap.put(dst, par2);
+				node2rootMap.put(dst, par1);
+			}else {//说明连接在insert_par上，不是insert_root
+				if(parMap.get(dst)==null) {
+					parMap.put(dst, par2);//映射链全部放入map，指向insert_root
+				}else
+					throw new Exception("error exist parMap!");
+			}			
 		}
-		if(par1 == null) {//仍然为-1说明不在mapping中，action为insert子树中的节点
-			if(parMap.get(par2)!=null) {
-				par1 = parMap.get(par2);//内部子节点的父亲节点与子树的父亲节点绑定
-				parMap.put(dst, par1);
-			}else
-				throw new Exception("error parMap!");
-		}	
-		return par1;
-	}//搜索该action根语句root,Insert专用	
+		
+		for(Map.Entry<ITree, ITree> entry : parMap.entrySet()) {
+			ITree dst = entry.getKey();
+			ITree par = entry.getValue();
+//			System.out.println("Insert:"+dst.getId()+","+par.getId());
+			if(node2rootMap.get(dst)!=null) {
+				continue;
+			}else {//说明连接在insert_par上，不是insert_root
+				ITree map_par = parMap.get(par);
+				if(map_par==null)
+					throw new Exception("check the null error!"+dst.getId()+","+par.getId());
+				while(map_par!=null) {
+					par = map_par;
+					map_par = parMap.get(map_par);
+				}//par is insert_root
+//				System.out.println("mapped par:"+par.getId());
+				ITree mapped_insert_root = mapping.getSrc(par);
+				if(mapped_insert_root==null)
+					throw new Exception("check the null error!");
+				node2rootMap.put(dst, mapped_insert_root);
+			}
+		}
+		hasBuildMap = true;
+	}//insert方法有非常多节点连接的父亲节点属于dst树，需预先建立这些节点与src_root之间的map
+	
+	public ITree findMovRoot(Action a) throws Exception {
+		if(!(a instanceof Move))
+			throw new Exception("action is not move!");
+		if(hasBuildMap==false)
+			throw new Exception("InsertMap should be built firstly!");
+		ITree dst = ((Move)a).getParent();
+		if(node2rootMap.get(dst)==null) {
+			ITree sRoot = mapping.getDst(dst);
+			if(sRoot == null)
+				System.err.println("error id:"+dst.getId());
+			return sRoot;
+		}//发现另一种情况,move连接的节点不在insert结果中，直接从mapping中找	
+		
+		ITree sRoot = node2rootMap.get(dst);
+		//move连接的父亲是tc2中节点，直接从insert结果中找，必然因为insert插入到tc1中了	
+		if(sRoot==null)
+			throw new Exception("sRoot is not exist!");
+		return sRoot;	
+	}
+	
+	public ITree traverseRealParent(Action act) throws Exception {
+		if(hasBuildMap==false)
+			throw new Exception("InsertMap should be built firstly!");
+//		System.out.println("parMapSize:"+parMap.size());
+		ITree dst = act.getNode();
+		ITree mapped_insert_root = node2rootMap.get(dst); 
+		return mapped_insert_root;
+	}//搜索该action根节点insert_root在src树上的映射, Insert专用	
 	
 	public ITree traverseSRoot(Action a) throws Exception {
 		ITree target = a.getNode();
@@ -248,7 +294,7 @@ public class Cluster {
 			}
 			target = src;
 		}
-		if(a instanceof Insert) {
+		if(a instanceof Insert) {//insert 方法需要搜索tc2中的insert root节点
 			ITree dst = ((Insert)a).getNode();
 			String typeLabel = tc2.getTypeLabel(dst);
 //			System.out.println(dst.getId()+"typeLabel:"+typeLabel);

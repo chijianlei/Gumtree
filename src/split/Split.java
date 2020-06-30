@@ -15,6 +15,7 @@ import com.sun.tools.javah.Util;
 import gumtreediff.actions.ActionGenerator;
 import gumtreediff.actions.model.Action;
 import gumtreediff.gen.srcml.SrcmlCppTreeGenerator;
+import gumtreediff.gen.srcml.SrcmlJavaTreeGenerator;
 import gumtreediff.matchers.Mapping;
 import gumtreediff.matchers.MappingStore;
 import gumtreediff.matchers.Matcher;
@@ -576,8 +577,8 @@ public class Split {
 				throw new Exception("error pair! "+dir.getName());
 			File srcFile = pair[0];
 			File dstFile = pair[1];
-			TreeContext tc1 = new SrcmlCppTreeGenerator().generateFromFile(srcFile);
-			TreeContext tc2 = new SrcmlCppTreeGenerator().generateFromFile(dstFile);
+			TreeContext tc1 = new SrcmlJavaTreeGenerator().generateFromFile(srcFile);
+			TreeContext tc2 = new SrcmlJavaTreeGenerator().generateFromFile(dstFile);
 			Matcher m = Matchers.getInstance().getMatcher(tc1.getRoot(), tc2.getRoot());
 	        m.match();
 	        MappingStore mappings = m.getMappings();
@@ -619,7 +620,7 @@ public class Split {
 		LinkedList<Action> deletes = actions.get("delete");
 		LinkedList<Action> inserts = actions.get("insert");
 		LinkedList<Action> moves = actions.get("move");	
-		ArrayList<Integer> srcActIds = Utils.collectSrcActNodeIds(srcT, dstT, actions);
+		ArrayList<Integer> srcActIds = Utils.collectSrcActNodeIds(srcT, dstT, mappings, actions);
 //		System.out.println("IdNum:"+srcActIds.size());		
 		
 //		Pruning pt = new Pruning(srcT, dstT, mappings);
@@ -750,42 +751,51 @@ public class Split {
 		count = 0;
 		ITree totalRoot = tc.getRoot();
 		List<ITree> orderList = TreeUtils.preOrder(totalRoot);
-		ArrayList<SubTree> subRootList = new ArrayList<>();
+		ArrayList<SubTree> subTreeList = new ArrayList<>();
+		ArrayList<ITree> subRootList = new ArrayList<ITree>();
 		for(ITree t : orderList) {
 			String typeLabel = tc.getTypeLabel(t);
 			if(Utils.ifSRoot(typeLabel)) {
-				ITree subRoot = t;
-				List<ITree> list = TreeUtils.preOrder(subRoot);
-				List<ITree> pars = t.getParents();
+				ITree subRoot = t;				
+				List<ITree> pars = t.getParents();				
 				ArrayList<ITree> parBlocks = new ArrayList<ITree>();
 				for(ITree par : pars) {
 					String type = tc.getTypeLabel(par);
 					if(type.equals("block")) {
 						parBlocks.add(par);
 					}
-				}//将sRoot所有父亲节点中的block节点备份
-				for(ITree tmp : list) {
-					String type = tc.getTypeLabel(tmp);
-					if(type.equals("block")) {
-						List<ITree> desendants = tmp.getDescendants();
-						if(desendants.size()>0) {//block节点太少就不断开了(该参数严重影响子树判定)
-							tmp.getParent().getChildren().remove(tmp);//断开父亲和所有block node的连接	
-							tmp.setParent(null);//是否需要断开block node跟父亲的连接呢?	
-						}						
-					}
-//					else if(type.equals("elseif")||type.equals("else"))	{
-//						tmp.getParent().getChildren().remove(tmp);//断开父亲和所有elseif node的连接	
-//						tmp.setParent(null);//是否需要断开elseif node跟父亲的连接呢?	
-//					}
-				}
+				}//将sRoot所有父亲节点中的block节点备份				
+				
 				SubTree st = new SubTree(subRoot, tc, count, miName);
 				st.setParBlocks(parBlocks);
-				subRootList.add(st);
+				st.setPars(pars);//因为subtree同父亲已断开，计算pars调用这个List
+				subTreeList.add(st);
+				subRootList.add(subRoot);
 				count++;			
 			}//if是否考虑typeLabel=="return"?			
 		}
+		
+		for(ITree subRoot : subRootList) {
+			String typeLabel = tc.getTypeLabel(subRoot);
+			subRoot.getParent().getChildren().remove(subRoot);//断开父亲和stRoot的连接
+			subRoot.setParent(null);//断开父亲和stRoot的连接
+			if(typeLabel.equals("class")||typeLabel.equals("function")) {
+				List<ITree> list = subRoot.getChildren();
+				ITree delete_node = null;
+				for(ITree tmp : list) {
+					String type = tc.getTypeLabel(tmp);
+					if(type.equals("block")) {//search block node
+						delete_node = tmp;			
+					}
+				}
+				if(delete_node!=null) {
+					subRoot.getChildren().remove(delete_node);//断开subRoot和所有block node的连接	
+					delete_node.setParent(null);//断开subRoot和所有block node的连接	
+				}
+			}
+		}
 //		System.out.println("subTreeNum:"+count);
-		return subRootList;
+		return subTreeList;
 	}
 	
 	public HashMap<DTree, DTree> delCondition(Transform tf) throws Exception {

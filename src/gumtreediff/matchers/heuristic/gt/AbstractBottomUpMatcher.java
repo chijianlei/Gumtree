@@ -37,7 +37,7 @@ import java.util.Set;
 public abstract class AbstractBottomUpMatcher extends Matcher {
     //TODO make final?
     public static int SIZE_THRESHOLD =
-            Integer.parseInt(System.getProperty("gt.bum.szt", "10000"));
+            Integer.parseInt(System.getProperty("gt.bum.szt", "100"));
   //seems SIZE_THRESHOLD will significantly affect the speed and scalability of analysis
     public static final double SIM_THRESHOLD =
             Double.parseDouble(System.getProperty("gt.bum.smt", "0.5"));
@@ -125,13 +125,15 @@ public abstract class AbstractBottomUpMatcher extends Matcher {
                 	if(!left.isLeaf()){
                 		if(sim >= SIM_THRESHOLD) {
                 			addMapping(left, right);
+//                			System.out.println("ZsMatcher"+src.getId()+" :"+left.getId()+","+right.getId());
                 		}else {
                 			newcandidates.put(left, right);
                 		}
                 	}else {
                 		addMapping(left, right);
+//                		System.out.println("ZsMatcher"+src.getId()+" :"+left.getId()+","+right.getId());
                 	}               	               	
-//                	System.out.println("ZsMatcher"+src.getId()+" :"+left.getId()+","+right.getId());
+                	
                 }                   
             }
             for(Map.Entry<ITree, ITree> entry : newcandidates.entrySet()) {

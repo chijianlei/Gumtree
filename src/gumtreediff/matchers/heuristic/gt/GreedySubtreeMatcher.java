@@ -31,7 +31,7 @@ public class GreedySubtreeMatcher extends AbstractSubtreeMatcher {
 
     public GreedySubtreeMatcher(ITree src, ITree dst, MappingStore store) {
         super(src, dst, store);
-        System.out.println("GreedySubtreeMatcher");
+//        System.out.println("GreedySubtreeMatcher");
     }
 
     @Override
@@ -59,11 +59,11 @@ public class GreedySubtreeMatcher extends AbstractSubtreeMatcher {
                 ignored.addAll(asrcs);
             }
         }
-//        for(Mapping map : ambiguousList) {
-//        	ITree src = map.first;
-//        	ITree dst = map.second;
-//        	System.out.println("ambiguousMap:"+src.getId()+","+dst.getId());
-//        }
+        for(Mapping map : ambiguousList) {
+        	ITree src = map.first;
+        	ITree dst = map.second;
+        	System.out.println("ambiguousMap:"+src.getId()+","+dst.getId());
+        }
 
         // Rank the mappings by score.
         Set<ITree> srcIgnored = new HashSet<>();

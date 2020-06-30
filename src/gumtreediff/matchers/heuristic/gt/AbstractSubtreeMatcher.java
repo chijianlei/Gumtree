@@ -30,7 +30,7 @@ import java.util.Set;
 public abstract class AbstractSubtreeMatcher extends Matcher {
 
     public static int MIN_HEIGHT = Integer.parseInt(
-            System.getProperty("gt.stm.mh", System.getProperty("gumtree.match.gt.minh", "1"))
+            System.getProperty("gt.stm.mh", System.getProperty("gumtree.match.gt.minh", "2"))
     );
 
     public AbstractSubtreeMatcher(ITree src, ITree dst, MappingStore store) {
@@ -74,7 +74,7 @@ public abstract class AbstractSubtreeMatcher extends Matcher {
                     ITree dst = currentHeightDstTrees.get(j);
 
                     if (src.isIsomorphicTo(dst)) {
-//                    	System.out.println("Iso ID:"+src.getId());
+                    	System.out.println("Iso ID:"+src.getId());
                         multiMappings.link(src, dst);
                         marksForSrcTrees[i] = true;
                         marksForDstTrees[j] = true;
@@ -94,8 +94,8 @@ public abstract class AbstractSubtreeMatcher extends Matcher {
         Set<Mapping> mappings = multiMappings.getMappings();
         for(Mapping map : mappings) {
         	ITree src = map.getFirst();
-        	ITree dst = map.getSecond();
-//        	System.out.println("greedyDownMap ID:"+src.getId()+"->"+dst.getId());
+        	ITree dst = map.getSecond();        	
+        	System.out.println("greedyDownMap ID:"+src.getId()+"->"+dst.getId());
         }
         
         filterMappings(multiMappings);

@@ -37,10 +37,10 @@ public class JdtVisitor  extends AbstractJdtVisitor {
     public void preVisit(ASTNode n) {
         pushNode(n, getLabel(n));
     	String type = n.getClass().getSimpleName();
-    	System.out.println(type);
-        if(type.equals("Block")) {
-        	System.out.println("size:"+getChildren(n).size());
-        }
+//    	System.out.println(type);
+//        if(type.equals("Block")) {
+//        	System.out.println("size:"+getChildren(n).size());
+//        }
     }
     
     public static List<ASTNode> getChildren(ASTNode node) {

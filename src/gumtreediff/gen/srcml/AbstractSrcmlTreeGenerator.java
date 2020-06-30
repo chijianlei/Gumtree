@@ -110,6 +110,8 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
             }
             fixPos(context);
             context.validate();
+            int size = context.getRoot().getDescendants().size();
+            context.setSize(size);
             return context;
         } catch (Exception e) {
             e.printStackTrace();

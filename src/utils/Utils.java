@@ -25,6 +25,7 @@ import gumtreediff.tree.TreeUtils;
 import net.sf.saxon.functions.KeyFn.SubtreeFilter;
 import nodecluster.Cluster;
 import split.Split;
+import structure.Boundary;
 import structure.ChangeTuple;
 import structure.DTree;
 import structure.SubTree;
@@ -430,6 +431,109 @@ public class Utils {
 		}					
 	}//搜索并定位父亲节点中的第一个block节点
 	
+	public static ITree searchFunction(SubTree st) {
+		TreeContext tc = st.getTC();
+		List<ITree> pars = st.getPars();
+		for(ITree par : pars) {
+			String type = tc.getTypeLabel(par);
+			if(type.equals("function"))
+				return par;
+		}
+		return null;
+	}
+	
+	public static ArrayList<ITree> searchFunctions(TreeContext tc){
+		ArrayList<ITree> functions = new ArrayList<ITree>();
+		ITree root = tc.getRoot();
+		List<ITree> des = root.getDescendants();
+		for(ITree node : des) {
+			String type = tc.getTypeLabel(node);
+			if(type.equals("function")) {
+				functions.add(node);
+			}
+		}
+		return functions;
+	}
+	
+	public static Boundary searchSubtreeBoundary(SubTree st) {
+		ITree sRoot = st.getRoot();
+		TreeContext tc = st.getTC();
+		List<ITree> nodes1 = sRoot.getDescendants();
+		nodes1.add(sRoot);//srcT所有节点
+		int sBeginLine = 0;
+		int sLastLine = 0;
+		int sBeginCol = 0;
+		int sLastCol = 0;
+		for(ITree node : nodes1) {
+			int line = node.getLine();
+			int col = node.getColumn();
+			int lastLine = node.getLastLine();
+			int lastCol = node.getLastColumn();
+			String type = tc.getTypeLabel(node);
+			if(!type.equals("block")) {//跳过block节点，该节点会导致lastline为大括号结束位置
+				if(sBeginLine==0&&line!=0) {
+					sBeginLine = line;
+				}else if(line < sBeginLine&&line!=0) {
+					sBeginLine = line;
+				}//begin line
+				if(sBeginCol==0&&col!=0) {
+					sBeginCol = col;
+				}else if(col < sBeginCol&&col!=0) {
+					sBeginCol = col;
+				}//begin col
+				if(lastLine > sLastLine) {
+					sLastLine = lastLine;
+				}//last line
+				if(lastCol > sLastCol) {
+					sLastCol = lastCol;
+				}//last col
+//				if(sRoot.getId()==16329) {
+//					System.err.println(node.getId()+type+":"+line+","+lastLine+","+col+","+lastCol);
+//				}
+			}else if(type.equals("empty_stmt"))//特殊情况	
+				continue;
+		}
+		Boundary boundary = new Boundary(sRoot, sBeginLine, sLastLine, sBeginCol, sLastCol);	
+		System.out.println("FCID:"+sRoot.getId()+";"+sBeginLine+","+sLastLine+","+sBeginCol+","+sLastCol);
+	    return boundary;
+	}
+	
+	public static Boundary searchFunctionBoundary(ITree function, TreeContext tc) throws Exception {
+		String type = tc.getTypeLabel(function);
+		if(!type.equals("function"))
+			throw new Exception("not a function! "+type);
+		List<ITree> des = function.getDescendants();
+		int beginLine = 0;
+		int lastLine = 0;
+		int beginCol = 0;
+		int lastCol = 0;
+		for(ITree node : des) {
+			int beginLine_tmp = node.getLine();
+			int beginCol_tmp = node.getColumn();
+			int lastLine_tmp = node.getLastLine();
+			int lastCol_tmp = node.getLastColumn();
+			if(beginLine==0&&beginLine_tmp!=0) {
+				beginLine = beginLine_tmp;
+			}else if(beginLine_tmp < beginLine&&beginLine_tmp!=0) {
+				beginLine = beginLine_tmp;
+			}//begin line
+			if(beginCol==0&&beginCol_tmp!=0) {
+				beginCol = beginCol_tmp;
+			}else if(beginCol_tmp < beginCol&&beginCol_tmp!=0) {
+				beginCol = beginCol_tmp;
+			}//begin col
+			if(lastLine_tmp > lastLine) {
+				lastLine = lastLine_tmp;
+			}//last line
+			if(lastCol_tmp > lastCol) {
+				lastCol = lastCol_tmp;
+			}//last col
+		}
+		Boundary boundary = new Boundary(function, beginLine, lastLine, beginCol, lastCol);	
+		System.out.println("FCID:"+function.getId()+";"+beginLine+","+lastLine+","+beginCol+","+lastCol);
+		return boundary;
+	}
+	
 	public static List<ITree> collectNode(ITree node, List<ITree> nodes) throws Exception {
 		if(nodes.isEmpty())
 			nodes.add(node);
@@ -455,7 +559,7 @@ public class Utils {
 		return num;		
 	}//收集AST树中所有边
 	
-	public static ArrayList<Integer> collectSrcActNodeIds(TreeContext tc1, TreeContext tc2, HashMap<String, LinkedList<Action>> actMap) throws Exception{
+	public static ArrayList<Integer> collectSrcActNodeIds(TreeContext tc1, TreeContext tc2, MappingStore mappings, HashMap<String, LinkedList<Action>> actMap) throws Exception{
 		ArrayList<Integer> srcActIds = new ArrayList<>();
         HashMap<String, LinkedList<Action>> actions = actMap;
         LinkedList<Action> updates = actions.get("update");
@@ -463,7 +567,7 @@ public class Utils {
         LinkedList<Action> inserts = actions.get("insert");
         LinkedList<Action> moves = actions.get("move");
 		
-		Cluster cl = new Cluster(tc1, tc2);
+		Cluster cl = new Cluster(tc1, tc2, mappings);
 		for(Action a : updates) {
 			int id = a.getNode().getId();
 			srcActIds.add(id);
@@ -474,20 +578,44 @@ public class Utils {
 			srcActIds.add(id);
 		}
 		
+//		for(Action a : inserts) {			
+//			ITree sRoot = cl.traverseSRoot(a);//似乎不应该指定sRoot，应寻找insert的root
+//			if(sRoot==null) {
+//				System.err.println("insert err");
+//				continue;//碰见一次，原因未知
+//			}				
+//			int id = sRoot.getId();
+//			srcActIds.add(id);
+//		}	
+		cl.buildInsertMap(inserts);//似乎不应该指定sRoot，先建立insert node 映射关系
 		for(Action a : inserts) {			
-			ITree sRoot = cl.traverseSRoot(a);
-			if(sRoot==null)
-				continue;//碰见一次，原因未知
-			int id = sRoot.getId();
+			ITree dst = a.getNode();
+			ITree mapped_insert_root = cl.traverseRealParent(a);//该action根节点insert_root在src树上的映射
+			if(mapped_insert_root==null) {
+				throw new Exception("mapped_insert_root is null!"+dst.getId());
+//				System.err.println("mapped_insert_root is null!");
+//				continue;//碰见一次，原因未知
+			}				
+			int id = mapped_insert_root.getId();
 			srcActIds.add(id);
 		}
 		
 		for(Action a : moves) {
+			ITree src = a.getNode();
+			List<ITree> des = src.getDescendants();
+			des.add(src);
+			for(ITree child : des) {
+				int id = child.getId();
+				srcActIds.add(id);
+			}//all children and itself are added into the changeList
 			ITree sRoot = cl.findMovRoot(a);
-			if(sRoot==null)
+			if(sRoot==null) {
+//				throw new Exception("sRoot is null!"+src.getId());
+				System.err.println("move err");
 				continue;//碰见一次，原因未知
-			int id = sRoot.getId();
-			srcActIds.add(id);
+			}			
+			int root_id = sRoot.getId();
+			srcActIds.add(root_id);
 		}
 		return srcActIds;        
 	}
@@ -555,15 +683,13 @@ public class Utils {
 	}
 	
 	public static HashMap<String, LinkedList<Action>> collectAction(TreeContext tc1, TreeContext tc2, MappingStore mappings) {
-		Matcher m = Matchers.getInstance().getMatcher(tc1.getRoot(), tc2.getRoot());
-        m.match();
-        ActionGenerator g = new ActionGenerator(tc1.getRoot(), tc2.getRoot(), mappings);
+        ActionGenerator g = new ActionGenerator(tc1.getRoot(), tc2.getRoot(), mappings);      
         List<Action> actions = g.generate();
         System.out.println("ActionSize:"+actions.size());
         checkTCRoot(tc1);
         checkTCRoot(tc2);
         HashMap<Integer, Integer> mapping1 = new HashMap<Integer, Integer>();
-        for(Mapping map : m.getMappings()) {
+        for(Mapping map : mappings) {
         	ITree src = map.getFirst();
         	ITree dst = map.getSecond();
         	mapping1.put(src.getId(), dst.getId());
@@ -678,11 +804,15 @@ public class Utils {
 		return target;
 	}	
 	
-	public static Boolean ifSRoot(String typeLabel) {
-		if(typeLabel=="decl_stmt"||typeLabel=="expr_stmt"||typeLabel=="while"||typeLabel=="for"||
-					typeLabel=="function"||typeLabel=="constructor"||typeLabel=="if"||
-					typeLabel=="class"||typeLabel=="return"||typeLabel=="ternary") {
-			return true;//include暂时不算typelabel， mapping有问题
+	public static Boolean ifSRoot(String typeLabel) {//该方法关系到subtree划分，非常重要
+		if(typeLabel=="decl_stmt"||typeLabel=="expr_stmt"||typeLabel=="while"||
+					typeLabel=="function"||typeLabel=="function_decl"||typeLabel=="if"||
+					typeLabel=="else"||typeLabel=="ternary"||typeLabel=="for"||
+					typeLabel=="class"||typeLabel=="return"||typeLabel=="catch"||
+					typeLabel=="try"||typeLabel=="throw"||typeLabel=="enum"||
+					typeLabel=="constructor"||typeLabel=="constructor_decl"||
+					typeLabel=="interface"||typeLabel=="switch"||typeLabel=="then") {
+			return true;//include暂时不算typelabel， mapping有问题，import也不考虑
 		}else
 			return false;
 	}//SRoot条件可能有遗漏
@@ -705,7 +835,7 @@ public class Utils {
 	public static void checkTCRoot(TreeContext tc){//发现action后有迷之根节点
 		ITree root = tc.getRoot();
 		if(root.getParent()!=null) {
-			System.err.println("find error root!!");
+			System.err.println("find error root!!"+root.getParent().getId()+tc.getTypeLabel(root.getParent()));
 			root.setParent(null);
 		}
 	}

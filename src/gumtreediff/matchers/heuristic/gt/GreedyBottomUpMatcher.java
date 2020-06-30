@@ -71,11 +71,12 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
                 if (best != null) {
                     lastChanceMatch(t, best);
                     addMapping(t, best);
+//                    System.out.println("AddMatcher:"+t.getId()+","+best.getId());
                 }               
 
             }
         }
-//        System.out.println("RecoveryMatcher");
+        //RecoveryMatcher
         for (ITree t: src.postOrder())  {
             if (t.isRoot()) {
                 break;
@@ -95,6 +96,7 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
 
                 if (best != null) {
                     addMapping(t, best);
+//                    System.out.println("RecoveryMatcher:"+t.getId()+","+best.getId());
                 }               
 
             }
