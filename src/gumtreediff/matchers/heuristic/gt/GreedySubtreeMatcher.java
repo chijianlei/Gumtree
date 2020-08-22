@@ -62,7 +62,7 @@ public class GreedySubtreeMatcher extends AbstractSubtreeMatcher {
         for(Mapping map : ambiguousList) {
         	ITree src = map.first;
         	ITree dst = map.second;
-        	System.out.println("ambiguousMap:"+src.getId()+","+dst.getId());
+//        	System.out.println("ambiguousMap:"+src.getId()+","+dst.getId());
         }
 
         // Rank the mappings by score.

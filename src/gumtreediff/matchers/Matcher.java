@@ -69,7 +69,7 @@ public abstract class Matcher {
     }
 
     protected void addMappingRecursively(ITree src, ITree dst) {
-    	System.out.println("mapsize:"+mappings.asSet().size());
+//    	System.out.println("mapsize:"+mappings.asSet().size());
         List<ITree> srcTrees = src.getTrees();
         List<ITree> dstTrees = dst.getTrees();
         for (int i = 0; i < srcTrees.size(); i++) {

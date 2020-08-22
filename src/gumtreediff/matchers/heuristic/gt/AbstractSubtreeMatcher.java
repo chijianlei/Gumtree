@@ -74,7 +74,7 @@ public abstract class AbstractSubtreeMatcher extends Matcher {
                     ITree dst = currentHeightDstTrees.get(j);
 
                     if (src.isIsomorphicTo(dst)) {
-                    	System.out.println("Iso ID:"+src.getId());
+//                    	System.out.println("Iso ID:"+src.getId());
                         multiMappings.link(src, dst);
                         marksForSrcTrees[i] = true;
                         marksForDstTrees[j] = true;
@@ -95,7 +95,7 @@ public abstract class AbstractSubtreeMatcher extends Matcher {
         for(Mapping map : mappings) {
         	ITree src = map.getFirst();
         	ITree dst = map.getSecond();        	
-        	System.out.println("greedyDownMap ID:"+src.getId()+"->"+dst.getId());
+//        	System.out.println("greedyDownMap ID:"+src.getId()+"->"+dst.getId());
         }
         
         filterMappings(multiMappings);
