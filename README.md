@@ -1,5 +1,9 @@
 # GumTree
 
+## Status
+Develop Branch: The latest official version.
+Experimental: Modified version for our experiments. Adding external functions such as def-use extraction, action extraction, diff location and also optimizing the matching algorithm.
+
 ## Description
 
 GumTree is a complete framework to deal with source code as trees and compute differences between them. It includes possibilities such as:
