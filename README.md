@@ -34,13 +34,13 @@ To use GumTree, you can start by consulting the [Getting Started](https://github
 
 We already deal with a wide range of languages: C, Java, JavaScript, Python, R, Ruby. Click [here](https://github.com/GumTreeDiff/gumtree/wiki/Languages) for more details about the language we support.
 
-## Usage and Example
+## Usage and Examples
 
-### From a release：
+### From a Release
 You can download a release of GumTree directly on GitHub. 
 Unzip the file and you will find gumtree's binaries in the bin folder.
 
-### From the sources
+### From the Sources
 You can build GumTree with the following commands:
 
 ```
@@ -53,13 +53,13 @@ You will have a zip distribution of GumTree in the `dist/build/distributions` fo
 Windows notes
 Instead of `./gradlew build -x test`, run `gradlew.bat build -x test`
 
-### From maven
+### From Maven
 GumTree's Maven modules are available here: http://mvnrepository.com/artifact/com.github.gumtreediff.
 
 ### From Docker
 You can use our docker image: https://github.com/GumTreeDiff/gumtree/tree/develop/docker. Follow our instructions.
 
-### For Examples： 
+### For Examples 
 
 #### WebDiff:
 ```
@@ -97,6 +97,13 @@ Description: diff outputs the diff between two files in a xml format.
 gumtree cluster PATH1 PATH2
 ```
 Description: Extract transformation action clusters.
+
+#### Similarity
+```
+gumtree sim PATH1 PATH2
+```
+Description: Calculate the similarity between two input files.
+The score is calculated by (2*mapping\_size)/(node\_size\_file1+node\_size\_file2)
 
 #### Parse
 ```
