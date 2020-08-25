@@ -1,9 +1,9 @@
 # GumTree
 
 ## Status
+Develop Branch: The latest official version.
 
-* Master branch: ![Build Status](https://travis-ci.org/GumTreeDiff/gumtree.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/GumTreeDiff/gumtree/badge.svg?branch=master)](https://coveralls.io/github/GumTreeDiff/gumtree?branch=master)
-* Develop branch: ![Build Status](https://travis-ci.org/GumTreeDiff/gumtree.svg?branch=develop) [![Coverage Status](https://coveralls.io/repos/github/GumTreeDiff/gumtree/badge.svg?branch=develop)](https://coveralls.io/github/GumTreeDiff/gumtree?branch=develop)
+Experimental: Modified version for our experiments. Adding external functions such as def-use extraction, action extraction, diff location and also optimizing the matching algorithm.
 
 ## Description
 
@@ -18,25 +18,91 @@ Compared to classical code differencing tools, it has two important particularit
 * it works on a tree structure rather than a text structure,
 * it can detect moved or renamed elements in addition of deleted and inserted elements.
 
+## Prerequisites
+
+GumTree requires Java 1.9 to run.
+You have to install srcML if you want to diff C++ and C# code
+You have to install cgum if you want to diff C code
+You have to install pythonparser to diff Python code
+All external tools have to be available in your system's path.
+
 ## Documentation
 
 To use GumTree, you can start by consulting the [Getting Started](https://github.com/GumTreeDiff/gumtree/wiki/Getting-Started) page from our [wiki](https://github.com/GumTreeDiff/gumtree/wiki).
-
-## Screenshots
-
-### The directory diff viewer
-
-![Directory comparator view](https://github.com/GumTreeDiff/gumtree/raw/develop/doc/screenshots/screenshot-0.png)
-
-### The file diff viewer
-
-![Diff view](https://github.com/GumTreeDiff/gumtree/raw/develop/doc/screenshots/screenshot-1.png)
 
 ## Supported languages
 
 We already deal with a wide range of languages: C, Java, JavaScript, Python, R, Ruby. Click [here](https://github.com/GumTreeDiff/gumtree/wiki/Languages) for more details about the language we support.
 
-More languages are coming soon, if you want to help contact [me](http://www.labri.fr/perso/falleri).
+## Usage and Example
+
+### From a release：
+You can download a release of GumTree directly on GitHub. 
+Unzip the file and you will find gumtree's binaries in the bin folder.
+
+### From the sources
+You can build GumTree with the following commands:
+
+```
+git clone https://github.com/chijianlei/Gumtree.git
+cd gumtree
+./gradlew build -x test
+```
+You will have a zip distribution of GumTree in the `dist/build/distributions` folder. The gumtree binary is located in the bin folder contained in this archive.
+
+Windows notes
+Instead of `./gradlew build -x test`, run `gradlew.bat build -x test`
+
+### From maven
+GumTree's Maven modules are available here: http://mvnrepository.com/artifact/com.github.gumtreediff.
+
+### From Docker
+You can use our docker image: https://github.com/GumTreeDiff/gumtree/tree/develop/docker. Follow our instructions.
+
+### For Examples： 
+
+#### WebDiff:
+```
+gumtree webdiff PATH1 PATH2
+```
+Description: webdiff starts a webserver that displays a diff between two files or two directories.
+It will perform a diff and will display it in a browser.
+
+#### SwingDiff
+```
+gumtree swingdiff PATH1 PATH2
+```
+Description: swingdiff displays the diff between two files using the Swing java UI toolkit.
+
+#### Textdiff
+```
+gumtree textdiff PATH1 PATH2
+```
+Description: diff outputs the diff between two files in a textual format.
+
+#### Dotdiff
+```
+gumtree dotdiff PATH1 PATH2
+```
+Description: diff outputs the diff between two files in a dot format.
+
+#### Xmldiff
+```
+gumtree axmldiff PATH1 PATH2
+```
+Description: diff outputs the diff between two files in a xml format.
+
+#### Cluster
+```
+gumtree cluster PATH1 PATH2
+```
+Description: Extract transformation action clusters.
+
+#### Parse
+```
+gumtree parse PATH
+```
+Description: parse outputs the AST contained in the given file.
 
 ## Citing GumTree
 
