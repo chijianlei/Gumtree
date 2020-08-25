@@ -20,10 +20,10 @@ Compared to classical code differencing tools, it has two important particularit
 
 ## Prerequisites
 
-GumTree requires Java 1.9 to run.
-You have to install srcML if you want to diff C++ and C# code
-You have to install cgum if you want to diff C code
-You have to install pythonparser to diff Python code
+GumTree requires Java 1.9 to run.  
+You have to install srcML if you want to diff C++ and C# code.  
+You have to install cgum if you want to diff C code.  
+You have to install pythonparser to diff Python code.  
 All external tools have to be available in your system's path.
 
 ## Documentation
@@ -32,7 +32,7 @@ To use GumTree, you can start by consulting the [Getting Started](https://github
 
 ## Supported languages
 
-We already deal with a wide range of languages: C, Java, JavaScript, Python, R, Ruby. Click [here](https://github.com/GumTreeDiff/gumtree/wiki/Languages) for more details about the language we support.
+We already deal with a wide range of languages: C, Java, JavaScript, Python, R, Ruby.     Click [here](https://github.com/GumTreeDiff/gumtree/wiki/Languages) for more details about the language we support.
 
 ## Usage and Examples
 
@@ -52,12 +52,6 @@ You will have a zip distribution of GumTree in the `dist/build/distributions` fo
 
 Windows notes
 Instead of `./gradlew build -x test`, run `gradlew.bat build -x test`
-
-### From Maven
-GumTree's Maven modules are available here: http://mvnrepository.com/artifact/com.github.gumtreediff.
-
-### From Docker
-You can use our docker image: https://github.com/GumTreeDiff/gumtree/tree/develop/docker. Follow our instructions.
 
 ### For Examples 
 
