@@ -101,10 +101,10 @@ public class Sim extends AbstractDiffClient<Sim.Options> {
         Diff diff = getDiff();
         TreeContext srcT = diff.src;
         TreeContext dstT = diff.dst;
-        int size_src = srcT.getRoot().getDescendants().size()+1;
-        int size_dst = dstT.getRoot().getDescendants().size()+1;
-        int diff_size = diff.mappings.size();
-        float sim = 1 - (float)(2*diff_size)/(size_src+size_dst);
+        int srcSize = srcT.getRoot().getDescendants().size()+1;
+        int dstSize = dstT.getRoot().getDescendants().size()+1;
+        int diffSize = diff.mappings.size();
+        float sim = 1 - (float)(2 * diffSize) / (srcSize + dstSize);
         System.out.println(sim);
 //        ActionsIoUtils.ActionSerializer serializer = opts.format.getSerializer(
 //                diff.src, diff.editScript, diff.mappings);
