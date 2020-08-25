@@ -101,8 +101,8 @@ public class Sim extends AbstractDiffClient<Sim.Options> {
         Diff diff = getDiff();
         TreeContext srcT = diff.src;
         TreeContext dstT = diff.dst;
-        int srcSize = srcT.getRoot().getDescendants().size()+1;
-        int dstSize = dstT.getRoot().getDescendants().size()+1;
+        int srcSize = srcT.getRoot().getDescendants().size() + 1;
+        int dstSize = dstT.getRoot().getDescendants().size() + 1;
         int diffSize = diff.mappings.size();
         float sim = 1 - (float)(2 * diffSize) / (srcSize + dstSize);
         System.out.println(sim);
