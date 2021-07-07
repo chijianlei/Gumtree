@@ -60,10 +60,10 @@ public class Output {
 		String cppName = cppFile.getName();	
 		System.out.println("Reading file: "+cppName);
 		Defuse def = new Defuse();
-		ArrayList<Definition> defs1 = def.getDef(tc, "src");//ÏÈ¼ÆËãaction,ÔÙÊÕ¼¯defs
+		ArrayList<Definition> defs1 = def.getDef(tc, "src");//å…ˆè®¡ç®—action,å†æ”¶é›†defs
         HashMap<String, ArrayList<Definition>> defMap1 = def.transferDefs(defs1);
         HashMap<ITree, ArrayList<Definition>> blockMap1 = def.transferBlockMap(defs1, tc, "src");
-		ArrayList<SubTree> sub1 = sp.splitSubTree(tc, cppName);//SubtreeÖĞ¸îÁÑ¹ıblock,×¢Òâ
+		ArrayList<SubTree> sub1 = sp.splitSubTree(tc, cppName);//Subtreeä¸­å‰²è£‚è¿‡block,æ³¨æ„
 		for(SubTree srcT : sub1) {			
 			ITree root = srcT.getRoot();			
 			List<ITree> candidates = root.getDescendants();
@@ -336,7 +336,7 @@ public class Output {
 			}
 		}
 		return candidates;
-	}//searchÕû·İ´úÂë£¬ÕÒµ½°üº¬×î¶àtokensµÄĞĞºÅ(¿ÉÄÜ²»Î¨Ò»)
+	}//searchæ•´ä»½ä»£ç ï¼Œæ‰¾åˆ°åŒ…å«æœ€å¤štokensçš„è¡Œå·(å¯èƒ½ä¸å”¯ä¸€)
 	
 	public static String subtree2src(SubTree st) throws Exception {
 //		String src = String.valueOf(st.getRoot().getId());
@@ -368,11 +368,11 @@ public class Output {
 		if(leaves.size()==0)
 			throw new Exception("null leaves");
 		else if(leaves.size()==1) {
-			src = src+leaves.get(0).getLabel();//ÏÈ°Ñ0ºÅÒ¶×Ó·ÅÈë
+			src = src+leaves.get(0).getLabel();//å…ˆæŠŠ0å·å¶å­æ”¾å…¥
 			return src;
 		}
 		
-		src = src+leaves.get(0).getLabel();//ÏÈ°Ñ0ºÅÒ¶×Ó·ÅÈë
+		src = src+leaves.get(0).getLabel();//å…ˆæŠŠ0å·å¶å­æ”¾å…¥
 //		System.out.println("leafSize:"+leaves.size());
 		for(int i=0;i<leaves.size()-1;i++) {
 //			System.out.println(src);
@@ -390,15 +390,15 @@ public class Output {
 				}else {
 					continue;
 				}
-			}//·¢ÏÖÓĞ½ØÈ¡blockºóµÄ¶ÏµãÓ°Ïì»¹Ô­,Ìø¹ı
-			if(leaf1.isRoot()||leaf2.isRoot())//Ò¶×Ó½ÚµãÎª×ÜÊ÷¸ù½Úµã£¬¿ÉÄÜÃ´£¿
+			}//å‘ç°æœ‰æˆªå–blockåçš„æ–­ç‚¹å½±å“è¿˜åŸ,è·³è¿‡
+			if(leaf1.isRoot()||leaf2.isRoot())//å¶å­èŠ‚ç‚¹ä¸ºæ€»æ ‘æ ¹èŠ‚ç‚¹ï¼Œå¯èƒ½ä¹ˆï¼Ÿ
 				throw new Exception("why is root???");
 			ITree sharePar = Utils.findShareParent(leaf1, leaf2, srcT);
 //			String parType = srcT.getTypeLabel(sharePar);
 			List<ITree> childs = sharePar.getChildren();
-			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//Í¬Ò»²ãµÄÁ½¸öÒ¶×Ó½Úµã£¬»¹Ô­Ê±ºòÖ±½ÓÆ´ÆğÀ´¾ÍĞĞ
+			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//åŒä¸€å±‚çš„ä¸¤ä¸ªå¶å­èŠ‚ç‚¹ï¼Œè¿˜åŸæ—¶å€™ç›´æ¥æ‹¼èµ·æ¥å°±è¡Œ
 				src = src+" "+leaf2.getLabel();
-			}else if(childs.size()>=2){//·ÖÇé¿öÌÖÂÛ²»Í¬·ÖÖ§ÏÂ»¹Ô­´úÂëÎÊÌâ
+			}else if(childs.size()>=2){//åˆ†æƒ…å†µè®¨è®ºä¸åŒåˆ†æ”¯ä¸‹è¿˜åŸä»£ç é—®é¢˜
 				ITree node1 = null;
 				ITree node2 = null;
 				for(ITree child : childs) {
@@ -416,7 +416,7 @@ public class Output {
 //						if(list.contains(leaf1)&&list.contains(leaf1))
 //							throw new Exception("wrong sharePar!");
 					}				
-				}//ÕÒshareParµÄÏÂÒ»¸öleaf1,leaf2¶ÔÓ¦¸¸½Úµã(»òÆä±¾Éí)
+				}//æ‰¾shareParçš„ä¸‹ä¸€ä¸ªleaf1,leaf2å¯¹åº”çˆ¶èŠ‚ç‚¹(æˆ–å…¶æœ¬èº«)
 				String type1 = "";
 				String type2 = "";
 				if(node1!=null&&node2!=null) {
@@ -428,10 +428,10 @@ public class Output {
 				if(type1.equals("name")) {
 					if(type2.equals("argument_list")||type2.equals("parameter_list")) {						
 						List<ITree> arguLeaves = new ArrayList<>();
-						arguLeaves = Utils.traverse2Leaf(node2, arguLeaves);//ÕÒµ½argulistÖĞËùÓĞÒ¶×Ó
-						src = src + recoverArguList(node2, arguLeaves, srcT);//argulistµ¥¶À´¦Àí
+						arguLeaves = Utils.traverse2Leaf(node2, arguLeaves);//æ‰¾åˆ°argulistä¸­æ‰€æœ‰å¶å­
+						src = src + recoverArguList(node2, arguLeaves, srcT);//argulistå•ç‹¬å¤„ç†
 						if(src.substring(src.length()-1)==" ")
-							src = src.substring(0, src.length()-1);//È¥³ı¿Õ¸ñ
+							src = src.substring(0, src.length()-1);//å»é™¤ç©ºæ ¼
 						size = arguLeaves.size();
 						i=i+size-1;
 					}else if(type2.equals("init")) {
@@ -445,7 +445,7 @@ public class Output {
 					}else {
 						src = String.valueOf(st.getRoot().getId())+"error name situation"; 
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄnameÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„nameæƒ…å†µ:"+type2);
 					}					
 				}else if(type1.equals("type")) {
 					if(type2.equals("name")) {	
@@ -453,10 +453,10 @@ public class Output {
 					}else {
 						src = String.valueOf(st.getRoot().getId())+"error type situation"; 
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄtypeÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„typeæƒ…å†µ:"+type2);
 					}						
 				}else if(type1.equals("operator")) {
-					if(type2.equals("call")) {//ºÃÏñÓĞnode2ÎªcallµÄÇé¿ö
+					if(type2.equals("call")) {//å¥½åƒæœ‰node2ä¸ºcallçš„æƒ…å†µ
 						node2 = node2.getChildren().get(0);
 						type2 = srcT.getTypeLabel(node2);
 					}						
@@ -465,7 +465,7 @@ public class Output {
 					}else {
 						src = String.valueOf(st.getRoot().getId())+"error operator situation"; 
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄoperatorÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„operatoræƒ…å†µ:"+type2);
 					}					
 				}else if(type1.equals("call")) {
 					if(type2.equals("operator")) {	
@@ -475,7 +475,7 @@ public class Output {
 					}else {
 						src = String.valueOf(st.getRoot().getId())+ "error call situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄtypeÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„typeæƒ…å†µ:"+type2);
 					}
 				}else if(type1.equals("specifier")) {
 					if(type2.equals("name")){
@@ -483,7 +483,7 @@ public class Output {
 					}else {
 						src = String.valueOf(st.getRoot().getId())+"error specifier situation"; 
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄtypeÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„typeæƒ…å†µ:"+type2);
 					}						
 				}else if(type1.equals("parameter_list")) {
 					if(type2.equals("member_init_list")) {
@@ -504,7 +504,7 @@ public class Output {
 				}else {
 					src = src+"error other situation";
 					break;
-//					throw new Exception("Ã»¿¼ÂÇ¹ıµÄchildrenÇé¿ö");
+//					throw new Exception("æ²¡è€ƒè™‘è¿‡çš„childrenæƒ…å†µ");
 				}				
 			}				
 		}
@@ -519,11 +519,11 @@ public class Output {
 		String arguSrc = "";
 		String end = "";
 		ITree node = root.getParent();
-		String type = srcT.getTypeLabel(node);//ÕÒµ½argument_list¸¸½Úµã
-		if(type.equals("name")) {//nameÇé¿öÓÃ<>
+		String type = srcT.getTypeLabel(node);//æ‰¾åˆ°argument_listçˆ¶èŠ‚ç‚¹
+		if(type.equals("name")) {//nameæƒ…å†µç”¨<>
 			arguSrc = arguSrc+" < ";
 			end = " > ";
-		}else if(type.equals("call")||type.equals("decl")) {//callµÄÇé¿öÏÂÓÃ()
+		}else if(type.equals("call")||type.equals("decl")) {//callçš„æƒ…å†µä¸‹ç”¨()
 			arguSrc = arguSrc+" ( ";
 			end = " ) ";
 		}else if(type.equals("constructor")||type.equals("function")) {
@@ -533,11 +533,11 @@ public class Output {
 		if(arguLeaves.size()==0) {
 			arguSrc = arguSrc+end;
 			return 	arguSrc;
-		}//·µ»Ø¿ÕÀ¨ºÅ
+		}//è¿”å›ç©ºæ‹¬å·
 		if(arguLeaves.size()==1) {
 			arguSrc = arguSrc + deleteLiteral(arguLeaves.get(0), srcT)+end;
 			return 	arguSrc;
-		}//·µ»Øµ¥¸öÔªËØ+À¨ºÅ
+		}//è¿”å›å•ä¸ªå…ƒç´ +æ‹¬å·
 				
 		arguSrc = arguSrc + deleteLiteral(arguLeaves.get(0), srcT);
 		for(int i=0;i<arguLeaves.size()-1;i++) {
@@ -546,7 +546,7 @@ public class Output {
 			ITree sharePar = Utils.findShareParent(leaf1, leaf2, srcT);
 //			String parType = srcT.getTypeLabel(sharePar);
 			List<ITree> childs = sharePar.getChildren();
-			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//Í¬Ò»²ãµÄÁ½¸öÒ¶×Ó½Úµã£¬»¹Ô­Ê±ºòÖ±½ÓÆ´ÆğÀ´¾ÍĞĞ
+			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//åŒä¸€å±‚çš„ä¸¤ä¸ªå¶å­èŠ‚ç‚¹ï¼Œè¿˜åŸæ—¶å€™ç›´æ¥æ‹¼èµ·æ¥å°±è¡Œ
 				arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
 			}else if(childs.size()>=2){
 				ITree node1 = null;
@@ -566,13 +566,13 @@ public class Output {
 //						if(list.contains(leaf1)&&list.contains(leaf1))
 //							throw new Exception("wrong sharePar!");
 					}				
-				}//ÕÒshareParµÄÏÂÒ»¸öleaf1,leaf2¶ÔÓ¦¸¸½Úµã(»òÆä±¾Éí)
+				}//æ‰¾shareParçš„ä¸‹ä¸€ä¸ªleaf1,leaf2å¯¹åº”çˆ¶èŠ‚ç‚¹(æˆ–å…¶æœ¬èº«)
 				String type1 = srcT.getTypeLabel(node1);
 				String type2 = srcT.getTypeLabel(node2);
 				if(type1.equals("name")) {
 					if(type2.equals("argument_list")||type2.equals("parameter_list")) {	
 						List<ITree> leaves = new ArrayList<>();
-						leaves = Utils.traverse2Leaf(node2, leaves);//ÕÒµ½argulistÖĞËùÓĞÒ¶×Ó
+						leaves = Utils.traverse2Leaf(node2, leaves);//æ‰¾åˆ°argulistä¸­æ‰€æœ‰å¶å­
 						arguSrc = arguSrc + recoverArguList(node2, leaves, srcT);
 					}else if(type2.equals("operator")) {
 						arguSrc = arguSrc+" "+deleteLiteral(leaf2, srcT);
@@ -581,7 +581,7 @@ public class Output {
 					}else {
 						arguSrc = String.valueOf(srcT.getRoot().getId())+"error nameArg situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄnameÇé¿ö:"+type2);	
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„nameæƒ…å†µ:"+type2);	
 					}																						
 				}else if(type1.equals("argument")||type1.equals("parameter")) {
 					if(type2.equals("argument")||type2.equals("parameter")) {
@@ -589,7 +589,7 @@ public class Output {
 					}else {
 						arguSrc = String.valueOf(srcT.getRoot().getId())+"error argumentArg situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄargumentÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„argumentæƒ…å†µ:"+type2);
 					}					
 				}else if(type1.equals("type")) {
 					if(type2.equals("name")) {	
@@ -597,7 +597,7 @@ public class Output {
 					}else {
 						arguSrc = String.valueOf(srcT.getRoot().getId())+"error typeArg situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄtypeÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„typeæƒ…å†µ:"+type2);
 					}						
 				}else if(type1.equals("call")) {
 					if(type2.equals("operator")) {	
@@ -605,10 +605,10 @@ public class Output {
 					}else {
 						arguSrc = String.valueOf(srcT.getRoot().getId())+"error callArg situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄtypeÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„typeæƒ…å†µ:"+type2);
 					}
 				}else if(type1.equals("operator")) {
-					if(type2.equals("call")) {//ºÃÏñÓĞnode2ÎªcallµÄÇé¿ö
+					if(type2.equals("call")) {//å¥½åƒæœ‰node2ä¸ºcallçš„æƒ…å†µ
 						node2 = node2.getChildren().get(0);
 						type2 = srcT.getTypeLabel(node2);
 					}						
@@ -617,7 +617,7 @@ public class Output {
 					}else {
 						arguSrc = String.valueOf(srcT.getRoot().getId())+"error operatorArg situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄoperatorÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„operatoræƒ…å†µ:"+type2);
 					}						
 				}else if(type1.equals("specifier")) {
 					if(type2.equals("name")){
@@ -625,18 +625,18 @@ public class Output {
 					}else {
 						arguSrc = String.valueOf(srcT.getRoot().getId())+"error specifierArg situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄtypeÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„typeæƒ…å†µ:"+type2);
 					}						
 				}else {
 					arguSrc = String.valueOf(srcT.getRoot().getId())+"error otherArg situation";
 					break;
-//					throw new Exception("Ã»¿¼ÂÇ¹ıµÄchildrenÇé¿ö");
+//					throw new Exception("æ²¡è€ƒè™‘è¿‡çš„childrenæƒ…å†µ");
 				}					
 			}		
 		}
-		arguSrc = arguSrc+end;//¼ÓÉÏÊÕÎ²
+		arguSrc = arguSrc+end;//åŠ ä¸Šæ”¶å°¾
 		return arguSrc;		
-	}//argulistÏàµ±ÓÚsubtreeÖĞµÄsubtree£¬µ¥¶À»¹Ô­
+	}//argulistç›¸å½“äºsubtreeä¸­çš„subtreeï¼Œå•ç‹¬è¿˜åŸ
 	
 	public static String deleteLiteral(ITree leaf, TreeContext tc) {
 		String label = leaf.getLabel();
@@ -691,7 +691,7 @@ public class Output {
 						newLine = newLine+" "+token;
 				}
 			}
-			newLine = newLine+" "+srcs[srcs.length-1];//²¹ÉÏÎ²°Í
+			newLine = newLine+" "+srcs[srcs.length-1];//è¡¥ä¸Šå°¾å·´
 		}		
 		return newLine;
 	}
@@ -711,9 +711,9 @@ public class Output {
 	}
 	
 	/* 
-	  * ÅĞ¶ÏÊÇ·ñÎªÕûÊı  
-	  * @param str ´«ÈëµÄ×Ö·û´®  
-	  * @return ÊÇÕûÊı·µ»Øtrue,·ñÔò·µ»Øfalse  
+	  * åˆ¤æ–­æ˜¯å¦ä¸ºæ•´æ•°  
+	  * @param str ä¼ å…¥çš„å­—ç¬¦ä¸²  
+	  * @return æ˜¯æ•´æ•°è¿”å›true,å¦åˆ™è¿”å›false  
 	*/  
 	  public static boolean isInteger(String str) {    
 	    Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");    
@@ -722,9 +722,9 @@ public class Output {
 
 
 	/*  
-	  * ÅĞ¶ÏÊÇ·ñÎª¸¡µãÊı£¬°üÀ¨doubleºÍfloat  
-	  * @param str ´«ÈëµÄ×Ö·û´®  
-	  * @return ÊÇ¸¡µãÊı·µ»Øtrue,·ñÔò·µ»Øfalse  
+	  * åˆ¤æ–­æ˜¯å¦ä¸ºæµ®ç‚¹æ•°ï¼ŒåŒ…æ‹¬doubleå’Œfloat  
+	  * @param str ä¼ å…¥çš„å­—ç¬¦ä¸²  
+	  * @return æ˜¯æµ®ç‚¹æ•°è¿”å›true,å¦åˆ™è¿”å›false  
 	*/    
 	  public static boolean isDouble(String str) {    
 	    Pattern pattern = Pattern.compile("^[-\\+]?[.\\d]*$");    

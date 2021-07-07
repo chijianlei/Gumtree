@@ -49,10 +49,10 @@ public class Split {
 //		sp.suggestion(inputPath);
 	}
 	
-	public void suggestion(String input) throws Exception {//Ã¿¸östatement¸ø5¸ösuggestion		
+	public void suggestion(String input) throws Exception {//æ¯ä¸ªstatementç»™5ä¸ªsuggestion		
 		File cppfile = new File(input);
-//		String miName = input.split("/")[input.split("/").length-1];//±ê¼ÇÎÄ¼şÃû
-		String miName = input.split("\\\\")[input.split("\\\\").length-1];//±ê¼ÇÎÄ¼şÃû
+//		String miName = input.split("/")[input.split("/").length-1];//æ ‡è®°æ–‡ä»¶å
+		String miName = input.split("\\\\")[input.split("\\\\").length-1];//æ ‡è®°æ–‡ä»¶å
 		TreeContext inputT = new SrcmlCppTreeGenerator().generateFromFile(cppfile);
 		ArrayList<SubTree> sts = splitSubTree(inputT, miName);
 		System.out.println("subSize:"+sts.size());
@@ -83,7 +83,7 @@ public class Split {
 					for(Map.Entry<Transform, Double> entry : sugs.entrySet()) {
 						Transform candiTs = entry.getKey();
 						Double candiSim = entry.getValue();
-						if(candiSim<sim&&candiSim<delSim) {//ÕÒµ½Îå¸ösuggestionÖĞsim×îĞ¡µÄÈÓÁË
+						if(candiSim<sim&&candiSim<delSim) {//æ‰¾åˆ°äº”ä¸ªsuggestionä¸­simæœ€å°çš„æ‰”äº†
 							delSim = candiSim;
 							delTs = candiTs;							
 						}
@@ -138,7 +138,7 @@ public class Split {
 			HashMap<DTree, DTree> dtMap = new HashMap<>();
 			ITree root = srcST.getRoot();
 			if(root.getDescendants().size()==0)
-				continue;//ÓĞ¼ôÖ¦ºÍÇĞ¶ÏblockÖ®ºówhile functionÀàËÆ½ÚµãÖ»ÓĞ½Úµã±¾ÉíµÄÇé¿ö£¬Ìø¹ı
+				continue;//æœ‰å‰ªæå’Œåˆ‡æ–­blockä¹‹åwhile functionç±»ä¼¼èŠ‚ç‚¹åªæœ‰èŠ‚ç‚¹æœ¬èº«çš„æƒ…å†µï¼Œè·³è¿‡
 			TreeContext tc = srcST.getTC();
 			String type = tc.getTypeLabel(root);
 			int id = root.getId();
@@ -179,7 +179,7 @@ public class Split {
 		}	
 		TreeContext srcT = tf.getSrcT();
 		System.out.println("srcRootID:"+srcST.getRoot().getId());
-		TreeContext dstT = tf.getDstT();//µ¥Ò¶×Ó½Úµã£¬²»Í¬value£¬no matchingÇé¿ö	
+		TreeContext dstT = tf.getDstT();//å•å¶å­èŠ‚ç‚¹ï¼Œä¸åŒvalueï¼Œno matchingæƒ…å†µ	
         HashMap<Integer, Integer> subMap = tf.getSubMap();
 		HashMap<String, ArrayList<Action>> actMap = tf.getActMap();
 		ArrayList<Action> updates = actMap.get("update");
@@ -204,7 +204,7 @@ public class Split {
 		for(int i=0;i<sDTs.size();i++) {//Dwarf-tree level
 			DTree sDT = sDTs.get(i);
 			List<ITree> leaves = sDT.getLeaves();
-			String sDTString = Utils.printLeaf(sDT);//ÒòÎª½á¹¹Ô­Òò£¬¿ÉÄÜÓĞ²¿·ÖrootµÄ×Ó½Úµã²»ÊÇDTµÄÒ¶×Ó
+			String sDTString = Utils.printLeaf(sDT);//å› ä¸ºç»“æ„åŸå› ï¼Œå¯èƒ½æœ‰éƒ¨åˆ†rootçš„å­èŠ‚ç‚¹ä¸æ˜¯DTçš„å¶å­
 			int size1 = leaves.size();
 			double sim1 = 0.0;
 			double sim2 = 0.0;
@@ -312,7 +312,7 @@ public class Split {
 						mappeddDTs.add(candidateDT2);
 					}
 				}
-			}//È«²¿matching£¬ÈôÒ¶×ÓÍêÈ«ÏàÍ¬£¬ÒÆ³ı£¬²»È»ÊÇÈ«²¿ĞèÒª¸ÄµÄÌØÊâÇé¿ö
+			}//å…¨éƒ¨matchingï¼Œè‹¥å¶å­å®Œå…¨ç›¸åŒï¼Œç§»é™¤ï¼Œä¸ç„¶æ˜¯å…¨éƒ¨éœ€è¦æ”¹çš„ç‰¹æ®Šæƒ…å†µ
 			if(sim1>=0.5&&sim1!=1) {
 				String dstTString = Utils.printLeaf(candidateDT2);
 				System.out.println("Change1:"+sDTString+"->"+dstTString);
@@ -399,7 +399,7 @@ public class Split {
 				}
 			}
 			if(ifMatch==true)
-				continue;//ÈôÊÇmatchÉÏÇÒ²»ĞèÒªĞŞ¸ÄµÄDTree£¬²»Òª¼ÇÂ¼Ö±½Ócontinue
+				continue;//è‹¥æ˜¯matchä¸Šä¸”ä¸éœ€è¦ä¿®æ”¹çš„DTreeï¼Œä¸è¦è®°å½•ç›´æ¥continue
 			String sRootType = srcT.getTypeLabel(sRoot);
 			String sParsString = sRootType+Utils.printParents(sRoot, srcT);
 			float sim = 0;
@@ -510,14 +510,14 @@ public class Split {
 			}				
 			String parType = tc.getTypeLabel(par);
 			if(type.equals("argument_list"))
-				continue;//"argument_list"µÄÒ¶×Ó½Úµã²»°üº¬ÈÎºÎĞÅÏ¢£¬»¹¿ÉÄÜÈÅÂÒÆ¥Åä
+				continue;//"argument_list"çš„å¶å­èŠ‚ç‚¹ä¸åŒ…å«ä»»ä½•ä¿¡æ¯ï¼Œè¿˜å¯èƒ½æ‰°ä¹±åŒ¹é…
 			//leaf nodes have many situations, need to consider one by one.
 			else if(type.equals("name")||type.equals("operator")) {
 				while(parType.equals("name")) {
 					par = par.getParent();
 					parType = tc.getTypeLabel(par);
-				}//name»òoperatorµÄparent²»ÄÜÎªname					
-			}//¿¼ÂÇname DTree·¢ÏÖµÄÌØÊâÇé¿ö, ²»È»¶à¸öname leafµÄpar¸úµ¥¸öname leaf»áÆ¥ÅäÒì³£
+				}//nameæˆ–operatorçš„parentä¸èƒ½ä¸ºname					
+			}//è€ƒè™‘name DTreeå‘ç°çš„ç‰¹æ®Šæƒ…å†µ, ä¸ç„¶å¤šä¸ªname leafçš„parè·Ÿå•ä¸ªname leafä¼šåŒ¹é…å¼‚å¸¸
 			if(parMap.get(par)==null) {
 				ArrayList<ITree> leafList = new ArrayList<>();
 				leafList.add(leaf);
@@ -627,8 +627,8 @@ public class Split {
 //		pt.pruneTree();//Prune the ContextTree in order to get accurate matching rules.
 		
 		Cluster cl = new Cluster(srcT, dstT);
-		ArrayList<SubTree> sub1 = splitSubTree(srcT, miName);//SubtreeÖĞ¸îÁÑ¹ıblock,×¢Òâ
-		ArrayList<SubTree> sub2 = splitSubTree(dstT, miName);//ÏÈ¼ÆËãaction,ÔÙsplit ST
+		ArrayList<SubTree> sub1 = splitSubTree(srcT, miName);//Subtreeä¸­å‰²è£‚è¿‡block,æ³¨æ„
+		ArrayList<SubTree> sub2 = splitSubTree(dstT, miName);//å…ˆè®¡ç®—action,å†split ST
 		for(SubTree st : sub1) {
 			ITree t = st.getRoot();
 			List<ITree> nodeList = new ArrayList<>();
@@ -641,7 +641,7 @@ public class Split {
         			break;
         		}
         	}
-		}//ÏÈÕÒ°üº¬actionµÄsubtree
+		}//å…ˆæ‰¾åŒ…å«actionçš„subtree
 //		for(int j=0;j<updates.size();j++) {
 //			Action a = updates.get(j);
 //			ITree node = a.getNode();
@@ -718,7 +718,7 @@ public class Split {
     		ITree dstStRoot = mappings.getDst(srcStRoot);
     		SubTree dstSt = null;
     		if(dstStRoot==null) {
-    			System.out.println("SID:"+srcStRoot.getId()); //·¢ÏÖÓĞÕû¿ÅsrcSrÉ¾³ıµÄÇé¿ö 
+    			System.out.println("SID:"+srcStRoot.getId()); //å‘ç°æœ‰æ•´é¢—srcSråˆ é™¤çš„æƒ…å†µ 
     		}else {
     			for(SubTree st2 : sub2) {
     				ITree root = st2.getRoot();
@@ -727,7 +727,7 @@ public class Split {
                 		break;
     				}      			
     			}
-    		}//ÊÇ·ñ»áÂ©µôsrcÖĞÃ»ÓĞÓï¾ä£¬dstÖĞ¼ÓÈëµÄÇé¿ö   			       			     		       			
+    		}//æ˜¯å¦ä¼šæ¼æ‰srcä¸­æ²¡æœ‰è¯­å¥ï¼Œdstä¸­åŠ å…¥çš„æƒ…å†µ   			       			     		       			
     		List<ITree> nodes = TreeUtils.preOrder(st.getRoot());
     		HashMap<Integer, Integer> subMap = new HashMap<>();
     		for(ITree src : nodes) {
@@ -764,21 +764,21 @@ public class Split {
 					if(type.equals("block")) {
 						parBlocks.add(par);
 					}
-				}//½«sRootËùÓĞ¸¸Ç×½ÚµãÖĞµÄblock½Úµã±¸·İ				
+				}//å°†sRootæ‰€æœ‰çˆ¶äº²èŠ‚ç‚¹ä¸­çš„blockèŠ‚ç‚¹å¤‡ä»½				
 				
 				SubTree st = new SubTree(subRoot, tc, count, miName);
 				st.setParBlocks(parBlocks);
-				st.setPars(pars);//ÒòÎªsubtreeÍ¬¸¸Ç×ÒÑ¶Ï¿ª£¬¼ÆËãparsµ÷ÓÃÕâ¸öList
+				st.setPars(pars);//å› ä¸ºsubtreeåŒçˆ¶äº²å·²æ–­å¼€ï¼Œè®¡ç®—parsè°ƒç”¨è¿™ä¸ªList
 				subTreeList.add(st);
 				subRootList.add(subRoot);
 				count++;			
-			}//ifÊÇ·ñ¿¼ÂÇtypeLabel=="return"?			
+			}//ifæ˜¯å¦è€ƒè™‘typeLabel=="return"?			
 		}
 		
 		for(ITree subRoot : subRootList) {
 			String typeLabel = tc.getTypeLabel(subRoot);
-			subRoot.getParent().getChildren().remove(subRoot);//¶Ï¿ª¸¸Ç×ºÍstRootµÄÁ¬½Ó
-			subRoot.setParent(null);//¶Ï¿ª¸¸Ç×ºÍstRootµÄÁ¬½Ó
+			subRoot.getParent().getChildren().remove(subRoot);//æ–­å¼€çˆ¶äº²å’ŒstRootçš„è¿æ¥
+			subRoot.setParent(null);//æ–­å¼€çˆ¶äº²å’ŒstRootçš„è¿æ¥
 			if(typeLabel.equals("class")||typeLabel.equals("function")) {
 				List<ITree> list = subRoot.getChildren();
 				ITree delete_node = null;
@@ -789,8 +789,8 @@ public class Split {
 					}
 				}
 				if(delete_node!=null) {
-					subRoot.getChildren().remove(delete_node);//¶Ï¿ªsubRootºÍËùÓĞblock nodeµÄÁ¬½Ó	
-					delete_node.setParent(null);//¶Ï¿ªsubRootºÍËùÓĞblock nodeµÄÁ¬½Ó	
+					subRoot.getChildren().remove(delete_node);//æ–­å¼€subRootå’Œæ‰€æœ‰block nodeçš„è¿æ¥	
+					delete_node.setParent(null);//æ–­å¼€subRootå’Œæ‰€æœ‰block nodeçš„è¿æ¥	
 				}
 			}
 		}
@@ -804,7 +804,7 @@ public class Split {
 		String code = Utils.subtree2src(srcST);
 		System.out.println("DELStmt:"+code);
 		return null;
-	}//dstSTÎª¿ÕµÄÌØÊâÇé¿ö£¬´ú±ísrcSTÕÒ²»µ½¶ÔÓ¦µÄdstST£¬Ö±½ÓÉ¾³ıÕû¿ÅsrcST¼´¿É
+	}//dstSTä¸ºç©ºçš„ç‰¹æ®Šæƒ…å†µï¼Œä»£è¡¨srcSTæ‰¾ä¸åˆ°å¯¹åº”çš„dstSTï¼Œç›´æ¥åˆ é™¤æ•´é¢—srcSTå³å¯
 	
 	public HashMap<DTree, DTree> addCondition(Transform tf) throws Exception {
 		HashMap<DTree, DTree> dtMap = new HashMap<>();
@@ -812,6 +812,6 @@ public class Split {
 		String code = Utils.subtree2src(dstST);
 		System.out.println("ADDStmt:"+code);
 		return null;
-	}//dstSTÎª¿ÕµÄÌØÊâÇé¿ö£¬´ú±ísrcSTÕÒ²»µ½¶ÔÓ¦µÄdstST£¬Ö±½ÓÉ¾³ıÕû¿ÅsrcST¼´¿É
+	}//dstSTä¸ºç©ºçš„ç‰¹æ®Šæƒ…å†µï¼Œä»£è¡¨srcSTæ‰¾ä¸åˆ°å¯¹åº”çš„dstSTï¼Œç›´æ¥åˆ é™¤æ•´é¢—srcSTå³å¯
 	
 }

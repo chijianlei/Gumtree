@@ -12,8 +12,8 @@ public  class  CopyFile  {
    }    
    
    /**   
-     *  ĞÂ½¨Ä¿Â¼   
-     *  @param  folderPath  String  Èç  c:/fqf   
+     *  æ–°å»ºç›®å½•   
+     *  @param  folderPath  String  å¦‚  c:/fqf   
      *  @return  boolean   
      */    
    public  void  newFolder(String  folderPath)  {    
@@ -26,36 +26,36 @@ public  class  CopyFile  {
            }    
        }    
        catch  (Exception  e)  {    
-           System.out.println("ĞÂ½¨Ä¿Â¼²Ù×÷³ö´í");    
+           System.out.println("æ–°å»ºç›®å½•æ“ä½œå‡ºé”™");    
            e.printStackTrace();    
        }    
    }    
    
    /**   
-     *  ĞÂ½¨ÎÄ¼ş   
-     *  @param  filePathAndName  String  ÎÄ¼şÂ·¾¶¼°Ãû³Æ  Èçc:/fqf.txt   
-     *  @param  fileContent  String  ÎÄ¼şÄÚÈİ   
+     *  æ–°å»ºæ–‡ä»¶   
+     *  @param  filePathAndName  String  æ–‡ä»¶è·¯å¾„åŠåç§°  å¦‚c:/fqf.txt   
+     *  @param  fileContent  String  æ–‡ä»¶å†…å®¹   
      *  @return  boolean   
      */    
    public  void  newFile(String  filePathAndName,  String  fileContent)  {    
    
        try  {    
            String  filePath  =  filePathAndName;    
-           filePath  =  filePath.toString();  //È¡µÄÂ·¾¶¼°ÎÄ¼şÃû   
+           filePath  =  filePath.toString();  //å–çš„è·¯å¾„åŠæ–‡ä»¶å   
            File  myFilePath  =  new  File(filePath);    
-           /**Èç¹ûÎÄ¼ş²»´æÔÚ¾Í½¨Ò»¸öĞÂÎÄ¼ş*/  
+           /**å¦‚æœæ–‡ä»¶ä¸å­˜åœ¨å°±å»ºä¸€ä¸ªæ–°æ–‡ä»¶*/  
            if  (!myFilePath.exists())  {    
                myFilePath.createNewFile();    
            }    
-           FileWriter  resultFile  =  new  FileWriter(myFilePath);  //ÓÃÀ´Ğ´Èë×Ö·ûÎÄ¼şµÄ±ã½İÀà, ÔÚ¸ø³ö File ¶ÔÏóµÄÇé¿öÏÂ¹¹ÔìÒ»¸ö FileWriter ¶ÔÏó   
-           PrintWriter  myFile  =  new  PrintWriter(resultFile);  //ÏòÎÄ±¾Êä³öÁ÷´òÓ¡¶ÔÏóµÄ¸ñÊ½»¯±íÊ¾ĞÎÊ½,Ê¹ÓÃÖ¸¶¨ÎÄ¼ş´´½¨²»¾ßÓĞ×Ô¶¯ĞĞË¢ĞÂµÄĞÂ PrintWriter¡£   
+           FileWriter  resultFile  =  new  FileWriter(myFilePath);  //ç”¨æ¥å†™å…¥å­—ç¬¦æ–‡ä»¶çš„ä¾¿æ·ç±», åœ¨ç»™å‡º File å¯¹è±¡çš„æƒ…å†µä¸‹æ„é€ ä¸€ä¸ª FileWriter å¯¹è±¡   
+           PrintWriter  myFile  =  new  PrintWriter(resultFile);  //å‘æ–‡æœ¬è¾“å‡ºæµæ‰“å°å¯¹è±¡çš„æ ¼å¼åŒ–è¡¨ç¤ºå½¢å¼,ä½¿ç”¨æŒ‡å®šæ–‡ä»¶åˆ›å»ºä¸å…·æœ‰è‡ªåŠ¨è¡Œåˆ·æ–°çš„æ–° PrintWriterã€‚   
            String  strContent  =  fileContent;    
            myFile.println(strContent);    
            resultFile.close();    
    
        }    
        catch  (Exception  e)  {    
-           System.out.println("ĞÂ½¨ÎÄ¼ş²Ù×÷³ö´í");    
+           System.out.println("æ–°å»ºæ–‡ä»¶æ“ä½œå‡ºé”™");    
            e.printStackTrace();    
    
        }    
@@ -63,8 +63,8 @@ public  class  CopyFile  {
    }    
    
    /**   
-     *  É¾³ıÎÄ¼ş   
-     *  @param  filePathAndName  String  ÎÄ¼şÂ·¾¶¼°Ãû³Æ  Èçc:/fqf.txt   
+     *  åˆ é™¤æ–‡ä»¶   
+     *  @param  filePathAndName  String  æ–‡ä»¶è·¯å¾„åŠåç§°  å¦‚c:/fqf.txt   
      *  @param  fileContent  String   
      *  @return  boolean   
      */    
@@ -77,7 +77,7 @@ public  class  CopyFile  {
    
        }    
        catch  (Exception  e)  {    
-           System.out.println("É¾³ıÎÄ¼ş²Ù×÷³ö´í");    
+           System.out.println("åˆ é™¤æ–‡ä»¶æ“ä½œå‡ºé”™");    
            e.printStackTrace();    
    
        }    
@@ -85,22 +85,22 @@ public  class  CopyFile  {
    }    
    
    /**   
-     *  É¾³ıÎÄ¼ş¼Ğ   
-     *  @param  filePathAndName  String  ÎÄ¼ş¼ĞÂ·¾¶¼°Ãû³Æ  Èçc:/fqf   
+     *  åˆ é™¤æ–‡ä»¶å¤¹   
+     *  @param  filePathAndName  String  æ–‡ä»¶å¤¹è·¯å¾„åŠåç§°  å¦‚c:/fqf   
      *  @param  fileContent  String   
      *  @return  boolean   
      */    
    public  void  delFolder(String  folderPath)  {    
        try  {    
-           delAllFile(folderPath);  //É¾³ıÍêÀïÃæËùÓĞÄÚÈİ     
+           delAllFile(folderPath);  //åˆ é™¤å®Œé‡Œé¢æ‰€æœ‰å†…å®¹     
            String  filePath  =  folderPath;    
            filePath  =  filePath.toString();    
            java.io.File  myFilePath  =  new  java.io.File(filePath);    
-           myFilePath.delete();  //É¾³ı¿ÕÎÄ¼ş¼Ğ     
+           myFilePath.delete();  //åˆ é™¤ç©ºæ–‡ä»¶å¤¹     
    
        }    
        catch  (Exception  e)  {    
-           System.out.println("É¾³ıÎÄ¼ş¼Ğ²Ù×÷³ö´í");    
+           System.out.println("åˆ é™¤æ–‡ä»¶å¤¹æ“ä½œå‡ºé”™");    
            e.printStackTrace();    
    
        }    
@@ -108,8 +108,8 @@ public  class  CopyFile  {
    }    
    
    /**   
-     *  É¾³ıÎÄ¼ş¼ĞÀïÃæµÄËùÓĞÎÄ¼ş   
-     *  @param  path  String  ÎÄ¼ş¼ĞÂ·¾¶  Èç  c:/fqf   
+     *  åˆ é™¤æ–‡ä»¶å¤¹é‡Œé¢çš„æ‰€æœ‰æ–‡ä»¶   
+     *  @param  path  String  æ–‡ä»¶å¤¹è·¯å¾„  å¦‚  c:/fqf   
      */    
    public  void  delAllFile(String  path)  {    
        File  file  =  new  File(path);    
@@ -132,16 +132,16 @@ public  class  CopyFile  {
                temp.delete();    
            }    
            if  (temp.isDirectory())  {    
-               delAllFile(path+"/"+  tempList[i]);//ÏÈÉ¾³ıÎÄ¼ş¼ĞÀïÃæµÄÎÄ¼ş     
-               delFolder(path+"/"+  tempList[i]);//ÔÙÉ¾³ı¿ÕÎÄ¼ş¼Ğ     
+               delAllFile(path+"/"+  tempList[i]);//å…ˆåˆ é™¤æ–‡ä»¶å¤¹é‡Œé¢çš„æ–‡ä»¶     
+               delFolder(path+"/"+  tempList[i]);//å†åˆ é™¤ç©ºæ–‡ä»¶å¤¹     
            }    
        }    
    }    
    
    /**   
-     *  ¸´ÖÆµ¥¸öÎÄ¼ş   
-     *  @param  oldPath  String  Ô­ÎÄ¼şÂ·¾¶  Èç£ºc:/fqf.txt   
-     *  @param  newPath  String  ¸´ÖÆºóÂ·¾¶  Èç£ºf:/fqf.txt   
+     *  å¤åˆ¶å•ä¸ªæ–‡ä»¶   
+     *  @param  oldPath  String  åŸæ–‡ä»¶è·¯å¾„  å¦‚ï¼šc:/fqf.txt   
+     *  @param  newPath  String  å¤åˆ¶åè·¯å¾„  å¦‚ï¼šf:/fqf.txt   
      *  @return  boolean   
      */    
    public  void  copyFile(String  oldPath,  String  newPath)  {    
@@ -149,13 +149,13 @@ public  class  CopyFile  {
 //           int  bytesum  =  0;     
            int  byteread  =  0;    
            File  oldfile  =  new  File(oldPath);    
-           if  (oldfile.exists())  {  //ÎÄ¼ş´æÔÚÊ±     
-               InputStream  inStream  =  new  FileInputStream(oldPath);  //¶ÁÈëÔ­ÎÄ¼ş    
+           if  (oldfile.exists())  {  //æ–‡ä»¶å­˜åœ¨æ—¶     
+               InputStream  inStream  =  new  FileInputStream(oldPath);  //è¯»å…¥åŸæ–‡ä»¶    
                FileOutputStream  fs  =  new  FileOutputStream(newPath);    
                byte[]  buffer  =  new  byte[1444];    
 //               int  length;     
                while  (  (byteread  =  inStream.read(buffer))  !=  -1)  {    
-//                   bytesum  +=  byteread;  //×Ö½ÚÊı  ÎÄ¼ş´óĞ¡     
+//                   bytesum  +=  byteread;  //å­—èŠ‚æ•°  æ–‡ä»¶å¤§å°     
 //                   System.out.println(bytesum);     
                    fs.write(buffer,  0,  byteread);    
                }    
@@ -163,7 +163,7 @@ public  class  CopyFile  {
            }    
        }    
        catch  (Exception  e)  {    
-           System.out.println("¸´ÖÆµ¥¸öÎÄ¼ş²Ù×÷³ö´í");    
+           System.out.println("å¤åˆ¶å•ä¸ªæ–‡ä»¶æ“ä½œå‡ºé”™");    
            e.printStackTrace();    
    
        }    
@@ -171,15 +171,15 @@ public  class  CopyFile  {
    }    
    
    /**   
-     *  ¸´ÖÆÕû¸öÎÄ¼ş¼ĞÄÚÈİ   
-     *  @param  oldPath  String  Ô­ÎÄ¼şÂ·¾¶  Èç£ºc:/fqf   
-     *  @param  newPath  String  ¸´ÖÆºóÂ·¾¶  Èç£ºf:/fqf/ff   
+     *  å¤åˆ¶æ•´ä¸ªæ–‡ä»¶å¤¹å†…å®¹   
+     *  @param  oldPath  String  åŸæ–‡ä»¶è·¯å¾„  å¦‚ï¼šc:/fqf   
+     *  @param  newPath  String  å¤åˆ¶åè·¯å¾„  å¦‚ï¼šf:/fqf/ff   
      *  @return  boolean   
      */    
    public  void  copyFolder(String  oldPath,  String  newPath)  {    
    
        try  {    
-           (new  File(newPath)).mkdirs();  //Èç¹ûÎÄ¼ş¼Ğ²»´æÔÚ  Ôò½¨Á¢ĞÂÎÄ¼ş¼Ğ     
+           (new  File(newPath)).mkdirs();  //å¦‚æœæ–‡ä»¶å¤¹ä¸å­˜åœ¨  åˆ™å»ºç«‹æ–°æ–‡ä»¶å¤¹     
            File  a=new  File(oldPath);    
            String[]  file=a.list();    
            File  temp=null;    
@@ -204,13 +204,13 @@ public  class  CopyFile  {
                    output.close();    
                    input.close();    
                }    
-               if(temp.isDirectory()){//Èç¹ûÊÇ×ÓÎÄ¼ş¼Ğ     
+               if(temp.isDirectory()){//å¦‚æœæ˜¯å­æ–‡ä»¶å¤¹     
                    copyFolder(oldPath+"/"+file[i],newPath+"/"+file[i]);    
                }    
            }    
        }    
        catch  (Exception  e)  {    
-           System.out.println("¸´ÖÆÕû¸öÎÄ¼ş¼ĞÄÚÈİ²Ù×÷³ö´í");    
+           System.out.println("å¤åˆ¶æ•´ä¸ªæ–‡ä»¶å¤¹å†…å®¹æ“ä½œå‡ºé”™");    
            e.printStackTrace();    
    
        }    
@@ -218,9 +218,9 @@ public  class  CopyFile  {
    }    
    
    /**   
-     *  ÒÆ¶¯ÎÄ¼şµ½Ö¸¶¨Ä¿Â¼   
-     *  @param  oldPath  String  Èç£ºc:/fqf.txt   
-     *  @param  newPath  String  Èç£ºd:/fqf.txt   
+     *  ç§»åŠ¨æ–‡ä»¶åˆ°æŒ‡å®šç›®å½•   
+     *  @param  oldPath  String  å¦‚ï¼šc:/fqf.txt   
+     *  @param  newPath  String  å¦‚ï¼šd:/fqf.txt   
      */    
    public  void  moveFile(String  oldPath,  String  newPath)  {    
        copyFile(oldPath,  newPath);    
@@ -229,9 +229,9 @@ public  class  CopyFile  {
    }    
    
    /**   
-     *  ÒÆ¶¯ÎÄ¼şµ½Ö¸¶¨Ä¿Â¼   
-     *  @param  oldPath  String  Èç£ºc:/fqf.txt   
-     *  @param  newPath  String  Èç£ºd:/fqf.txt   
+     *  ç§»åŠ¨æ–‡ä»¶åˆ°æŒ‡å®šç›®å½•   
+     *  @param  oldPath  String  å¦‚ï¼šc:/fqf.txt   
+     *  @param  newPath  String  å¦‚ï¼šd:/fqf.txt   
      */    
    public  void  moveFolder(String  oldPath,  String  newPath)  {    
        copyFolder(oldPath,  newPath);    
@@ -243,7 +243,7 @@ public  class  CopyFile  {
 //    file.newFolder("newFolder22222");   
     file.delAllFile("E:/1");  
    }  
-// ¿½±´ÎÄ¼ş   
+// æ‹·è´æ–‡ä»¶   
    private void copyFile2(String source, String dest) {  
    try {  
    File in = new File(source);  

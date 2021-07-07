@@ -41,7 +41,7 @@ public class Utils {
 		TreeContext tc2 = new SrcmlCppTreeGenerator().generateFromFile(cppfile2);		
 //		HashMap<String, LinkedList<Action>> actions = collectAction(tc1, tc2);
 //		printAllActions(tc1, tc2, actions);
-		String miName = path2.split("/")[path2.split("/").length-1];//±ê¼ÇÎÄ¼şÃû
+		String miName = path2.split("/")[path2.split("/").length-1];//æ ‡è®°æ–‡ä»¶å
 		Split sp = new Split();
 		ArrayList<SubTree> sts = sp.splitSubTree(tc2, miName);
 		System.out.println(sts.size());
@@ -76,23 +76,23 @@ public class Utils {
 		if(leaves.size()==0)
 			throw new Exception("null leaves");
 		else if(leaves.size()==1) {
-			src = src+leaves.get(0).getLabel();//ÏÈ°Ñ0ºÅÒ¶×Ó·ÅÈë
+			src = src+leaves.get(0).getLabel();//å…ˆæŠŠ0å·å¶å­æ”¾å…¥
 			return src;
 		}
 		
-		src = src+leaves.get(0).getLabel();//ÏÈ°Ñ0ºÅÒ¶×Ó·ÅÈë
+		src = src+leaves.get(0).getLabel();//å…ˆæŠŠ0å·å¶å­æ”¾å…¥
 		for(int i=0;i<leaves.size()-1;i++) {
 			int size = 0;
 			ITree leaf1 = leaves.get(i);
 			ITree leaf2 = leaves.get(i+1);
-			if(leaf1.isRoot()||leaf2.isRoot())//Ò¶×Ó½ÚµãÎª×ÜÊ÷¸ù½Úµã£¬¿ÉÄÜÃ´£¿
+			if(leaf1.isRoot()||leaf2.isRoot())//å¶å­èŠ‚ç‚¹ä¸ºæ€»æ ‘æ ¹èŠ‚ç‚¹ï¼Œå¯èƒ½ä¹ˆï¼Ÿ
 				throw new Exception("why is root???");
 			ITree sharePar = findShareParent(leaf1, leaf2, srcT);
 //			String parType = srcT.getTypeLabel(sharePar);
 			List<ITree> childs = sharePar.getChildren();
-			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//Í¬Ò»²ãµÄÁ½¸öÒ¶×Ó½Úµã£¬»¹Ô­Ê±ºòÖ±½ÓÆ´ÆğÀ´¾ÍĞĞ
+			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//åŒä¸€å±‚çš„ä¸¤ä¸ªå¶å­èŠ‚ç‚¹ï¼Œè¿˜åŸæ—¶å€™ç›´æ¥æ‹¼èµ·æ¥å°±è¡Œ
 				src = src+ leaf2.getLabel();
-			}else if(childs.size()>=2){//·ÖÇé¿öÌÖÂÛ²»Í¬·ÖÖ§ÏÂ»¹Ô­´úÂëÎÊÌâ
+			}else if(childs.size()>=2){//åˆ†æƒ…å†µè®¨è®ºä¸åŒåˆ†æ”¯ä¸‹è¿˜åŸä»£ç é—®é¢˜
 				ITree node1 = null;
 				ITree node2 = null;
 				for(ITree child : childs) {
@@ -110,7 +110,7 @@ public class Utils {
 //						if(list.contains(leaf1)&&list.contains(leaf1))
 //							throw new Exception("wrong sharePar!");
 					}				
-				}//ÕÒshareParµÄÏÂÒ»¸öleaf1,leaf2¶ÔÓ¦¸¸½Úµã(»òÆä±¾Éí)
+				}//æ‰¾shareParçš„ä¸‹ä¸€ä¸ªleaf1,leaf2å¯¹åº”çˆ¶èŠ‚ç‚¹(æˆ–å…¶æœ¬èº«)
 				String type1 = "";
 				String type2 = "";
 				if(node1!=null&&node2!=null) {
@@ -122,8 +122,8 @@ public class Utils {
 				if(type1.equals("name")) {
 					if(type2.equals("argument_list")||type2.equals("parameter_list")) {						
 						List<ITree> arguLeaves = new ArrayList<>();
-						arguLeaves = traverse2Leaf(node2, arguLeaves);//ÕÒµ½argulistÖĞËùÓĞÒ¶×Ó
-						src = src + recoverArguList(node2, arguLeaves, srcT);//argulistµ¥¶À´¦Àí
+						arguLeaves = traverse2Leaf(node2, arguLeaves);//æ‰¾åˆ°argulistä¸­æ‰€æœ‰å¶å­
+						src = src + recoverArguList(node2, arguLeaves, srcT);//argulistå•ç‹¬å¤„ç†
 						size = arguLeaves.size();
 						i=i+size-1;
 					}else if(type2.equals("init")) {
@@ -133,7 +133,7 @@ public class Utils {
 					}else {
 						src = "error situation"; 
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄnameÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„nameæƒ…å†µ:"+type2);
 					}					
 				}else if(type1.equals("type")) {
 					if(type2.equals("name")) {	
@@ -141,10 +141,10 @@ public class Utils {
 					}else {
 						src = "error situation"; 
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄtypeÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„typeæƒ…å†µ:"+type2);
 					}						
 				}else if(type1.equals("operator")) {
-					if(type2.equals("call")) {//ºÃÏñÓĞnode2ÎªcallµÄÇé¿ö
+					if(type2.equals("call")) {//å¥½åƒæœ‰node2ä¸ºcallçš„æƒ…å†µ
 						node2 = node2.getChildren().get(0);
 						type2 = srcT.getTypeLabel(node2);
 					}						
@@ -153,7 +153,7 @@ public class Utils {
 					}else {
 						src = "error situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄoperatorÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„operatoræƒ…å†µ:"+type2);
 					}					
 				}else if(type1.equals("specifier")) {
 					if(type2.equals("name")){
@@ -161,13 +161,13 @@ public class Utils {
 					}else {
 						src = "error situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄtypeÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„typeæƒ…å†µ:"+type2);
 					}						
 				}
 			}else {
 				src = "error situation";
 				break;
-//				throw new Exception("Ã»¿¼ÂÇ¹ıµÄchildrenÇé¿ö");
+//				throw new Exception("æ²¡è€ƒè™‘è¿‡çš„childrenæƒ…å†µ");
 			}				
 		}
 		src = src+loopEnd;
@@ -178,11 +178,11 @@ public class Utils {
 		String arguSrc = "";
 		String end = "";
 		ITree node = root.getParent();
-		String type = srcT.getTypeLabel(node);//ÕÒµ½argument_list¸¸½Úµã
-		if(type.equals("name")) {//nameÇé¿öÓÃ<>
+		String type = srcT.getTypeLabel(node);//æ‰¾åˆ°argument_listçˆ¶èŠ‚ç‚¹
+		if(type.equals("name")) {//nameæƒ…å†µç”¨<>
 			arguSrc = arguSrc+"<";
 			end = ">";
-		}else if(type.equals("call")||type.equals("decl")) {//callµÄÇé¿öÏÂÓÃ()
+		}else if(type.equals("call")||type.equals("decl")) {//callçš„æƒ…å†µä¸‹ç”¨()
 			arguSrc = arguSrc+"(";
 			end = ")";
 		}else if(type.equals("constructor")||type.equals("function")) {
@@ -192,11 +192,11 @@ public class Utils {
 		if(arguLeaves.size()==0) {
 			arguSrc = arguSrc+end;
 			return 	arguSrc;
-		}//·µ»Ø¿ÕÀ¨ºÅ
+		}//è¿”å›ç©ºæ‹¬å·
 		if(arguLeaves.size()==1) {
 			arguSrc = arguSrc + arguLeaves.get(0).getLabel()+end;
 			return 	arguSrc;
-		}//·µ»Øµ¥¸öÔªËØ+À¨ºÅ
+		}//è¿”å›å•ä¸ªå…ƒç´ +æ‹¬å·
 				
 		arguSrc = arguSrc + arguLeaves.get(0).getLabel();
 		for(int i=0;i<arguLeaves.size()-1;i++) {
@@ -205,7 +205,7 @@ public class Utils {
 			ITree sharePar = findShareParent(leaf1, leaf2, srcT);
 //			String parType = srcT.getTypeLabel(sharePar);
 			List<ITree> childs = sharePar.getChildren();
-			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//Í¬Ò»²ãµÄÁ½¸öÒ¶×Ó½Úµã£¬»¹Ô­Ê±ºòÖ±½ÓÆ´ÆğÀ´¾ÍĞĞ
+			if(childs.contains(leaf1)&&childs.contains(leaf2)) {//åŒä¸€å±‚çš„ä¸¤ä¸ªå¶å­èŠ‚ç‚¹ï¼Œè¿˜åŸæ—¶å€™ç›´æ¥æ‹¼èµ·æ¥å°±è¡Œ
 				arguSrc = arguSrc+ leaf2.getLabel();
 			}else if(childs.size()>=2){
 				ITree node1 = null;
@@ -225,13 +225,13 @@ public class Utils {
 //						if(list.contains(leaf1)&&list.contains(leaf1))
 //							throw new Exception("wrong sharePar!");
 					}				
-				}//ÕÒshareParµÄÏÂÒ»¸öleaf1,leaf2¶ÔÓ¦¸¸½Úµã(»òÆä±¾Éí)
+				}//æ‰¾shareParçš„ä¸‹ä¸€ä¸ªleaf1,leaf2å¯¹åº”çˆ¶èŠ‚ç‚¹(æˆ–å…¶æœ¬èº«)
 				String type1 = srcT.getTypeLabel(node1);
 				String type2 = srcT.getTypeLabel(node2);
 				if(type1.equals("name")) {
 					if(type2.equals("argument_list")||type2.equals("parameter_list")) {	
 						List<ITree> leaves = new ArrayList<>();
-						leaves = traverse2Leaf(node2, leaves);//ÕÒµ½argulistÖĞËùÓĞÒ¶×Ó
+						leaves = traverse2Leaf(node2, leaves);//æ‰¾åˆ°argulistä¸­æ‰€æœ‰å¶å­
 						arguSrc = arguSrc + recoverArguList(node2, leaves, srcT);
 					}else if(type2.equals("operator")) {
 						arguSrc = arguSrc+leaf2.getLabel();
@@ -240,7 +240,7 @@ public class Utils {
 					}else {
 						arguSrc = "error situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄnameÇé¿ö:"+type2);	
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„nameæƒ…å†µ:"+type2);	
 					}																						
 				}else if(type1.equals("argument")||type1.equals("parameter")) {
 					if(type2.equals("argument")||type2.equals("parameter")) {
@@ -248,7 +248,7 @@ public class Utils {
 					}else {
 						arguSrc = "error situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄargumentÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„argumentæƒ…å†µ:"+type2);
 					}					
 				}else if(type1.equals("type")) {
 					if(type2.equals("name")) {	
@@ -256,10 +256,10 @@ public class Utils {
 					}else {
 						arguSrc = "error situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄtypeÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„typeæƒ…å†µ:"+type2);
 					}						
 				}else if(type1.equals("operator")) {
-					if(type2.equals("call")) {//ºÃÏñÓĞnode2ÎªcallµÄÇé¿ö
+					if(type2.equals("call")) {//å¥½åƒæœ‰node2ä¸ºcallçš„æƒ…å†µ
 						node2 = node2.getChildren().get(0);
 						type2 = srcT.getTypeLabel(node2);
 					}						
@@ -268,7 +268,7 @@ public class Utils {
 					}else {
 						arguSrc = "error situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄoperatorÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„operatoræƒ…å†µ:"+type2);
 					}						
 				}else if(type1.equals("specifier")) {
 					if(type2.equals("name")){
@@ -276,18 +276,18 @@ public class Utils {
 					}else {
 						arguSrc = "error situation";
 						break;
-//						throw new Exception("Ã»¿¼ÂÇ¹ıµÄtypeÇé¿ö:"+type2);
+//						throw new Exception("æ²¡è€ƒè™‘è¿‡çš„typeæƒ…å†µ:"+type2);
 					}						
 				}else {
 					arguSrc = "error situation";
 					break;
-//					throw new Exception("Ã»¿¼ÂÇ¹ıµÄchildrenÇé¿ö");
+//					throw new Exception("æ²¡è€ƒè™‘è¿‡çš„childrenæƒ…å†µ");
 				}					
 			}		
 		}
-		arguSrc = arguSrc+end;//¼ÓÉÏÊÕÎ²
+		arguSrc = arguSrc+end;//åŠ ä¸Šæ”¶å°¾
 		return arguSrc;		
-	}//argulistÏàµ±ÓÚsubtreeÖĞµÄsubtree£¬µ¥¶À»¹Ô­
+	}//argulistç›¸å½“äºsubtreeä¸­çš„subtreeï¼Œå•ç‹¬è¿˜åŸ
 	
 	public static ChangeTuple filterChange(DTree sDT, DTree dDT) throws Exception {
 		ChangeTuple ct = new ChangeTuple();
@@ -349,7 +349,7 @@ public class Utils {
 				}
 				ct.setSrc(sString);
 				ct.setDst(dString);
-			//diffµÄ×îºóÒ»¸öÎ»ÖÃ±àºÅÒ²±ÈsameĞ¡»òµÚÒ»¸öÎ»ÖÃ±àºÅ¾Í±Èsame´ó£¬Ö»±£Áôdiff²¿·Ö£¬·ñÔò²»¸Ä
+			//diffçš„æœ€åä¸€ä¸ªä½ç½®ç¼–å·ä¹Ÿæ¯”sameå°æˆ–ç¬¬ä¸€ä¸ªä½ç½®ç¼–å·å°±æ¯”sameå¤§ï¼Œåªä¿ç•™difféƒ¨åˆ†ï¼Œå¦åˆ™ä¸æ”¹
 			}else {
 				sString = Utils.printLeaf(sDT);
 				dString = Utils.printLeaf(dDT);
@@ -366,7 +366,7 @@ public class Utils {
 		}
 		
 		return ct;		
-	}//changeÖĞ°üº¬ÏàÍ¬µÄ²»ĞŞ¸Ä²¿·Ö£¬ĞèÒª¹ıÂËÉ¾³ı
+	}//changeä¸­åŒ…å«ç›¸åŒçš„ä¸ä¿®æ”¹éƒ¨åˆ†ï¼Œéœ€è¦è¿‡æ»¤åˆ é™¤
 	
 	
 	
@@ -375,7 +375,7 @@ public class Utils {
 		if(leaf1.isRoot()||leaf2.isRoot()) 
 			throw new Exception("check the leaf!");
 		ITree sharePar = null;
-		if(leaf1.getParent().equals(leaf2.getParent()))//´ó¸ÅÂÊÍ¬¸ö¸¸Ç×
+		if(leaf1.getParent().equals(leaf2.getParent()))//å¤§æ¦‚ç‡åŒä¸ªçˆ¶äº²
 			sharePar = leaf1.getParent();
 		else {
 			ITree subRoot = traverSubRoot(leaf1, tc);
@@ -397,14 +397,14 @@ public class Utils {
 		}
 //		System.out.println("find sharePar:"+tc.getTypeLabel(sharePar));
 		return sharePar;		
-	}//ÕÒÁ½¸ö½Úµã¹²ÓĞ×îµÍµÄ¸¸Ç×½Úµã	
+	}//æ‰¾ä¸¤ä¸ªèŠ‚ç‚¹å…±æœ‰æœ€ä½çš„çˆ¶äº²èŠ‚ç‚¹	
 
 	
 	public static ITree traverSubRoot(ITree node, TreeContext tc) {
 		ITree subRoot = null;
 		String typeLabel = tc.getTypeLabel(node);				
-		while(!ifSRoot(typeLabel)) {//¿ÉÄÜÓĞÎÊÌâ£¬Òª×¢ÒâÑ­»·Ìõ¼ş
-			if(node.isRoot()) {//·¢ÏÖÓĞĞŞ¸ÄincludeµÄÇé¿ö£¬subrootÎª×ÜÊ÷¸ù½Úµã
+		while(!ifSRoot(typeLabel)) {//å¯èƒ½æœ‰é—®é¢˜ï¼Œè¦æ³¨æ„å¾ªç¯æ¡ä»¶
+			if(node.isRoot()) {//å‘ç°æœ‰ä¿®æ”¹includeçš„æƒ…å†µï¼Œsubrootä¸ºæ€»æ ‘æ ¹èŠ‚ç‚¹
 				subRoot = node;
 				break;
 			}else {
@@ -415,7 +415,7 @@ public class Utils {
 			}		
 		}
 		return subRoot;
-	}//ÍùÉÏ×·ËİÄ³½ÚµãÔÚ×ÓÊ÷ÄÚµÄ¸ù½Úµã
+	}//å¾€ä¸Šè¿½æº¯æŸèŠ‚ç‚¹åœ¨å­æ ‘å†…çš„æ ¹èŠ‚ç‚¹
 	
 	public static ITree searchBlock(SubTree sub) throws Exception {
 		ITree sRoot = sub.getRoot();
@@ -429,7 +429,7 @@ public class Utils {
 		}else {
 			return par;
 		}					
-	}//ËÑË÷²¢¶¨Î»¸¸Ç×½ÚµãÖĞµÄµÚÒ»¸öblock½Úµã
+	}//æœç´¢å¹¶å®šä½çˆ¶äº²èŠ‚ç‚¹ä¸­çš„ç¬¬ä¸€ä¸ªblockèŠ‚ç‚¹
 	
 	public static ITree searchFunction(SubTree st) {
 		TreeContext tc = st.getTC();
@@ -459,7 +459,7 @@ public class Utils {
 		ITree sRoot = st.getRoot();
 		TreeContext tc = st.getTC();
 		List<ITree> nodes1 = sRoot.getDescendants();
-		nodes1.add(sRoot);//srcTËùÓĞ½Úµã
+		nodes1.add(sRoot);//srcTæ‰€æœ‰èŠ‚ç‚¹
 		int sBeginLine = 0;
 		int sLastLine = 0;
 		int sBeginCol = 0;
@@ -470,7 +470,7 @@ public class Utils {
 			int lastLine = node.getLastLine();
 			int lastCol = node.getLastColumn();
 			String type = tc.getTypeLabel(node);
-			if(!type.equals("block")) {//Ìø¹ıblock½Úµã£¬¸Ã½Úµã»áµ¼ÖÂlastlineÎª´óÀ¨ºÅ½áÊøÎ»ÖÃ
+			if(!type.equals("block")) {//è·³è¿‡blockèŠ‚ç‚¹ï¼Œè¯¥èŠ‚ç‚¹ä¼šå¯¼è‡´lastlineä¸ºå¤§æ‹¬å·ç»“æŸä½ç½®
 				if(sBeginLine==0&&line!=0) {
 					sBeginLine = line;
 				}else if(line < sBeginLine&&line!=0) {
@@ -490,7 +490,7 @@ public class Utils {
 //				if(sRoot.getId()==16329) {
 //					System.err.println(node.getId()+type+":"+line+","+lastLine+","+col+","+lastCol);
 //				}
-			}else if(type.equals("empty_stmt"))//ÌØÊâÇé¿ö	
+			}else if(type.equals("empty_stmt"))//ç‰¹æ®Šæƒ…å†µ	
 				continue;
 		}
 		Boundary boundary = new Boundary(sRoot, sBeginLine, sLastLine, sBeginCol, sLastCol);	
@@ -547,7 +547,7 @@ public class Utils {
 			}else continue;
 		}
 		return nodes;		
-	}//ÊÕ¼¯ASTÊ÷ÖĞËùÓĞµã
+	}//æ”¶é›†ASTæ ‘ä¸­æ‰€æœ‰ç‚¹
 	
 	public static Integer collectEdge(ITree node, int num) {
 		List<ITree> childs = node.getChildren();
@@ -557,7 +557,7 @@ public class Utils {
 			collectEdge(child, num);
 		}
 		return num;		
-	}//ÊÕ¼¯ASTÊ÷ÖĞËùÓĞ±ß
+	}//æ”¶é›†ASTæ ‘ä¸­æ‰€æœ‰è¾¹
 	
 	public static ArrayList<Integer> collectSrcActNodeIds(TreeContext tc1, TreeContext tc2, MappingStore mappings, HashMap<String, LinkedList<Action>> actMap) throws Exception{
 		ArrayList<Integer> srcActIds = new ArrayList<>();
@@ -579,22 +579,22 @@ public class Utils {
 		}
 		
 //		for(Action a : inserts) {			
-//			ITree sRoot = cl.traverseSRoot(a);//ËÆºõ²»Ó¦¸ÃÖ¸¶¨sRoot£¬Ó¦Ñ°ÕÒinsertµÄroot
+//			ITree sRoot = cl.traverseSRoot(a);//ä¼¼ä¹ä¸åº”è¯¥æŒ‡å®šsRootï¼Œåº”å¯»æ‰¾insertçš„root
 //			if(sRoot==null) {
 //				System.err.println("insert err");
-//				continue;//Åö¼ûÒ»´Î£¬Ô­ÒòÎ´Öª
+//				continue;//ç¢°è§ä¸€æ¬¡ï¼ŒåŸå› æœªçŸ¥
 //			}				
 //			int id = sRoot.getId();
 //			srcActIds.add(id);
 //		}	
-		cl.buildInsertMap(inserts);//ËÆºõ²»Ó¦¸ÃÖ¸¶¨sRoot£¬ÏÈ½¨Á¢insert node Ó³Éä¹ØÏµ
+		cl.buildInsertMap(inserts);//ä¼¼ä¹ä¸åº”è¯¥æŒ‡å®šsRootï¼Œå…ˆå»ºç«‹insert node æ˜ å°„å…³ç³»
 		for(Action a : inserts) {			
 			ITree dst = a.getNode();
-			ITree mapped_insert_root = cl.traverseRealParent(a);//¸Ãaction¸ù½Úµãinsert_rootÔÚsrcÊ÷ÉÏµÄÓ³Éä
+			ITree mapped_insert_root = cl.traverseRealParent(a);//è¯¥actionæ ¹èŠ‚ç‚¹insert_rootåœ¨srcæ ‘ä¸Šçš„æ˜ å°„
 			if(mapped_insert_root==null) {
 				throw new Exception("mapped_insert_root is null!"+dst.getId());
 //				System.err.println("mapped_insert_root is null!");
-//				continue;//Åö¼ûÒ»´Î£¬Ô­ÒòÎ´Öª
+//				continue;//ç¢°è§ä¸€æ¬¡ï¼ŒåŸå› æœªçŸ¥
 			}				
 			int id = mapped_insert_root.getId();
 			srcActIds.add(id);
@@ -612,7 +612,7 @@ public class Utils {
 			if(sRoot==null) {
 //				throw new Exception("sRoot is null!"+src.getId());
 				System.err.println("move err");
-				continue;//Åö¼ûÒ»´Î£¬Ô­ÒòÎ´Öª
+				continue;//ç¢°è§ä¸€æ¬¡ï¼ŒåŸå› æœªçŸ¥
 			}			
 			int root_id = sRoot.getId();
 			srcActIds.add(root_id);
@@ -670,7 +670,7 @@ public class Utils {
 		return parString;
 	}
 	
-	public static List<ITree> traverse2Leaf(ITree node, List<ITree> leafList) throws Exception{//´Ó¸ù½ÚµãÉî¶È±éÀúÖÁÒ¶×Ó½Úµã£¬ÓÅÏÈÈ·¶¨pathÏàÍ¬µÄleaf mappings
+	public static List<ITree> traverse2Leaf(ITree node, List<ITree> leafList) throws Exception{//ä»æ ¹èŠ‚ç‚¹æ·±åº¦éå†è‡³å¶å­èŠ‚ç‚¹ï¼Œä¼˜å…ˆç¡®å®špathç›¸åŒçš„leaf mappings
 		List<ITree> childList = node.getChildren();
 		if(node.isLeaf()){
 			leafList.add(node);
@@ -804,7 +804,7 @@ public class Utils {
 		return target;
 	}	
 	
-	public static Boolean ifSRoot(String typeLabel) {//¸Ã·½·¨¹ØÏµµ½subtree»®·Ö£¬·Ç³£ÖØÒª
+	public static Boolean ifSRoot(String typeLabel) {//è¯¥æ–¹æ³•å…³ç³»åˆ°subtreeåˆ’åˆ†ï¼Œéå¸¸é‡è¦
 		if(typeLabel=="decl_stmt"||typeLabel=="expr_stmt"||typeLabel=="while"||
 					typeLabel=="function"||typeLabel=="function_decl"||typeLabel=="if"||
 					typeLabel=="else"||typeLabel=="ternary"||typeLabel=="for"||
@@ -812,10 +812,10 @@ public class Utils {
 					typeLabel=="try"||typeLabel=="throw"||typeLabel=="enum"||
 					typeLabel=="constructor"||typeLabel=="constructor_decl"||
 					typeLabel=="interface"||typeLabel=="switch"||typeLabel=="then") {
-			return true;//includeÔİÊ±²»Ëãtypelabel£¬ mappingÓĞÎÊÌâ£¬importÒ²²»¿¼ÂÇ
+			return true;//includeæš‚æ—¶ä¸ç®—typelabelï¼Œ mappingæœ‰é—®é¢˜ï¼Œimportä¹Ÿä¸è€ƒè™‘
 		}else
 			return false;
-	}//SRootÌõ¼ş¿ÉÄÜÓĞÒÅÂ©
+	}//SRootæ¡ä»¶å¯èƒ½æœ‰é—æ¼
 	
 	
 	public static Boolean ifChild(ITree root, ITree target) throws Exception {
@@ -832,7 +832,7 @@ public class Utils {
 		return findNode;
 	}
 	
-	public static void checkTCRoot(TreeContext tc){//·¢ÏÖactionºóÓĞÃÔÖ®¸ù½Úµã
+	public static void checkTCRoot(TreeContext tc){//å‘ç°actionåæœ‰è¿·ä¹‹æ ¹èŠ‚ç‚¹
 		ITree root = tc.getRoot();
 		if(root.getParent()!=null) {
 			System.err.println("find error root!!"+root.getParent().getId()+tc.getTypeLabel(root.getParent()));

@@ -22,8 +22,8 @@ public class Cluster {
 	private TreeContext tc1;
 	private TreeContext tc2;
 	private MappingStore mapping;
-	private HashMap<ITree, ITree> node2rootMap = new HashMap<>();//insert×¨ÓÃ
-	private HashMap<ITree, ITree> parMap = new HashMap<>();//insert×¨ÓÃ
+	private HashMap<ITree, ITree> node2rootMap = new HashMap<>();//insertä¸“ç”¨
+	private HashMap<ITree, ITree> parMap = new HashMap<>();//insertä¸“ç”¨
 	private Boolean hasBuildMap = false;
 	
 	public static void main (String args[]) throws Exception{
@@ -188,13 +188,13 @@ public class Cluster {
 			System.out.println("downRootname:"+tc1.getTypeLabel(newRoot));
 			printPath(newRoot);
 		}				
-	}//ĞèÒªdebug
+	}//éœ€è¦debug
 	
-	public void printPath(ITree newRoot) {//´òÓ¡´ÓnewRootµ½SRoot
+	public void printPath(ITree newRoot) {//æ‰“å°ä»newRootåˆ°SRoot
 		ITree SRoot = newRoot;
 		String typeLabel = tc1.getTypeLabel(newRoot);	
 		String allPath = typeLabel;
-		while(!Utils.ifSRoot(typeLabel)) {//¿ÉÄÜÓĞÎÊÌâ£¬Òª×¢ÒâÑ­»·Ìõ¼ş
+		while(!Utils.ifSRoot(typeLabel)) {//å¯èƒ½æœ‰é—®é¢˜ï¼Œè¦æ³¨æ„å¾ªç¯æ¡ä»¶
 			typeLabel = tc1.getTypeLabel(SRoot.getParent());
 			allPath = allPath+"<-"+typeLabel;
 			SRoot = SRoot.getParent();
@@ -203,7 +203,7 @@ public class Cluster {
 	}
 	
 	public void buildInsertMap(LinkedList<Action> inserts) throws Exception {
-		for(Action act : inserts) {//insert·½·¨²»Éæ¼°src½Úµã£¬Ö»ÔÚdstÊ÷ÖĞ²åÈë
+		for(Action act : inserts) {//insertæ–¹æ³•ä¸æ¶‰åŠsrcèŠ‚ç‚¹ï¼Œåªåœ¨dstæ ‘ä¸­æ’å…¥
 			if(!(act instanceof Insert))
 				throw new Exception("Action type error!");
 			ITree dst = act.getNode();
@@ -216,13 +216,13 @@ public class Cluster {
 //				else
 //					System.err.println("not exist!");
 //			}
-			if(map_par2!=null) {//ËµÃ÷Ö±½ÓÁ¬½ÓÔÚinsert_rootÉÏÇÒÓĞ¶ÔÓ¦µÄsrc_root
+			if(map_par2!=null) {//è¯´æ˜ç›´æ¥è¿æ¥åœ¨insert_rootä¸Šä¸”æœ‰å¯¹åº”çš„src_root
 				par1 = map_par2;
 				parMap.put(dst, par2);
 				node2rootMap.put(dst, par1);
-			}else {//ËµÃ÷Á¬½ÓÔÚinsert_parÉÏ£¬²»ÊÇinsert_root
+			}else {//è¯´æ˜è¿æ¥åœ¨insert_parä¸Šï¼Œä¸æ˜¯insert_root
 				if(parMap.get(dst)==null) {
-					parMap.put(dst, par2);//Ó³ÉäÁ´È«²¿·ÅÈëmap£¬Ö¸Ïòinsert_root
+					parMap.put(dst, par2);//æ˜ å°„é“¾å…¨éƒ¨æ”¾å…¥mapï¼ŒæŒ‡å‘insert_root
 				}else
 					throw new Exception("error exist parMap!");
 			}			
@@ -234,7 +234,7 @@ public class Cluster {
 //			System.out.println("Insert:"+dst.getId()+","+par.getId());
 			if(node2rootMap.get(dst)!=null) {
 				continue;
-			}else {//ËµÃ÷Á¬½ÓÔÚinsert_parÉÏ£¬²»ÊÇinsert_root
+			}else {//è¯´æ˜è¿æ¥åœ¨insert_parä¸Šï¼Œä¸æ˜¯insert_root
 				ITree map_par = parMap.get(par);
 				if(map_par==null)
 					throw new Exception("check the null error!"+dst.getId()+","+par.getId());
@@ -250,7 +250,7 @@ public class Cluster {
 			}
 		}
 		hasBuildMap = true;
-	}//insert·½·¨ÓĞ·Ç³£¶à½ÚµãÁ¬½ÓµÄ¸¸Ç×½ÚµãÊôÓÚdstÊ÷£¬ĞèÔ¤ÏÈ½¨Á¢ÕâĞ©½ÚµãÓësrc_rootÖ®¼äµÄmap
+	}//insertæ–¹æ³•æœ‰éå¸¸å¤šèŠ‚ç‚¹è¿æ¥çš„çˆ¶äº²èŠ‚ç‚¹å±äºdstæ ‘ï¼Œéœ€é¢„å…ˆå»ºç«‹è¿™äº›èŠ‚ç‚¹ä¸src_rootä¹‹é—´çš„map
 	
 	public ITree findMovRoot(Action a) throws Exception {
 		if(!(a instanceof Move))
@@ -263,10 +263,10 @@ public class Cluster {
 			if(sRoot == null)
 				System.err.println("error id:"+dst.getId());
 			return sRoot;
-		}//·¢ÏÖÁíÒ»ÖÖÇé¿ö,moveÁ¬½ÓµÄ½Úµã²»ÔÚinsert½á¹ûÖĞ£¬Ö±½Ó´ÓmappingÖĞÕÒ	
+		}//å‘ç°å¦ä¸€ç§æƒ…å†µ,moveè¿æ¥çš„èŠ‚ç‚¹ä¸åœ¨insertç»“æœä¸­ï¼Œç›´æ¥ä»mappingä¸­æ‰¾	
 		
 		ITree sRoot = node2rootMap.get(dst);
-		//moveÁ¬½ÓµÄ¸¸Ç×ÊÇtc2ÖĞ½Úµã£¬Ö±½Ó´Óinsert½á¹ûÖĞÕÒ£¬±ØÈ»ÒòÎªinsert²åÈëµ½tc1ÖĞÁË	
+		//moveè¿æ¥çš„çˆ¶äº²æ˜¯tc2ä¸­èŠ‚ç‚¹ï¼Œç›´æ¥ä»insertç»“æœä¸­æ‰¾ï¼Œå¿…ç„¶å› ä¸ºinsertæ’å…¥åˆ°tc1ä¸­äº†	
 		if(sRoot==null)
 			throw new Exception("sRoot is not exist!");
 		return sRoot;	
@@ -279,14 +279,14 @@ public class Cluster {
 		ITree dst = act.getNode();
 		ITree mapped_insert_root = node2rootMap.get(dst); 
 		return mapped_insert_root;
-	}//ËÑË÷¸Ãaction¸ù½Úµãinsert_rootÔÚsrcÊ÷ÉÏµÄÓ³Éä, Insert×¨ÓÃ	
+	}//æœç´¢è¯¥actionæ ¹èŠ‚ç‚¹insert_rootåœ¨srcæ ‘ä¸Šçš„æ˜ å°„, Insertä¸“ç”¨	
 	
 	public ITree traverseSRoot(Action a) throws Exception {
 		ITree target = a.getNode();
 		if(a instanceof Update||a instanceof Delete) {
 			ITree src = a.getNode();
 			String typeLabel = tc1.getTypeLabel(src);				
-			while(!Utils.ifSRoot(typeLabel)) {//¿ÉÄÜÓĞÎÊÌâ£¬Òª×¢ÒâÑ­»·Ìõ¼ş
+			while(!Utils.ifSRoot(typeLabel)) {//å¯èƒ½æœ‰é—®é¢˜ï¼Œè¦æ³¨æ„å¾ªç¯æ¡ä»¶
 				ITree par = src.getParent();
 				typeLabel = tc1.getTypeLabel(par);
 //				System.out.println("typeLabel:"+typeLabel);
@@ -294,7 +294,7 @@ public class Cluster {
 			}
 			target = src;
 		}
-		if(a instanceof Insert) {//insert ·½·¨ĞèÒªËÑË÷tc2ÖĞµÄinsert root½Úµã
+		if(a instanceof Insert) {//insert æ–¹æ³•éœ€è¦æœç´¢tc2ä¸­çš„insert rootèŠ‚ç‚¹
 			ITree dst = ((Insert)a).getNode();
 			String typeLabel = tc2.getTypeLabel(dst);
 //			System.out.println(dst.getId()+"typeLabel:"+typeLabel);
@@ -309,10 +309,10 @@ public class Cluster {
 	        		System.out.println("getMap:"+first.getId()+"->"+second.getId());
 	        		par1 = first;
 	        		typeLabel = tc1.getTypeLabel(par1);
-	        		while(!Utils.ifSRoot(typeLabel)) {//¿ÉÄÜÓĞÎÊÌâ£¬Òª×¢ÒâÑ­»·Ìõ¼ş
+	        		while(!Utils.ifSRoot(typeLabel)) {//å¯èƒ½æœ‰é—®é¢˜ï¼Œè¦æ³¨æ„å¾ªç¯æ¡ä»¶
 //	        			System.out.println("LabelID:"+par1.getId());
 	        			if(par1.isRoot())
-	        				break;//·¢ÏÖÓĞÖ±½ÓÁ¬½ÓÔÚ×ÜÊ÷¸ù½ÚµãµÄÇé¿ö
+	        				break;//å‘ç°æœ‰ç›´æ¥è¿æ¥åœ¨æ€»æ ‘æ ¹èŠ‚ç‚¹çš„æƒ…å†µ
 	        			else {
 	        				ITree tmpPar = par1.getParent();	        			
 		        			typeLabel = tc1.getTypeLabel(tmpPar);
@@ -320,11 +320,11 @@ public class Cluster {
 		        			par1 = tmpPar;
 	        			}	        			
 	        		}
-	        		node2rootMap.put(dst, par1);//°ó¶¨×Ó½ÚµãÓÃ
+	        		node2rootMap.put(dst, par1);//ç»‘å®šå­èŠ‚ç‚¹ç”¨
 	        		break;	        		
 	        	}
 	        }
-	        if(par1 == null) {//ÈÔÈ»Îª-1ËµÃ÷²»ÔÚmappingÖĞ£¬actionÎªinsert×ÓÊ÷ÖĞµÄ½Úµã
+	        if(par1 == null) {//ä»ç„¶ä¸º-1è¯´æ˜ä¸åœ¨mappingä¸­ï¼Œactionä¸ºinsertå­æ ‘ä¸­çš„èŠ‚ç‚¹
 	        	if(node2rootMap.get(par2)!=null) {
 	        		par1 = node2rootMap.get(par2); 
 	        		node2rootMap.put(dst, par1);
@@ -342,7 +342,7 @@ public class Cluster {
 			String typeLabel = tc1.getTypeLabel(src);
 //			System.out.println(dst.getId()+"typeLabel:"+typeLabel);
 //			System.out.println("dstPar:"+dst.getParent().getId());
-			while(!Utils.ifSRoot(typeLabel)) {//¿ÉÄÜÓĞÎÊÌâ£¬Òª×¢ÒâÑ­»·Ìõ¼ş
+			while(!Utils.ifSRoot(typeLabel)) {//å¯èƒ½æœ‰é—®é¢˜ï¼Œè¦æ³¨æ„å¾ªç¯æ¡ä»¶
 				ITree par = dst.getParent();
 				typeLabel = tc1.getTypeLabel(par);
 //				System.out.println(dst.getId()+"typeLabel:"+typeLabel);
@@ -351,7 +351,7 @@ public class Cluster {
 			target = dst;
 		}
 		return target;		
-	}//ËÑË÷¸Ãaction¸ùÓï¾äroot
+	}//æœç´¢è¯¥actionæ ¹è¯­å¥root
 	
 	public ITree downRoot(ArrayList<Action> actions) throws Exception {//topdown or downtop?
 		ITree sRoot = null;
@@ -397,10 +397,10 @@ public class Cluster {
 			}				
 		}			
 		
-		while(ifChild==true) {//ÏÂ½µ¸ù½Úµã±ØĞë±£Ö¤¸²¸ÇËùÓĞactionNode
+		while(ifChild==true) {//ä¸‹é™æ ¹èŠ‚ç‚¹å¿…é¡»ä¿è¯è¦†ç›–æ‰€æœ‰actionNode
 			System.out.println("par:"+sRoot.getId());
 			if(parents.contains(sRoot.getId())) {
-				break;//Èç¹ûÏÂ½µµ½Ö»±ÈactionµÄ¸¸½Úµã¸ßÒ»²ã,break
+				break;//å¦‚æœä¸‹é™åˆ°åªæ¯”actionçš„çˆ¶èŠ‚ç‚¹é«˜ä¸€å±‚,break
 			}
 				
 			List<ITree> childs = sRoot.getChildren();
@@ -429,7 +429,7 @@ public class Cluster {
 			}		
 		}
 		return sRoot;
-	}//´Ó¸ùÓï¾ärootÏÂ½µrootnode,È¡ËùÓĞactionµÄ¹«ÓĞ×îÏÂ·½root
+	}//ä»æ ¹è¯­å¥rootä¸‹é™rootnode,å–æ‰€æœ‰actionçš„å…¬æœ‰æœ€ä¸‹æ–¹root
 	
 		
 		  

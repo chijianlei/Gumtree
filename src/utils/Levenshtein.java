@@ -3,9 +3,9 @@ package utils;
 public class Levenshtein {
 
 /**
-     * ±È½ÏÁ½¸ö×Ö·û´®µÄÏàÊ¶¶È
-     * ºËĞÄËã·¨£ºÓÃÒ»¸ö¶şÎ¬Êı×é¼ÇÂ¼Ã¿¸ö×Ö·û´®ÊÇ·ñÏàÍ¬£¬Èç¹ûÏàÍ¬¼ÇÎª0£¬²»ÏàÍ¬¼ÇÎª1£¬Ã¿ĞĞÃ¿ÁĞÏàÍ¬¸öÊıÀÛ¼Ó
-     * ÔòÊı×é×îºóÒ»¸öÊıÎª²»ÏàÍ¬µÄ×ÜÊı£¬´Ó¶øÅĞ¶ÏÕâÁ½¸ö×Ö·ûµÄÏàÊ¶¶È
+     * æ¯”è¾ƒä¸¤ä¸ªå­—ç¬¦ä¸²çš„ç›¸è¯†åº¦
+     * æ ¸å¿ƒç®—æ³•ï¼šç”¨ä¸€ä¸ªäºŒç»´æ•°ç»„è®°å½•æ¯ä¸ªå­—ç¬¦ä¸²æ˜¯å¦ç›¸åŒï¼Œå¦‚æœç›¸åŒè®°ä¸º0ï¼Œä¸ç›¸åŒè®°ä¸º1ï¼Œæ¯è¡Œæ¯åˆ—ç›¸åŒä¸ªæ•°ç´¯åŠ 
+     * åˆ™æ•°ç»„æœ€åä¸€ä¸ªæ•°ä¸ºä¸ç›¸åŒçš„æ€»æ•°ï¼Œä»è€Œåˆ¤æ–­è¿™ä¸¤ä¸ªå­—ç¬¦çš„ç›¸è¯†åº¦
   *
   * @param str
   * @param target
@@ -15,18 +15,18 @@ public class Levenshtein {
 	public static void main(String[] args) {
         String a= "1000";
         String b = "rmw_qos_profile_default";
-        System.out.println("ÏàËÆ¶È£º"+getSimilarityRatio(a,b));
+        System.out.println("ç›¸ä¼¼åº¦ï¼š"+getSimilarityRatio(a,b));
     }
 	
     private static int compare(String str, String target) {
-        int d[][];              // ¾ØÕó
+        int d[][];              // çŸ©é˜µ
         int n = str.length();
         int m = target.length();
-        int i;                  // ±éÀústrµÄ
-        int j;                  // ±éÀútargetµÄ
-        char ch1;               // strµÄ
-        char ch2;               // targetµÄ
-        int temp;               // ¼ÇÂ¼ÏàÍ¬×Ö·û,ÔÚÄ³¸ö¾ØÕóÎ»ÖÃÖµµÄÔöÁ¿,²»ÊÇ0¾ÍÊÇ1
+        int i;                  // éå†strçš„
+        int j;                  // éå†targetçš„
+        char ch1;               // strçš„
+        char ch2;               // targetçš„
+        int temp;               // è®°å½•ç›¸åŒå­—ç¬¦,åœ¨æŸä¸ªçŸ©é˜µä½ç½®å€¼çš„å¢é‡,ä¸æ˜¯0å°±æ˜¯1
         if (n == 0) {
             return m;
         }
@@ -34,18 +34,18 @@ public class Levenshtein {
             return n;
         }
         d = new int[n + 1][m + 1];
-        // ³õÊ¼»¯µÚÒ»ÁĞ
+        // åˆå§‹åŒ–ç¬¬ä¸€åˆ—
         for (i = 0; i <= n; i++) {
             d[i][0] = i;
         }
-        // ³õÊ¼»¯µÚÒ»ĞĞ
+        // åˆå§‹åŒ–ç¬¬ä¸€è¡Œ
         for (j = 0; j <= m; j++) {
             d[0][j] = j;
         }
         for (i = 1; i <= n; i++) {
-            // ±éÀústr
+            // éå†str
             ch1 = str.charAt(i - 1);
-            // È¥Æ¥Åätarget
+            // å»åŒ¹é…target
             for (j = 1; j <= m; j++) {
                 ch2 = target.charAt(j - 1);
                 if (ch1 == ch2 || ch1 == ch2 + 32 || ch1 + 32 == ch2) {
@@ -53,7 +53,7 @@ public class Levenshtein {
                 } else {
                     temp = 1;
                 }
-                // ×ó±ß+1,ÉÏ±ß+1, ×óÉÏ½Ç+tempÈ¡×îĞ¡
+                // å·¦è¾¹+1,ä¸Šè¾¹+1, å·¦ä¸Šè§’+tempå–æœ€å°
                 d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + temp);
             }
         }
@@ -62,14 +62,14 @@ public class Levenshtein {
  
  
     /**
-     * »ñÈ¡×îĞ¡µÄÖµ
+     * è·å–æœ€å°çš„å€¼
      */
     private static int min(int one, int two, int three) {
         return (one = one < two ? one : two) < three ? one : three;
     }
  
     /**
-     * »ñÈ¡Á½×Ö·û´®µÄÏàËÆ¶È
+     * è·å–ä¸¤å­—ç¬¦ä¸²çš„ç›¸ä¼¼åº¦
      */
     public static float getSimilarityRatio(String str, String target) {
         int max = Math.max(str.length(), target.length());

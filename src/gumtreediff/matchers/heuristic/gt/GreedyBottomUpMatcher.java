@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with GumTree.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright 2011-2015 Jean-R茅my Falleri <jr.falleri@gmail.com>
- * Copyright 2011-2015 Flor茅al Morandat <florealm@gmail.com>
+ * Copyright 2011-2015 Jean-R鑼卪y Falleri <jr.falleri@gmail.com>
+ * Copyright 2011-2015 Flor鑼卆l Morandat <florealm@gmail.com>
  */
 
 package gumtreediff.matchers.heuristic.gt;
@@ -65,7 +65,7 @@ public class GreedyBottomUpMatcher extends AbstractBottomUpMatcher {
                     if (sim > max && sim >= SIM_THRESHOLD) {
                         max = sim;
                         best = cand;
-                    }//如果sim=max，是否应有多个候选集
+                    }//濡傛灉sim=max锛屾槸鍚﹀簲鏈夊涓�欓�夐泦
                 }
 
                 if (best != null) {

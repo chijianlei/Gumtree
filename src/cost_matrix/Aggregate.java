@@ -11,27 +11,27 @@ import java.util.Map.Entry;
 public class Aggregate {
 
 	public static void CreatSet(Map<Integer, Integer> arr1,Map<Integer, Integer> arr2){
-		 // ²âÊÔunion  
+		 // æµ‹è¯•union  
 //        int[] arr1 = { 123, 45, 1234 };  
 //        int[] arr2 = { 123, 33, 45, 4, 123 };  
 //        Integer[] result_union = union(arr1, arr2);  
-//        System.out.println("Çó²¢¼¯µÄ½á¹ûÈçÏÂ£º");  
+//        System.out.println("æ±‚å¹¶é›†çš„ç»“æœå¦‚ä¸‹ï¼š");  
 //        for (int str : result_union)  
 //        {  
 //            System.out.println(str);  
 //        }  
-//        System.out.println("---------------------¿É°®µÄ·Ö¸îÏß------------------------");  
-        // ²âÊÔinsect  
+//        System.out.println("---------------------å¯çˆ±çš„åˆ†å‰²çº¿------------------------");  
+        // æµ‹è¯•insect  
 		List<Integer> result_insect = intersect(arr1, arr2);  
-        System.out.println("Çó½»¼¯µÄ½á¹ûÈçÏÂ£º");  
+        System.out.println("æ±‚äº¤é›†çš„ç»“æœå¦‚ä¸‹ï¼š");  
         for (int str : result_insect)  
         {  
             System.out.println(str);  
         }  
-        System.out.println("---------------------¿É°®µÄ·Ö¸îÏß------------------------");  
+        System.out.println("---------------------å¯çˆ±çš„åˆ†å‰²çº¿------------------------");  
     }  
    
-    // ÇóÁ½¸öÊıÖµÊı×éµÄ²¢¼¯£¬ÀûÓÃsetµÄÔªËØÎ¨Ò»ĞÔ  
+    // æ±‚ä¸¤ä¸ªæ•°å€¼æ•°ç»„çš„å¹¶é›†ï¼Œåˆ©ç”¨setçš„å…ƒç´ å”¯ä¸€æ€§  
     public static Integer[] union(int[] arr1, int[] arr2)  
     {  
         Set<Integer> set = new HashSet<Integer>();  
@@ -47,7 +47,7 @@ public class Aggregate {
         return set.toArray(result);  
     }  
    
-    // ÇóÁ½¸öÊı×éµÄ½»¼¯  
+    // æ±‚ä¸¤ä¸ªæ•°ç»„çš„äº¤é›†  
     public static ArrayList<Integer> intersect(Map<Integer, Integer> arr1, Map<Integer, Integer> arr2)  
     {  
         Map<Integer, Boolean> map = new HashMap<Integer, Boolean>();  
@@ -62,7 +62,7 @@ public class Aggregate {
 				int small = Math.min(num1Integer, num2Integer);
 				for(int i=0;i<small;i++){
 					list.add(nameInteger);
-//					System.out.println(nameInteger);//Êä³ö³ö±ßĞòÁĞ
+//					System.out.println(nameInteger);//è¾“å‡ºå‡ºè¾¹åºåˆ—
 				 }
 				
 			}

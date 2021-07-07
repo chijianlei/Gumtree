@@ -31,7 +31,7 @@ public class SubtreeTest {
 		TreeContext tc1 = new SrcmlJavaTreeGenerator().generateFromFile(cppfile);
 		ITree root1 = tc1.getRoot();
 		List<ITree> des1 = root1.getDescendants();
-		String miName = path1.split("/")[path1.split("/").length-1];//±ê¼ÇÎÄ¼şÃû
+		String miName = path1.split("/")[path1.split("/").length-1];//æ ‡è®°æ–‡ä»¶å
 		String path2 = "java_test\\BZip2CompressorOutputStream2.java";
 		File cppfile2 = new File(path2);
 		TreeContext tc2 = new SrcmlJavaTreeGenerator().generateFromFile(cppfile2);
@@ -147,7 +147,7 @@ public class SubtreeTest {
 						childs.remove(tmp);
 						System.out.println(sRoot.getChildren().size());
 						sRoot.setChildren(childs);
-						tmp.setParent(null);//¶Ï¿ªËùÓĞblock nodeºÍ¸¸Ç×µÄÁ¬½Ó											
+						tmp.setParent(null);//æ–­å¼€æ‰€æœ‰block nodeå’Œçˆ¶äº²çš„è¿æ¥											
 					}										
 				}
 				String srcTree1 = Similarity.transfer2string(st);

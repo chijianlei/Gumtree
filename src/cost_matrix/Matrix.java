@@ -52,7 +52,7 @@ public class Matrix {
 		nodes2 = new ArrayList<Node>();
 		ReadNode(list1, list2);		
 		int m = nodes1.size();
-		System.out.println("m:"+m);//²âÊÔ½Úµã×ÜÊı
+		System.out.println("m:"+m);//æµ‹è¯•èŠ‚ç‚¹æ€»æ•°
 		int n = nodes2.size();
 		System.out.println("n:"+n);
 		compare(nodes1, nodes2);
@@ -61,7 +61,7 @@ public class Matrix {
 		graph1 = new int[m][m];
 		graph2 = new int[n][n];
 		ReadEdge(list1, list2);
-//		System.out.println(graph1[0][2]);//²âÊÔ±ß¶ÁÈëÇé¿ö
+//		System.out.println(graph1[0][2]);//æµ‹è¯•è¾¹è¯»å…¥æƒ…å†µ
 		Traversal(nodes1,graph1);
 		Traversal(nodes2,graph2);
 		CreatCostmatrix(graph1,graph2,nodes1,nodes2);
@@ -69,12 +69,12 @@ public class Matrix {
 //		for(int i =0;i<m+n;i++){
 //			for(int j =0;j<m+n;j++){
 //				String content = String.valueOf(costmatrix[i][j]);
-////				System.out.println(costmatrix[i][j]);//²âÊÔÏûºÄ¾ØÕó¶ÁÈëÇé¿ö
+////				System.out.println(costmatrix[i][j]);//æµ‹è¯•æ¶ˆè€—çŸ©é˜µè¯»å…¥æƒ…å†µ
 //				Writetxt(matrixpath,content+",");				
 //			}
 //			Writetxt(matrixpath,"\r\n");	
 //		}
-		System.out.println("Hungry±éÀúÖĞ");		
+		System.out.println("Hungryéå†ä¸­");		
 		KuhnMunkres km = new KuhnMunkres(m+n);
 		double[] result = new double[m+n];
 		int[][] recostmatrix = new int[m+n][m+n];
@@ -83,9 +83,9 @@ public class Matrix {
 				recostmatrix[i][j] = -costmatrix[i][j];
 			}
 		}
-		int[][] re = km.getMaxBipartie(recostmatrix,result);//KuhnMunkresËã·¨¼ÆËã×îĞ¡´ú¼ÛµÄ¶ş·ÖÆ¥Åä
+		int[][] re = km.getMaxBipartie(recostmatrix,result);//KuhnMunkresç®—æ³•è®¡ç®—æœ€å°ä»£ä»·çš„äºŒåˆ†åŒ¹é…
 		int len = Math.min(km.getlenX(), km.getlenY());
-		System.out.println("Hungry±éÀúÍê±Ï"+" len:"+len);
+		System.out.println("Hungryéå†å®Œæ¯•"+" len:"+len);
 		map = new HashMap<Integer, Integer>();
 		for(int i=0;i<len;i++){
 			map.put(re[i][0],re[i][1]);
@@ -99,21 +99,21 @@ public class Matrix {
 			int i = map.get(key).intValue();
 			int j = map.get(val).intValue();
 			if(i<m)
-				change.put(i, j);//¹¹½¨Æ¥Åä¾ØÕó
-//			System.out.println(i + " " + j);//²âÊÔ¶ş·ÖÆ¥ÅäĞòÁĞ	
+				change.put(i, j);//æ„å»ºåŒ¹é…çŸ©é˜µ
+//			System.out.println(i + " " + j);//æµ‹è¯•äºŒåˆ†åŒ¹é…åºåˆ—	
 		}
 		Iterator iter1 = change.entrySet().iterator();
 		while (iter1.hasNext()) {			
 			Map.Entry entry = (Map.Entry) iter1.next();
 			Object key = entry.getKey();
 			Object val = entry.getValue();
-			System.out.println(key + " " + val);//²âÊÔÆ¥Åä¾ØÕó	
+			System.out.println(key + " " + val);//æµ‹è¯•åŒ¹é…çŸ©é˜µ	
 		}
 //		for(Edge edge : edges1){			
 //			int source = edge.getSource();
 //			int target = edge.getTarget();
 //			int weight = edge.getweight();
-//			System.out.println(source + " " + target+ " " +weight);//²âÊÔ±ßÁ´±í	
+//			System.out.println(source + " " + target+ " " +weight);//æµ‹è¯•è¾¹é“¾è¡¨	
 //		}
 //		System.out.println(nodes1.get(0).getName());
 //		System.out.println(nodes2.get(0).getName());
@@ -123,24 +123,24 @@ public class Matrix {
 		long EdgeCost = EdgeCost(map,m,n);
 		System.out.println("NodeCost:"+NodeCost);
 		System.out.println("EdgeCost:"+EdgeCost);
-		long EditDistance = NodeCost + EdgeCost;//Í¼±à¼­¾àÀë
+		long EditDistance = NodeCost + EdgeCost;//å›¾ç¼–è¾‘è·ç¦»
 		double Similarity = (double)EditDistance/(double)(m+n+edgenum1+edgenum2);
-		System.out.println("EditDistance:"+EditDistance);//²âÊÔÍ¼±à¼­¾àÀë
-		System.out.println("Similarity:"+Similarity);//²âÊÔÍ¼ÏàËÆ¶È
+		System.out.println("EditDistance:"+EditDistance);//æµ‹è¯•å›¾ç¼–è¾‘è·ç¦»
+		System.out.println("Similarity:"+Similarity);//æµ‹è¯•å›¾ç›¸ä¼¼åº¦
 //		Map<Integer, Integer> map1 = nodes1.get(0).getinMap();		
 //		Map<Integer, Integer> map2 = nodes2.get(0).getinMap();
 //		ArrayList<Integer> integer = new ArrayList<Integer>();
 //		System.out.println(Aggregate.Travel(map1));
-//		System.out.println(Aggregate.Travel(map2));//²âÊÔ0ºÅ³ö±ßÊı×é
+//		System.out.println(Aggregate.Travel(map2));//æµ‹è¯•0å·å‡ºè¾¹æ•°ç»„
 //		integer = Aggregate.intersect(map1, map2);
-//		System.out.println(integer);//²âÊÔ0ºÅ³ö±ß½»¼¯
+//		System.out.println(integer);//æµ‹è¯•0å·å‡ºè¾¹äº¤é›†
 //		Map<Integer, Integer> test1 = nodes1.get(0).getoutMap();
 //		Iterator iter = test1.entrySet().iterator();
 //		while (iter.hasNext()) {			
 //			Map.Entry entry = (Map.Entry) iter.next();
 //			Object key = entry.getKey();
 //			Object val = entry.getValue();
-//			System.out.println(key + " " + val);//²âÊÔ0ºÅ½Úµã³ö¶ÈĞòÁĞ	
+//			System.out.println(key + " " + val);//æµ‹è¯•0å·èŠ‚ç‚¹å‡ºåº¦åºåˆ—	
 //		}
 		return Similarity;
 	}
@@ -159,7 +159,7 @@ public class Matrix {
 				if(!(nodes1.get(i).getName().equals(nodes2.get(j).getName()))){
 //					System.out.println("Node:"+i + " " + j);
 //					System.out.println("Node:"+nodes1.get(i).getName() + " " + nodes2.get(j).getName());
-					nodecost = nodecost+1;//ÖØÃüÃû´ú¼Û
+					nodecost = nodecost+1;//é‡å‘½åä»£ä»·
 					
 				}
 			}
@@ -168,7 +168,7 @@ public class Matrix {
 				
 			}
 			else if(i>=m && i<m+n && j<n){
-				nodecost = nodecost+1;//¿Õ½ÚµãÆ¥ÅäÕæÊµ½Úµãcost+1	
+				nodecost = nodecost+1;//ç©ºèŠ‚ç‚¹åŒ¹é…çœŸå®èŠ‚ç‚¹cost+1	
 			    
 			}
 							
@@ -201,11 +201,11 @@ public class Matrix {
 				source2 = edge2.getSource();
 				target2 = edge2.getTarget();	 			
 				if(change1 == source2 && change2 == target2){
-//					count++;//²»¿¼ÂÇÈ¨ÖØÊ¹ÓÃcount
-//					System.out.println(source1+">"+source2+" "+target1+">"+target2);//²é¿´Æ¥ÅäĞòÁĞ
+//					count++;//ä¸è€ƒè™‘æƒé‡ä½¿ç”¨count
+//					System.out.println(source1+">"+source2+" "+target1+">"+target2);//æŸ¥çœ‹åŒ¹é…åºåˆ—
 					weight2 = edge2.getweight();
 					weight = Math.min(weight1, weight2);
-					edgecost = edgecost+weight;//ÊÇ·ñ¿¼ÂÇÈ¨ÖØ?
+					edgecost = edgecost+weight;//æ˜¯å¦è€ƒè™‘æƒé‡?
 //					System.out.println("weight:"+ weight);
 				}			
 			}
@@ -219,7 +219,7 @@ public class Matrix {
 	
    
 	 public static int[][] CreatCostmatrix(int[][] graph1,int[][] graph2,ArrayList<Node> nodes1,ArrayList<Node> nodes2){
-		 System.out.println("´´½¨ÏûºÄ¾ØÕóÖĞ");
+		 System.out.println("åˆ›å»ºæ¶ˆè€—çŸ©é˜µä¸­");
 		 int m = nodes1.size();
 		 int n = nodes2.size();
 		 double weight_out1;
@@ -247,7 +247,7 @@ public class Matrix {
 				 outedge_cost = (int) Math.abs(weight_out1-weight_out2);
 //				 System.out.println("["+i+"]["+j+"]:");
 				 System.out.println("outedge_cost:"+outedge_cost);
-				 costmatrix[i][j] = relabel_cost+outedge_cost;//×óÉÏ½Ç¾ØÕócost
+				 costmatrix[i][j] = relabel_cost+outedge_cost;//å·¦ä¸Šè§’çŸ©é˜µcost
 			 }
 		 }
 //		 System.out.println("costmatrix:"+costmatrix[1][1]);
@@ -256,9 +256,9 @@ public class Matrix {
 			 weight_out1 = Aggregate.Travel(outmap1);
 			 outedge_cost = (int) weight_out1;
 			 for(int j = n;j<m+n;j++){
-				 costmatrix[i][j] = 0x7fffffff;//ÉèÖÃ·Ç¶Ô½ÇÏßÏûºÄÎªÎŞÇî´ó
+				 costmatrix[i][j] = 0x7fffffff;//è®¾ç½®éå¯¹è§’çº¿æ¶ˆè€—ä¸ºæ— ç©·å¤§
 			 }
-			 costmatrix[i][n+i] = 1+ outedge_cost;//×óÏÂ½Ç¾ØÕó
+			 costmatrix[i][n+i] = 1+ outedge_cost;//å·¦ä¸‹è§’çŸ©é˜µ
 		 }
 		 for(int j = 0;j<n;j++){
 			 outmap2 = nodes2.get(j).getoutMap();
@@ -267,8 +267,8 @@ public class Matrix {
 			 for(int i = m;i<m+n;i++){
 				 costmatrix[i][j] = 0x7fffffff;
 			 }
-			 costmatrix[m+j][j] = 1+ outedge_cost;//ÓÒÉÏ½Ç¾ØÕó
-		 }//ÓÒÏÂ½Ç¾ØÕóÎª¿Õ
+			 costmatrix[m+j][j] = 1+ outedge_cost;//å³ä¸Šè§’çŸ©é˜µ
+		 }//å³ä¸‹è§’çŸ©é˜µä¸ºç©º
 		 return costmatrix;
 	 }	 	 
 	 
@@ -288,28 +288,28 @@ public class Matrix {
 	 }
 	 
 	 public static void Traversal(ArrayList<Node> nodes,int[][] graph){
-		 System.out.println("±éÀúÖĞ");
+		 System.out.println("éå†ä¸­");
 		 int size = nodes.size();
 		 for(int i = 0;i < size;i++){
 			 for(int j = 0;j<size;j++){
 //				if(graph[j][i]!=0){
 //					Node in =  nodes.get(j);
 //					int innum = nodes.get(j).getNum();
-////					System.out.println(innum);//¼ì²éÈë±ßÊı×é
+////					System.out.println(innum);//æ£€æŸ¥å…¥è¾¹æ•°ç»„
 //					nodes.get(i).setParent(in);
-//				    nodes.get(i).setinMap(innum, graph[j][i]);//²»¿¼ÂÇÈ¨ÖØ¾ÍÉèÎª1 										
+//				    nodes.get(i).setinMap(innum, graph[j][i]);//ä¸è€ƒè™‘æƒé‡å°±è®¾ä¸º1 										
 //				}
 				if(graph[i][j]!=0){
 					Node out =  nodes.get(j);
 					int outnum = nodes.get(j).getNum();
-//					System.out.println(outnum);//¼ì²é³ö±ßÊı×é
+//					System.out.println(outnum);//æ£€æŸ¥å‡ºè¾¹æ•°ç»„
 					nodes.get(i).setChild(out);
-					nodes.get(i).setoutMap(outnum, graph[i][j]);//²»¿¼ÂÇÈ¨ÖØ¾ÍÉèÎª1 
+					nodes.get(i).setoutMap(outnum, graph[i][j]);//ä¸è€ƒè™‘æƒé‡å°±è®¾ä¸º1 
 				}				
 			 }			 
 		 }
 			
-	 }//Í¼±éÀúĞ´Èë±ß³ö±ß
+	 }//å›¾éå†å†™å…¥è¾¹å‡ºè¾¹
 	
 	 public static void ReadEdge(List<ITree> list1, List<ITree> list2){
 		 edgenum1 = 0;
@@ -327,7 +327,7 @@ public class Matrix {
 					 edges1.add(edge);
 					 System.out.println(src+"->"+dst);
 					 graph1[src][dst] = 1;
-					 edgenum1 = edgenum1+1;//ÊÇ·ñ¿¼ÂÇÈ¨ÖØ
+					 edgenum1 = edgenum1+1;//æ˜¯å¦è€ƒè™‘æƒé‡
 				 }
 			 }
 		 }
@@ -345,7 +345,7 @@ public class Matrix {
 					 edges2.add(edge);
 					 System.out.println(src+"->"+dst);
 					 graph2[src][dst] = 1;
-					 edgenum2 = edgenum2+1;//ÊÇ·ñ¿¼ÂÇÈ¨ÖØ
+					 edgenum2 = edgenum2+1;//æ˜¯å¦è€ƒè™‘æƒé‡
 				 }
 			 }
 		 }
@@ -402,7 +402,7 @@ public class Matrix {
             fw.close();
         } catch (IOException e1) {
             e1.printStackTrace();
-            System.out.println("Ğ´ÈëÊ§°Ü");
+            System.out.println("å†™å…¥å¤±è´¥");
             System.exit(-1);
         }
     }

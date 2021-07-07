@@ -84,7 +84,7 @@ public class Similarity {
 				ITree par = node.getParent();
 				String parType = tCont.getTypeLabel(par);
 				List<ITree> parChilds = par.getChildren();
-				if(parType.equals("decl")&&parChilds.get(1).equals(node)) {//³éÏóµôdeclµÄµÚ¶ş¸ö½ÚµãÒ²¾ÍÊÇname²¿·ÖµÄÃû×Ö
+				if(parType.equals("decl")&&parChilds.get(1).equals(node)) {//æŠ½è±¡æ‰declçš„ç¬¬äºŒä¸ªèŠ‚ç‚¹ä¹Ÿå°±æ˜¯nameéƒ¨åˆ†çš„åå­—
 					ITree firstChild = parChilds.get(0);
 					String firstType = tCont.getTypeLabel(firstChild);
 					if(firstType.equals("type")) {
@@ -106,6 +106,6 @@ public class Similarity {
 		}
 		bracketTree = bracketTree +"}";
 		return bracketTree;	
-	}//ÊÕ¼¯ASTÊ÷ÖĞËùÓĞµã
+	}//æ”¶é›†ASTæ ‘ä¸­æ‰€æœ‰ç‚¹
 
 }

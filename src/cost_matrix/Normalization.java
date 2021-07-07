@@ -7,7 +7,7 @@ import java.io.IOException;
 
 
 public class Normalization {
-	private static double[][] Smatrix;//ËùÓĞÎÄ¼şµÄÏàËÆ¶È¾ØÕó
+	private static double[][] Smatrix;//æ‰€æœ‰æ–‡ä»¶çš„ç›¸ä¼¼åº¦çŸ©é˜µ
 	private static double Min;
 	private static double Max;
 	
@@ -20,7 +20,7 @@ public class Normalization {
 			size++;		
 		}
 		br.close();
-		System.out.println("size:"+size);//´ÓfileÖĞ¶ÁÈë¾ØÕó´óĞ¡
+		System.out.println("size:"+size);//ä»fileä¸­è¯»å…¥çŸ©é˜µå¤§å°
 		Smatrix = new double[size][size];
 		String txtPath1="D:\\workspace\\eclipse4.3\\Kieker_records_analysis-kieker1.9\\test.txt";
 		BufferedReader br1=new BufferedReader(new FileReader(txtPath1));
@@ -51,12 +51,12 @@ public class Normalization {
 		}
 		br1.close();
 		System.out.println("Min:"+Min);
-		System.out.println("Max:"+Max);//²âÊÔ×î´ó×îĞ¡Öµ
+		System.out.println("Max:"+Max);//æµ‹è¯•æœ€å¤§æœ€å°å€¼
 //		for(int i=0;i<Smatrix.length;i++){
 //			for(int j=0;j<Smatrix.length;j++){
 //				System.out.println(Smatrix[i][j]+",");
 //			}
-//		}//²âÊÔ¾ØÕóÊäÈë
+//		}//æµ‹è¯•çŸ©é˜µè¾“å…¥
 		int num = 0;
 		for(int i=0;i<size;i++){
 			for(int j=0;j<size;j++){
@@ -77,7 +77,7 @@ public class Normalization {
 //				Writetxt(outpath,x1+", ");
 //			}
 //			Writetxt(outpath,"\r\n");
-//		}//ÊıÖµ¹éÒ»»¯
+//		}//æ•°å€¼å½’ä¸€åŒ–
 		
 	}
 	
@@ -90,7 +90,7 @@ public class Normalization {
             fw.close();
         } catch (IOException e1) {
             e1.printStackTrace();
-            System.out.println("Ğ´ÈëÊ§°Ü");
+            System.out.println("å†™å…¥å¤±è´¥");
             System.exit(-1);
         }
     }

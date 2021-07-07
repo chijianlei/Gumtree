@@ -19,7 +19,7 @@ public class Test {
 	private static double[][] Smatrix;
 	
 	/**
-	 * ±È½Ï°üÄÚÍâµÄÏàËÆ¶È
+	 * æ¯”è¾ƒåŒ…å†…å¤–çš„ç›¸ä¼¼åº¦
 	 */	
 	
 	public static void main(String[] args) throws Exception {
@@ -39,7 +39,7 @@ public class Test {
 		br.close();
 //		for(int i=0;i<targetfile.size();i++){
 //			String tmp = targetfile.get(i);
-//			double avg = test.avgS(tmp);//¼ÆËãÏàÍ¬ÎÄ¼ş¼ĞÏàËÆ¶È
+//			double avg = test.avgS(tmp);//è®¡ç®—ç›¸åŒæ–‡ä»¶å¤¹ç›¸ä¼¼åº¦
 //			System.out.println("avg:"+avg);
 //			System.out.println("--------------");
 //		}
@@ -50,7 +50,7 @@ public class Test {
 				String name2 = targetfile.get(j);
 				if(name1.equals(name2))
 					continue;
-				double avg = test.avgS(name1, name2);//¼ÆËã²»Í¬ÎÄ¼ş¼Ğ¼äÏàËÆ¶È
+				double avg = test.avgS(name1, name2);//è®¡ç®—ä¸åŒæ–‡ä»¶å¤¹é—´ç›¸ä¼¼åº¦
 				System.out.println("name1:"+name1+" name2:"+name2);
 				System.out.println("avg:"+avg);
 				System.out.println("--------------");
@@ -76,7 +76,7 @@ public class Test {
 			}
 			wr.newLine();
 			wr.flush();
-		}//Êä³ö°ü¼äÏàËÆ¶È¾ØÕó
+		}//è¾“å‡ºåŒ…é—´ç›¸ä¼¼åº¦çŸ©é˜µ
 		wr.close();
 		
 		String path5 = "matrix1.csv";
@@ -99,7 +99,7 @@ public class Test {
 				if(tmp<min)
 					min = tmp;
 			}
-			avg = avg/(targetfile.size()-1);//Æ½¾ù°ü¼äÏàËÆ¶È
+			avg = avg/(targetfile.size()-1);//å¹³å‡åŒ…é—´ç›¸ä¼¼åº¦
 			wr1.append(targetfile.get(i)+",");
 			wr1.append(String.valueOf(avg)+",");
 			wr1.append(String.valueOf(max)+",");
@@ -141,7 +141,7 @@ public class Test {
 			num++;
 		}
 		br1.close();
-	}//¶ÁÈ¡ÏàËÆ¶È¾ØÕóºÍÎÄ¼şÃû
+	}//è¯»å–ç›¸ä¼¼åº¦çŸ©é˜µå’Œæ–‡ä»¶å
 	
 	public double avgS(String name1) throws Exception{
 		ArrayList<Double> avgs = new ArrayList<>();
@@ -152,10 +152,10 @@ public class Test {
 			if(value.contains(name1)){
 				files1.add(key);
 			}
-		}//¾ØÕóÖĞ¶ÁÈëËùĞèÎÄ¼şÃû¶ÔÓ¦ĞÅÏ¢
+		}//çŸ©é˜µä¸­è¯»å…¥æ‰€éœ€æ–‡ä»¶åå¯¹åº”ä¿¡æ¯
 		System.out.println("size:"+files1.size());	
 		if(files1.isEmpty())
-			throw new Exception("²»ÄÜÎª¿Õ£¡");
+			throw new Exception("ä¸èƒ½ä¸ºç©ºï¼");
 		
 		double avg = 0.0;
 		for(int i=0;i<files1.size();i++){
@@ -169,7 +169,7 @@ public class Test {
 		}
 		avg = avg/(files1.size()*(files1.size()-1));	
 		return avg;
-	}//¼ÆËãÍ¬ÎÄ¼ş¼ĞÖ®¼äÏàËÆ¶È
+	}//è®¡ç®—åŒæ–‡ä»¶å¤¹ä¹‹é—´ç›¸ä¼¼åº¦
 	
 	public double avgS(String name1, String name2) throws Exception{
 		ArrayList<Integer> files1 = new ArrayList<>();
@@ -184,9 +184,9 @@ public class Test {
 			if(value.contains(name2)){
 				files2.add(key);
 			}
-		}//¾ØÕóÖĞ¶ÁÈëËùĞèÎÄ¼şÃû¶ÔÓ¦ĞÅÏ¢
+		}//çŸ©é˜µä¸­è¯»å…¥æ‰€éœ€æ–‡ä»¶åå¯¹åº”ä¿¡æ¯
 		if(files1.isEmpty()||files2.isEmpty())
-			throw new Exception("²»ÄÜÎª¿Õ£¡");
+			throw new Exception("ä¸èƒ½ä¸ºç©ºï¼");
 		
 		for(int i=0;i<files1.size();i++){
 			double avg = 0.0;
@@ -199,7 +199,7 @@ public class Test {
 				int y = files2.get(k);
 				avg= avg+Smatrix[y][x];
 			}
-			avg = avg/(2*files2.size());//´Ë´¦²»ÓÃ-1
+			avg = avg/(2*files2.size());//æ­¤å¤„ä¸ç”¨-1
 			System.out.println(avg);
 			avgs.add(avg);	
 		}
@@ -210,6 +210,6 @@ public class Test {
 		}
 		avg = avg/files1.size();
 		return avg;
-	}//¼ÆËã²»Í¬ÎÄ¼ş¼ĞÖ®¼äÏàËÆ¶È
+	}//è®¡ç®—ä¸åŒæ–‡ä»¶å¤¹ä¹‹é—´ç›¸ä¼¼åº¦
 
 }

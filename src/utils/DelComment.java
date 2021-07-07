@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
  
 /**
- * É¾³ıJava´úÂëÖĞµÄ×¢ÊÍ
+ * åˆ é™¤Javaä»£ç ä¸­çš„æ³¨é‡Š
  * 
  * @author Alive
  * @build 2010-12-23
@@ -17,23 +17,23 @@ import java.io.OutputStreamWriter;
 public class DelComment {
 	
 	public static void main(String[] args) {
-      clearComment("migrations_test"); //É¾³ıÄ¿Â¼ÏÂËùÓĞjava||cppÎÄ¼ş×¢ÊÍ
-      clearInclude("migrations_test"); //É¾³ıÄ¿Â¼ÏÂËùÓĞjava||cppÎÄ¼şheader
-      //É¾³ıÄ³¸ö¾ßÌåÎÄ¼şµÄ×¢ÊÍ
+      clearComment("migrations_test"); //åˆ é™¤ç›®å½•ä¸‹æ‰€æœ‰java||cppæ–‡ä»¶æ³¨é‡Š
+      clearInclude("migrations_test"); //åˆ é™¤ç›®å½•ä¸‹æ‰€æœ‰java||cppæ–‡ä»¶header
+      //åˆ é™¤æŸä¸ªå…·ä½“æ–‡ä»¶çš„æ³¨é‡Š
 //      clearComment("Absolute3DLocalizationElement2.cpp");
   }
  
     private static int count = 0;
  
     /**
-     * É¾³ıÎÄ¼şÖĞµÄ¸÷ÖÖ×¢ÊÍ£¬°üº¬//¡¢/* * /µÈ
-     * @param charset ÎÄ¼ş±àÂë
-     * @param file ÎÄ¼ş
+     * åˆ é™¤æ–‡ä»¶ä¸­çš„å„ç§æ³¨é‡Šï¼ŒåŒ…å«//ã€/* * /ç­‰
+     * @param charset æ–‡ä»¶ç¼–ç 
+     * @param file æ–‡ä»¶
      */
     public static void clearComment(File file, String charset) {
         try {
-        	System.out.println("-----¿ªÊ¼´¦ÀíÎÄ¼ş£º" + file.getAbsolutePath());
-            //µİ¹é´¦ÀíÎÄ¼ş¼Ğ
+        	System.out.println("-----å¼€å§‹å¤„ç†æ–‡ä»¶ï¼š" + file.getAbsolutePath());
+            //é€’å½’å¤„ç†æ–‡ä»¶å¤¹
             if (!file.exists()) {
                 return;
             }
@@ -41,15 +41,15 @@ public class DelComment {
             if (file.isDirectory()) {
                 File[] files = file.listFiles();
                 for (File f : files) {
-                    clearComment(f, charset); //µİ¹éµ÷ÓÃ
+                    clearComment(f, charset); //é€’å½’è°ƒç”¨
                 }
                 return;
             } else if (!file.getName().endsWith(".cpp")&&!file.getName().endsWith(".java")) {
-                //·Çcpp or javaÎÄ¼şÖ±½Ó·µ»Ø
+                //écpp or javaæ–‡ä»¶ç›´æ¥è¿”å›
                 return;
             }           
  
-            //¸ù¾İ¶ÔÓ¦µÄ±àÂë¸ñÊ½¶ÁÈ¡
+            //æ ¹æ®å¯¹åº”çš„ç¼–ç æ ¼å¼è¯»å–
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
             StringBuffer content = new StringBuffer();
             String tmp = null;
@@ -59,29 +59,29 @@ public class DelComment {
             }
             reader.close();
             String target = content.toString();
-            //String s = target.replaceAll("\\/\\/[^\\n]*|\\/\\*([^\\*^\\/]*|[\\*^\\/*]*|[^\\**\\/]*)*\\*\\/", ""); //±¾¶ÎÕıÔòÕª×ÔÍøÉÏ£¬ÓĞÒ»ÖÖÇé¿öÎŞ·¨Âú×ã£¨/* ...**/£©£¬ÂÔ×÷ĞŞ¸Ä
+            //String s = target.replaceAll("\\/\\/[^\\n]*|\\/\\*([^\\*^\\/]*|[\\*^\\/*]*|[^\\**\\/]*)*\\*\\/", ""); //æœ¬æ®µæ­£åˆ™æ‘˜è‡ªç½‘ä¸Šï¼Œæœ‰ä¸€ç§æƒ…å†µæ— æ³•æ»¡è¶³ï¼ˆ/* ...**/ï¼‰ï¼Œç•¥ä½œä¿®æ”¹
             String s = target.replaceAll("\\/\\/[^\\n]*|\\/\\*([^\\*^\\/]*|[\\*^\\/*]*|[^\\**\\/]*)*\\*+\\/", "");
             //System.out.println(s);
-            //Ê¹ÓÃ¶ÔÓ¦µÄ±àÂë¸ñÊ½Êä³ö
+            //ä½¿ç”¨å¯¹åº”çš„ç¼–ç æ ¼å¼è¾“å‡º
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset));
             out.write(s);
             out.flush();
             out.close();
             count++;
-            System.out.println("-----ÎÄ¼ş´¦ÀíÍê³É---" + count);
+            System.out.println("-----æ–‡ä»¶å¤„ç†å®Œæˆ---" + count);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
     /**
-              ·¢ÏÖ²»Ò»ÑùµÄinclude»áÑÏÖØÓ°ÏìactionÉú³É£¬ÊÇ·ñÊÇÃ»µ¼ÈëdependencyµÄ¹ØÏµ£¿
+              å‘ç°ä¸ä¸€æ ·çš„includeä¼šä¸¥é‡å½±å“actionç”Ÿæˆï¼Œæ˜¯å¦æ˜¯æ²¡å¯¼å…¥dependencyçš„å…³ç³»ï¼Ÿ
     */
     
     public static void clearInclude(File file, String charset) {
         try {
-        	System.out.println("-----¿ªÊ¼´¦ÀíÎÄ¼ş£º" + file.getAbsolutePath());
-            //µİ¹é´¦ÀíÎÄ¼ş¼Ğ
+        	System.out.println("-----å¼€å§‹å¤„ç†æ–‡ä»¶ï¼š" + file.getAbsolutePath());
+            //é€’å½’å¤„ç†æ–‡ä»¶å¤¹
             if (!file.exists()) {
                 return;
             }
@@ -89,15 +89,15 @@ public class DelComment {
             if (file.isDirectory()) {
                 File[] files = file.listFiles();
                 for (File f : files) {
-                	clearInclude(f, charset); //µİ¹éµ÷ÓÃ
+                	clearInclude(f, charset); //é€’å½’è°ƒç”¨
                 }
                 return;
             } else if (!file.getName().endsWith(".cpp")&&!file.getName().endsWith(".java")) {
-                //·Çcpp or javaÎÄ¼şÖ±½Ó·µ»Ø
+                //écpp or javaæ–‡ä»¶ç›´æ¥è¿”å›
                 return;
             }           
  
-            //¸ù¾İ¶ÔÓ¦µÄ±àÂë¸ñÊ½¶ÁÈ¡
+            //æ ¹æ®å¯¹åº”çš„ç¼–ç æ ¼å¼è¯»å–
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
             StringBuffer content = new StringBuffer();
             String tmp = null;
@@ -115,7 +115,7 @@ public class DelComment {
             out.flush();
             out.close();
             count++;
-            System.out.println("-----ÎÄ¼ş´¦ÀíÍê³É---" + count);
+            System.out.println("-----æ–‡ä»¶å¤„ç†å®Œæˆ---" + count);
         } catch (Exception e) {
             e.printStackTrace();
         }

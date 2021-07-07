@@ -13,7 +13,7 @@ public class SubTree {
 	private int stNum;
 	private String miName;
 	private ArrayList<ITree> parBlocks;
-	private List<ITree> pars;//因为subtree同父亲已断开，计算pars调用这个List
+	private List<ITree> pars;//鍥犱负subtree鍚岀埗浜插凡鏂紑锛岃绠梡ars璋冪敤杩欎釜List
 	
 	public SubTree(ITree node, TreeContext context, int count, String name) {
 		root = node;

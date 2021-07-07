@@ -40,7 +40,7 @@ public class CompositeMatchers {
                     new GreedySubtreeMatcher(src, dst, store),
                     new GreedyBottomUpMatcher(src, dst, store)
             });
-//            System.out.println("ClassicGumtree");
+            System.out.println("ClassicGumtree");
         }
     }
 

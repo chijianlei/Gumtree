@@ -20,9 +20,9 @@ public class test1 {
         map.put("b", 3);
         map.put("c", 1);
  
-        // Í¨¹ıArrayList¹¹Ôìº¯Êı°Ñmap.entrySet()×ª»»³Élist
+        // é€šè¿‡ArrayListæ„é€ å‡½æ•°æŠŠmap.entrySet()è½¬æ¢æˆlist
         List<Map.Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(map.entrySet());
-        // Í¨¹ı±È½ÏÆ÷ÊµÏÖ±È½ÏÅÅĞò
+        // é€šè¿‡æ¯”è¾ƒå™¨å®ç°æ¯”è¾ƒæ’åº
         Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
             public int compare(Map.Entry<String, Integer> mapping1, Map.Entry<String, Integer> mapping2) {
                 return mapping2.getValue().compareTo(mapping1.getValue());

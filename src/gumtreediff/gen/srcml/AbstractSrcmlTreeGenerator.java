@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with GumTree.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright 2016 Jean-RÃ©my Falleri <jr.falleri@gmail.com>
+ * Copyright 2016 Jean-RèŒ…my Falleri <jr.falleri@gmail.com>
  */
 
 package gumtreediff.gen.srcml;
@@ -46,7 +46,7 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
 
     private Set<String> labeled = new HashSet<String>(
             Arrays.asList("specifier", "name", "comment", "literal", "operator",
-            		"modifier", "include", "directive", "file", "argument", "value"));//µÚ¶şĞĞgumtree±¾ÉíÎ´Ìí¼Ó
+            		"modifier", "include", "directive", "file", "argument", "value"));//ç¬¬äºŒè¡Œgumtreeæœ¬èº«æœªæ·»åŠ 
 
     private StringBuilder currentLabel;
 
@@ -79,7 +79,7 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
                     	int type = typeLabel.hashCode();
                     	ITree t = context.createTree(type, "", typeLabel);
                     	trees.addFirst(t);
-                    	continue;//²»ĞèÒªcomment½Úµã
+                    	continue;//ä¸éœ€è¦commentèŠ‚ç‚¹
                     }else {
                         int type = typeLabel.hashCode();
                         ITree t = context.createTree(type, "", typeLabel);
@@ -89,6 +89,7 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
                             t.setPos(0);
                         } else {
                             t.setParentAndUpdateChildren(trees.peekFirst());
+//                            System.out.println("setpos");
                             setPos(t, s);
                         }
                         trees.addFirst(t);
@@ -144,6 +145,8 @@ public abstract class AbstractSrcmlTreeGenerator extends TreeGenerator {
         if (e.getAttributeByName(LINE) != null) {
             int line = Integer.parseInt(e.getAttributeByName(LINE).getValue());
             int column = Integer.parseInt(e.getAttributeByName(COLUMN).getValue());
+//            System.out.println("line:"+line);
+//            System.out.println("column"+column);
             t.setPos(lr.positionFor(line, column));
             t.setLine(line);
             t.setColumn(column);

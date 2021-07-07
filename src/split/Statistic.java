@@ -33,7 +33,7 @@ public class Statistic {
 			inputName = dir.getName();
 			File[] files = dir.listFiles(); 
 			String testName = files[0].getAbsolutePath();
-			String miName = testName.split("\\\\")[testName.split("\\\\").length-1];//±ê¼ÇÎÄ¼şÃû
+			String miName = testName.split("\\\\")[testName.split("\\\\").length-1];//æ ‡è®°æ–‡ä»¶å
 			String output = miName.substring(0, miName.length()-4)+".txt";
 			System.out.println(output);
 			File[] fileList = (new File("D:\\workspace\\eclipse2018\\gumtree")).listFiles();

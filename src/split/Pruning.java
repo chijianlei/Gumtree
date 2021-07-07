@@ -73,10 +73,10 @@ public class Pruning {
 			ITree par = node.getParent();
 			List<ITree> children = par.getChildren();
 			int pos = children.indexOf(node);
-			children.remove(node);//¶Ï¿ª¸¸Ç×ºÍËùÓĞblock nodeµÄÁ¬½Ó
+			children.remove(node);//æ–­å¼€çˆ¶äº²å’Œæ‰€æœ‰block nodeçš„è¿æ¥
 			PruneTuple pt = new PruneTuple(par, node, pos);
 			pts1.add(pt);
-			node.setParent(null);//ÊÇ·ñĞèÒª¶Ï¿ªblock node¸ú¸¸Ç×µÄÁ¬½ÓÄØ?	
+			node.setParent(null);//æ˜¯å¦éœ€è¦æ–­å¼€block nodeè·Ÿçˆ¶äº²çš„è¿æ¥å‘¢?	
 		}
 		for(ITree node : results2) {
 			int id = node.getId();
@@ -84,10 +84,10 @@ public class Pruning {
 			ITree par = node.getParent();
 			List<ITree> children = par.getChildren();
 			int pos = children.indexOf(node);
-			children.remove(node);//¶Ï¿ª¸¸Ç×ºÍËùÓĞblock nodeµÄÁ¬½Ó
+			children.remove(node);//æ–­å¼€çˆ¶äº²å’Œæ‰€æœ‰block nodeçš„è¿æ¥
 			PruneTuple pt = new PruneTuple(par, node, pos);
 			pts2.add(pt);	
-			node.setParent(null);//ÊÇ·ñĞèÒª¶Ï¿ªblock node¸ú¸¸Ç×µÄÁ¬½ÓÄØ?	
+			node.setParent(null);//æ˜¯å¦éœ€è¦æ–­å¼€block nodeè·Ÿçˆ¶äº²çš„è¿æ¥å‘¢?	
 		}
 		List<ITree> after1 = root1.getDescendants();
         List<ITree> after2 = root2.getDescendants();
